@@ -775,7 +775,22 @@ app.factory('restaurantSchema', function() {
 				name: '',
 				desc: '',
 				slogan: '',
-				cuisine: ''
+				cuisine: '',
+				featured: '',
+				sunOpen: '',
+				sunClose: '',
+				monOpen: '',
+				monClose: '',
+				tueOpen: '',
+				tueClose: '',
+				wedOpen: '',
+				wedClose: '',
+				thuOpen: '',
+				thuClose: '',
+				friOpen: '',
+				friClose: '',
+				satOpen: '',
+				satClose: '',
 			}
 		},
 
