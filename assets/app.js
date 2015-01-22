@@ -777,20 +777,36 @@ app.factory('restaurantSchema', function() {
 				slogan: '',
 				cuisine: '',
 				featured: '',
-				sunOpen: '',
-				sunClose: '',
-				monOpen: '',
-				monClose: '',
-				tueOpen: '',
-				tueClose: '',
-				wedOpen: '',
-				wedClose: '',
-				thuOpen: '',
-				thuClose: '',
-				friOpen: '',
-				friClose: '',
-				satOpen: '',
-				satClose: '',
+				hours: {
+					0: {
+						open: '',
+						close: ''
+					},
+					1: {
+						open: '',
+						close: ''
+					},
+					2: {
+						open: '',
+						close: ''
+					},
+					3: {
+						open: '',
+						close: ''
+					},
+					4: {
+						open: '',
+						close: ''
+					},
+					5: {
+						open: '',
+						close: ''
+					},
+					6: {
+						open: '',
+						close: ''
+					}
+				}
 			}
 		},
 
