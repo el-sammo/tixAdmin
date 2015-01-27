@@ -33,22 +33,78 @@
 		</div>
 
 		<div class="form-group">
-			<label for="availStart" class="col-md-1 control-label">Start Time</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="menu.availStart" id="availStart"
-				>
+			<div class="col-md-3 control-label">Active</div>
+			<div class="col-md-9">
+				<input type="radio" ng-model="menu.active" id="active" name="active" value="true">Yes<br>
+				<input type="radio" ng-model="menu.active" id="active" name="active" value="false">No<br>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="availEnd" class="col-md-1 control-label">End Time</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="menu.availEnd" id="availEnd"
-				>
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="availStart" class="col-md-6 control-label">Start Time</label>
+						<div class="col-md-6">
+							<select name="availStart" ng-model="menu.availStart" id="availStart">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="availEnd" class="col-md-6 control-label">End Time</label>
+						<div class="col-md-6">
+							<select	name="availEnd" ng-model="menu.availEnd" id="availEnd">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 

@@ -911,10 +911,7 @@ app.controller('RestaurantsAddController', function(
 
 	$scope.restaurant.areaId = areaSchema.defaults.area.id;
 
-	console.log($scope.restaurant);
-
 	$scope.save = function save(restaurant, options) {
-		console.log(restaurant);
 		options || (options = {});
 
 		$http.post(
@@ -1000,6 +997,7 @@ app.factory('menuSchema', function() {
 				restaurantId: '',
 				name: '',
 				desc: '',
+				active: '',
 				availStart: '',
 				availEnd: ''
 			}
