@@ -1204,7 +1204,9 @@ app.factory('itemSchema', function() {
 			item: {
 				menuId: '',
 				name: '',
-				desc: ''
+				desc: '',
+				image: '',
+				active: ''
 			}
 		},
 
