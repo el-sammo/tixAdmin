@@ -13,8 +13,8 @@
 	</div>
 	<form name="form" class="form-horizontal">
 		<div class="form-group">
-			<label for="name" class="col-md-1 control-label">Restaurant Name</label>
-			<div class="col-md-11">
+			<label for="name" class="col-md-3 control-label">Restaurant Name</label>
+			<div class="col-md-9">
 				<input 
 					type="text" class="form-control" placeholder="Name"
 					ng-model="restaurant.name" id="name"
@@ -23,8 +23,8 @@
 		</div>
 
 		<div class="form-group">
-			<label for="desc" class="col-md-1 control-label">Description</label>
-			<div class="col-md-11">
+			<label for="desc" class="col-md-3 control-label">Description</label>
+			<div class="col-md-9">
 				<input 
 					type="text" class="form-control" placeholder="Authentic Italian Cuisine"
 					ng-model="restaurant.desc" id="desc"
@@ -33,8 +33,8 @@
 		</div>
 
 		<div class="form-group">
-			<label for="slogan" class="col-md-1 control-label">Slogan</label>
-			<div class="col-md-11">
+			<label for="slogan" class="col-md-3 control-label">Slogan</label>
+			<div class="col-md-9">
 				<input 
 					type="text" class="form-control" placeholder="When you're here, you're family!"
 					ng-model="restaurant.slogan" id="slogan"
@@ -43,237 +43,527 @@
 		</div>
 
 		<div class="form-group">
-			<label for="cuisine" class="col-md-1 control-label">Cuisine Type</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="italian"
-					ng-model="restaurant.cuisine" id="cuisine"
-				>
+			<label for="cuisine" class="col-md-3 control-label">Cuisine Type</label>
+			<div class="col-md-9">
+				<select name="cuisine" ng-model="restaurant.cuisine" id="cuisine">
+				 	<option value="American">American</option>	
+				 	<option value="Bar & Grill">Bar & Grill</option>	
+				 	<option value="BBQ">BBQ</option>	
+				 	<option value="Burgers">Burgers</option>	
+				 	<option value="Cajun and Creole">Cajun and Creole</option>	
+				 	<option value="Chinese">Chinese</option>	
+				 	<option value="Deli">Deli</option>	
+				 	<option value="French">French</option>	
+				 	<option value="Greek">Greek</option>	
+				 	<option value="Italian">Italian</option>	
+					<option value="Japanese">Japanese</option>	
+					<option value="Korean">Korean</option>	
+					<option value="Mexican">Mexican</option>	
+					<option value="Pizza">Pizza</option>	
+					<option value="Sandwiches">Sandwiches</option>	
+					<option value="Seafood">Seafood</option>	
+					<option value="Shakes & Smoothies">Shakes & Smoothies</option>	
+					<option value="Steakhouse">Steakhouse</option>	
+					<option value="Sushi">Sushi</option>	
+					<option value="Thai">Thai</option>	
+					<option value="Wings">Wings</option>	
+				</select>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="featured" class="col-md-1 control-label">Featured</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="true"
-					ng-model="restaurant.featured" id="featured"
-				>
+			<div class="col-md-3 control-label">Featured</div>
+			<div class="col-md-9">
+				<input type="radio" ng-model="restaurant.featured" id="featured" name="featured" value="true">Yes<br>
+				<input type="radio" ng-model="restaurant.featured" id="featured" name="featured" value="false">No<br>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="hours0open" class="col-md-1 control-label">Sunday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.0.open" id="hours0open"
-				>
+			<div class="col-md-3 control-label">Active</div>
+			<div class="col-md-9">
+				<input type="radio" ng-model="restaurant.active" id="active" name="active" value="true">Yes<br>
+				<input type="radio" ng-model="restaurant.active" id="active" name="active" value="false">No<br>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="hours0close" class="col-md-1 control-label">Sunday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.0.close" id="hours0close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours1open" class="col-md-1 control-label">Monday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.1.open" id="hours1open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours1close" class="col-md-1 control-label">Monday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.1.close" id="hours1close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours2open" class="col-md-1 control-label">Tuesday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.2.open" id="hours2open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours2close" class="col-md-1 control-label">Tuesday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.2.close" id="hours2close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours3open" class="col-md-1 control-label">Wednesday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.3.open" id="hours3open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours3close" class="col-md-1 control-label">Wednesday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.3.close" id="hours3close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours4open" class="col-md-1 control-label">Thursday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.4.open" id="hours4open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours4close" class="col-md-1 control-label">Thursday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.4.close" id="hours4close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours5open" class="col-md-1 control-label">Friday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.5.open" id="hours5open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours5close" class="col-md-1 control-label">Friday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.5.close" id="hours5close"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours6open" class="col-md-1 control-label">Saturday Open</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="10:00:00"
-					ng-model="restaurant.hours.6.open" id="hours6open"
-				>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="hours6close" class="col-md-1 control-label">Saturday Close</label>
-			<div class="col-md-11">
-				<input 
-					type="text" class="form-control" placeholder="22:00:00"
-					ng-model="restaurant.hours.6.close" id="hours6close"
-				>
-			</div>
-		</div>
-
-		<!--
-		<div class="form-group">
-			<label class="col-md-1 control-label">Web Locations</label>
-			<div class="col-md-11 controls pod-row">
-				<div 
-					class="col-md-3 pod pod-default" 
-					ng-repeat="(idx, link) in restaurant.links"
-				>
-					<div class="pod-body">
-						<div class="row">
-							<select class="form-control" ng-model="link.type">
-								<option value="website">Website</option>
-								<option value="facebook">Facebook</option>
-								<option value="twitter">Twitter</option>
-								<option value="instagram">Instagram</option>
-								<option value="pinterest">Pinterest</option>
-								<option value="other">Other</option>
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours0open" class="col-md-6 control-label">Sunday Open</label>
+						<div class="col-md-6">
+							<select name="hours0open" ng-model="restaurant.hours0open" id="hours0open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
 							</select>
 						</div>
-						<div class="row" ng-show="link.type == 'other'">
-							<div class="input-group">
-								<span class="input-group-addon">Location Type:</span>
-								<input 
-									type="text" class="form-control"
-									placeholder="Eg. Google+, Flickr, etc."
-									ng-model="link.otherType"
-								>
-							</div>
-						</div>
-						<div class="row">
-							<div class="input-group">
-								<span class="input-group-addon">
-									{{restaurantConfig.links[link.type].addon}}
-								</span>
-								<input 
-									type="text" class="form-control"
-									placeholder="{{restaurantConfig.links[link.type].placeholder(restaurant)}}"
-									ng-model="link.url"
-								>
-							</div>
-						</div>
 					</div>
-					<div class="pod-controls">
-						<button 
-							type="button" class="close" aria-label="Delete"
-							ng-click="$pod.remove(restaurant.links, idx, defaultLink)"
-						>
-							<span aria-hidden="true">
-								<i class="fa fa-times"></i>
-							</span>
-						</button>
-						<button 
-							type="button" class="close" aria-label="Copy"
-							ng-click="$pod.copy(restaurant.links, idx)"
-						>
-							<span aria-hidden="true">
-								<i class="fa fa-copy"></i>
-							</span>
-						</button>
-						<button
-							type="button" class="close" aria-label="Add"
-							ng-click="$pod.add(restaurant.links, idx, defaultLink)"
-						>
-							<span aria-hidden="true">
-								<i class="fa fa-plus-square"></i>
-							</span>
-						</button>
+					<div class="col-md-4">
+						<label for="hours0close" class="col-md-6 control-label">Sunday Close</label>
+						<div class="col-md-6">
+							<select	name="hours0close" ng-model="restaurant.hours0close" id="hours0close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
--->
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours1open" class="col-md-6 control-label">Monday Open</label>
+						<div class="col-md-6">
+							<select name="hours1open" ng-model="restaurant.hours1open" id="hours1open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours1close" class="col-md-6 control-label">Monday Close</label>
+						<div class="col-md-6">
+							<select	name="hours1close" ng-model="restaurant.hours1close" id="hours1close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours2open" class="col-md-6 control-label">Tuesday Open</label>
+						<div class="col-md-6">
+							<select name="hours2open" ng-model="restaurant.hours2open" id="hours2open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours2close" class="col-md-6 control-label">Tuesday Close</label>
+						<div class="col-md-6">
+							<select	name="hours2close" ng-model="restaurant.hours2close" id="hours2close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours3open" class="col-md-6 control-label">Wednesday Open</label>
+						<div class="col-md-6">
+							<select name="hours3open" ng-model="restaurant.hours3open" id="hours3open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours3close" class="col-md-6 control-label">Wednesday Close</label>
+						<div class="col-md-6">
+							<select	name="hours3close" ng-model="restaurant.hours3close" id="hours3close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours4open" class="col-md-6 control-label">Thursday Open</label>
+						<div class="col-md-6">
+							<select name="hours4open" ng-model="restaurant.hours4open" id="hours4open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours4close" class="col-md-6 control-label">Thursday Close</label>
+						<div class="col-md-6">
+							<select	name="hours4close" ng-model="restaurant.hours4close" id="hours4close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours5open" class="col-md-6 control-label">Friday Open</label>
+						<div class="col-md-6">
+							<select name="hours5open" ng-model="restaurant.hours5open" id="hours5open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours5close" class="col-md-6 control-label">Friday Close</label>
+						<div class="col-md-6">
+							<select	name="hours5close" ng-model="restaurant.hours5close" id="hours5close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-2">
+					</div>
+					<div class="col-md-4">
+						<label for="hours6open" class="col-md-6 control-label">Saturday Open</label>
+						<div class="col-md-6">
+							<select name="hours6open" ng-model="restaurant.hours6open" id="hours6open">
+								<option value="21600">6:00 am</option>
+								<option value="23400">6:30 am</option>
+								<option value="25200">7:00 am</option>
+								<option value="27000">7:30 am</option>
+								<option value="28800">8:00 am</option>
+								<option value="30600">8:30 am</option>
+								<option value="32400">9:00 am</option>
+								<option value="34200">9:30 am</option>
+								<option value="36000">10:00 am</option>
+								<option value="37800">10:30 am</option>
+								<option value="39600">11:00 am</option>
+								<option value="41400">11:30 am</option>
+								<option value="43200">12:00 pm</option>
+								<option value="45000">12:30 pm</option>
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<label for="hours6close" class="col-md-6 control-label">Saturday Close</label>
+						<div class="col-md-6">
+							<select	name="hours6close" ng-model="restaurant.hours6close" id="hours6close">
+								<option value="46800">1:00 pm</option>
+								<option value="48600">1:30 pm</option>
+								<option value="50400">2:00 pm</option>
+								<option value="52200">2:30 pm</option>
+								<option value="54000">3:00 pm</option>
+								<option value="55800">3:30 pm</option>
+								<option value="57600">4:00 pm</option>
+								<option value="59400">4:30 pm</option>
+								<option value="61200">5:00 pm</option>
+								<option value="63000">5:30 pm</option>
+								<option value="64800">6:00 pm</option>
+								<option value="66600">6:30 pm</option>
+								<option value="68400">7:00 pm</option>
+								<option value="70200">7:30 pm</option>
+								<option value="72000">8:00 pm</option>
+								<option value="73800">8:30 pm</option>
+								<option value="75600">9:00 pm</option>
+								<option value="77400">9:30 pm</option>
+								<option value="79200">10:00 pm</option>
+								<option value="81000">10:30 pm</option>
+								<option value="82800">11:00 pm</option>
+								<option value="84600">11:30 pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br><br>
 
 		<div class="navbar navbar-default navbar-fixed-bottom">
 			<div class="container-fluid">

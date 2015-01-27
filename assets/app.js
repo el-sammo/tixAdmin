@@ -777,36 +777,21 @@ app.factory('restaurantSchema', function() {
 				slogan: '',
 				cuisine: '',
 				featured: '',
-				hours: {
-					0: {
-						open: '',
-						close: ''
-					},
-					1: {
-						open: '',
-						close: ''
-					},
-					2: {
-						open: '',
-						close: ''
-					},
-					3: {
-						open: '',
-						close: ''
-					},
-					4: {
-						open: '',
-						close: ''
-					},
-					5: {
-						open: '',
-						close: ''
-					},
-					6: {
-						open: '',
-						close: ''
-					}
-				}
+				active: '',
+				hours0open: '',
+				hours0close: '',
+				hours1open: '',
+				hours1close: '',
+				hours2open: '',
+				hours2close: '',
+				hours3open: '',
+				hours3close: '',
+				hours4open: '',
+				hours4close: '',
+				hours5open: '',
+				hours5close: '',
+				hours6open: '',
+				hours6close: '',
 			}
 		},
 
@@ -926,7 +911,10 @@ app.controller('RestaurantsAddController', function(
 
 	$scope.restaurant.areaId = areaSchema.defaults.area.id;
 
+	console.log($scope.restaurant);
+
 	$scope.save = function save(restaurant, options) {
+		console.log(restaurant);
 		options || (options = {});
 
 		$http.post(
