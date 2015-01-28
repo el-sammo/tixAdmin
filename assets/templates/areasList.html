@@ -1,0 +1,38 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{area.name}} <small>RESTAURANTS</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add/{{area.id}}" class="pull-right">
+    <button id="restaurantAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="restaurantAdd" class="fa-btn-text divspan">Add a Restaurant to {{area.name}}</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Restaurant</h3>
+			</td>
+			<td>
+				<h3>Edit</h3>
+			</td>
+			<td>
+				<h3>View Menus</h3>
+			</td>
+		</tr>
+		<tr ng-init="restaurantId = restaurant.id" ng-repeat="restaurant in restaurants">
+			<td>
+				<span>{{restaurant.name}}</span>
+			</td>
+			<td>
+				<span><a href="#/restaurants/edit/{{restaurantId}}">Edit {{restaurant.name}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/menus/{{restaurantId}}">View {{restaurant.name}} Menus</a></span>
+			</td>
+		</tr>
+	</table>
+</div>

@@ -14,7 +14,7 @@ app.config(function($routeProvider) {
 
 	$routeProvider.when('/', {
 		controller: 'AreasListController',
-		templateUrl: '/templates/list.html'
+		templateUrl: '/templates/areasList.html'
 	});
 
 	$routeProvider.when('/areas/add', {
@@ -27,11 +27,6 @@ app.config(function($routeProvider) {
 		templateUrl: '/templates/areasForm.html'
 	});
 
-	$routeProvider.when('/areas/:id', {
-		controller: 'AreasShowController',
-		templateUrl: '/templates/areas.html'
-	});
-
 	///
 	// Restaurants
 	///
@@ -41,7 +36,7 @@ app.config(function($routeProvider) {
 		templateUrl: '/templates/list.html'
 	});
 
-	$routeProvider.when('/restaurants/add', {
+	$routeProvider.when('/restaurants/add/:id', {
 		controller: 'RestaurantsAddController',
 		templateUrl: '/templates/restaurantsForm.html'
 	});
@@ -51,21 +46,16 @@ app.config(function($routeProvider) {
 		templateUrl: '/templates/restaurantsForm.html'
 	});
 
-	$routeProvider.when('/restaurants/:id', {
-		controller: 'RestaurantsShowController',
-		templateUrl: '/templates/restaurants.html'
-	});
-
 	///
 	// Menus
 	///
 
-	$routeProvider.when('/menus', {
+	$routeProvider.when('/menus/:id', {
 		controller: 'MenusListController',
-		templateUrl: '/templates/list.html'
+		templateUrl: '/templates/menusList.html'
 	});
 
-	$routeProvider.when('/menus/add', {
+	$routeProvider.when('/menus/add/:id', {
 		controller: 'MenusAddController',
 		templateUrl: '/templates/menusForm.html'
 	});
@@ -75,21 +65,16 @@ app.config(function($routeProvider) {
 		templateUrl: '/templates/menusForm.html'
 	});
 
-	$routeProvider.when('/menus/:id', {
-		controller: 'MenusShowController',
-		templateUrl: '/templates/menus.html'
-	});
-
 	///
 	// Items
 	///
 
-	$routeProvider.when('/items', {
+	$routeProvider.when('/items/:id', {
 		controller: 'ItemsListController',
-		templateUrl: '/templates/list.html'
+		templateUrl: '/templates/itemsList.html'
 	});
 
-	$routeProvider.when('/items/add', {
+	$routeProvider.when('/items/add/:id', {
 		controller: 'ItemsAddController',
 		templateUrl: '/templates/itemsForm.html'
 	});
@@ -99,21 +84,16 @@ app.config(function($routeProvider) {
 		templateUrl: '/templates/itemsForm.html'
 	});
 
-	$routeProvider.when('/items/:id', {
-		controller: 'ItemsShowController',
-		templateUrl: '/templates/items.html'
-	});
-
 	///
 	// Options
 	///
 
-	$routeProvider.when('/options', {
+	$routeProvider.when('/options/:id', {
 		controller: 'OptionsListController',
-		templateUrl: '/templates/list.html'
+		templateUrl: '/templates/optionsList.html'
 	});
 
-	$routeProvider.when('/options/add', {
+	$routeProvider.when('/options/add/:id', {
 		controller: 'OptionsAddController',
 		templateUrl: '/templates/optionsForm.html'
 	});
@@ -121,11 +101,6 @@ app.config(function($routeProvider) {
 	$routeProvider.when('/options/edit/:id', {
 		controller: 'OptionsEditController',
 		templateUrl: '/templates/optionsForm.html'
-	});
-
-	$routeProvider.when('/options/:id', {
-		controller: 'OptionsShowController',
-		templateUrl: '/templates/options.html'
 	});
 
 	///
@@ -623,60 +598,35 @@ app.factory('areaSchema', function() {
 	return service;
 });
 
-app.controller('AreasListController', function(datatables, $scope) {
-	$scope.name = 'Area';
-	$scope.pluralName = 'Areas';
-	$scope.path = 'areas';
-
-	datatables.build($scope, {
-		id: 'fms-areas-grid',
-		ajax: '/areas/datatables',
-		actions: [
-			{
-				url: '#/areas/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>',
-			},
-			{
-				url: '#/areas/',
-				content: '<i class="fa fa-2x fa-binoculars"></i>',
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
-});
-
-app.controller('AreasShowController', function(
-	datatables, navMgr, messenger, pod, areaSchema, $scope, $http, $routeParams
-) {
+app.controller('AreasListController', function($scope, $http, $routeParams) {
+	//TODO
+	//get areaId
+	var areaId = '54b32e4c3756f5d15ad4ca49';
 
 	$scope.path = 'restaurants';
-	areaSchema.defaults.area.id = $routeParams.id;
 
-	datatables.build($scope, {
-		id: 'fms-areas-grid',
-		ajax: '/restaurants/datatables',
-		actions: [
-			{
-				url: '#/restaurants/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>',
-			},
-			{
-				url: '#/restaurants/',
-				content: '<i class="fa fa-2x fa-search"></i>',
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
+	var p = $http.get('/areas/' + areaId);
+
+	p.error(function(err) {
+		console.log('AreasListController: area ajax failed');
+		console.log(err);
+	});
+
+	p.then(function(res) {
+		$scope.area = res.data;
+	});
+
+	var r = $http.get('/restaurants/byAreaId/' + areaId);
+
+	r.error(function(err) {
+		console.log('AreasListController: restaurants ajax failed');
+		console.log(err);
+	});
+
+	r.then(function(res) {
+		$scope.restaurants = res.data;
+	});
+
 });
 
 app.controller('AreasAddController', function(
@@ -863,45 +813,9 @@ app.controller('RestaurantsListController', function(datatables, $scope) {
 	}); 
 });
 
-app.controller('RestaurantsShowController', function(
-	datatables, navMgr, messenger, pod, restaurantSchema, $scope, $http, $routeParams
-) {
-
-	$scope.path = 'menus';
-	restaurantSchema.defaults.restaurant.id = $routeParams.id;
-
-	datatables.build($scope, {
-		id: 'fms-restaurants-grid',
-		ajax: '/menus/datatables',
-		actions: [
-			{
-				url: '#/menus/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/menus/',
-				content: '<i class="fa fa-2x fa-search"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
-});
-
 app.controller('RestaurantsAddController', function(
-	navMgr, messenger, pod, areaSchema, restaurantSchema, $scope, $http, $window
+	navMgr, messenger, pod, restaurantSchema, $scope, $http, $routeParams, $window
 ) {
-	
-	// todo: this is clunky and gives the user an odd experience
-	// if there is no area id to associate this restaurant with
-	if(!areaSchema.defaults.area.id) {
-		// send the user back to the areas list page
-		window.location.href = '/';
-	};
 	
 	navMgr.protect(function() { return $scope.form.$dirty; });
 	pod.podize($scope);
@@ -909,7 +823,7 @@ app.controller('RestaurantsAddController', function(
 	$scope.restaurantSchema = restaurantSchema;
 	$scope.restaurant = restaurantSchema.populateDefaults({});
 
-	$scope.restaurant.areaId = areaSchema.defaults.area.id;
+	$scope.restaurant.areaId = $routeParams.id;
 
 	$scope.save = function save(restaurant, options) {
 		options || (options = {});
@@ -932,7 +846,7 @@ app.controller('RestaurantsAddController', function(
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/restaurants');
+		navMgr.cancel('#/');
 	};
 });
 
@@ -966,7 +880,7 @@ app.controller('RestaurantsEditController', function(
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/restaurants');
+		navMgr.cancel('#/');
 	};
 });
 
@@ -1044,80 +958,45 @@ app.factory('menuSchema', function() {
 	return service;
 });
 
-app.controller('MenusListController', function(datatables, $scope) {
-	$scope.name = 'Menu';
-	$scope.pluralName = 'Menus';
+app.controller('MenusListController', function($scope, $http, $routeParams) {
 	$scope.path = 'menus';
 
-	datatables.build($scope, {
-		id: 'fms-menus-grid',
-		ajax: '/menus/datatables',
-		actions: [
-			{
-				url: '#/menus/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/menus/',
-				content: '<i class="fa fa-2x fa-binoculars"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
+	var p = $http.get('/restaurants/' + $routeParams.id);
+
+	p.error(function(err) {
+		console.log('MenusListController: restaurant ajax failed');
+		console.log(err);
+	});
+
+	p.then(function(res) {
+		$scope.restaurant = res.data;
+	});
+
+	var r = $http.get('/menus/byRestaurantId/' + $routeParams.id);
+
+	r.error(function(err) {
+		console.log('MenusListController: menus ajax failed');
+		console.log(err);
+	});
+
+	r.then(function(res) {
+		$scope.menus = res.data;
+	});
+
 });
 
-app.controller('MenusShowController', function(
-	datatables, navMgr, messenger, pod, menuSchema, $scope, $http, $routeParams
-) {
-
-	$scope.path = 'items';
-	menuSchema.defaults.menu.id = $routeParams.id;
-
-	datatables.build($scope, {
-		id: 'fms-items-grid',
-		ajax: '/items/datatables',
-		actions: [
-			{
-				url: '#/items/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/items/',
-				content: '<i class="fa fa-2x fa-search"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
-});
 
 app.controller('MenusAddController', function(
-	navMgr, messenger, pod, areaSchema, restaurantSchema, menuSchema, $scope, $http, $window
+	navMgr, messenger, pod, menuSchema, $scope, $http, $routeParams, $window
 ) {
 
-	// todo: this is clunky and gives the user an odd experience
-	// if there is no restaurant id to associate this menu with
-	if(!restaurantSchema.defaults.restaurant.id) {
-		// send the user back to the areas list page
-		window.location.href = '/';
-	};
-	
 	navMgr.protect(function() { return $scope.form.$dirty; });
 	pod.podize($scope);
 
 	$scope.menuSchema = menuSchema;
 	$scope.menu = menuSchema.populateDefaults({});
 
-	$scope.menu.restaurantId = restaurantSchema.defaults.restaurant.id;
+	$scope.menu.restaurantId = $routeParams.id
 
 	$scope.save = function save(menu, options) {
 		options || (options = {});
@@ -1135,18 +1014,19 @@ app.controller('MenusAddController', function(
 			}
 
 			navMgr.protect(false);
-			$window.location.href = '#/menus/' + data.id;
+			$window.location.href = '#/menus/' + $routeParams.id;
 		});
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/menus');
+		navMgr.cancel('#/menus/'+$routeParams.id);
 	};
 });
 
 app.controller('MenusEditController', function(
 	navMgr, messenger, pod, menuSchema, $scope, $http, $routeParams
 ) {
+
 	navMgr.protect(function() { return $scope.form.$dirty; });
 	pod.podize($scope);
 
@@ -1174,7 +1054,7 @@ app.controller('MenusEditController', function(
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/menus');
+		navMgr.cancel('#/menus/');
 	};
 });
 
@@ -1251,80 +1131,44 @@ app.factory('itemSchema', function() {
 	return service;
 });
 
-app.controller('ItemsListController', function(datatables, $scope) {
-	$scope.name = 'Menu';
-	$scope.pluralName = 'Items';
+app.controller('ItemsListController', function(datatables, $http, $routeParams, $scope) {
 	$scope.path = 'items';
 
-	datatables.build($scope, {
-		id: 'fms-items-grid',
-		ajax: '/items/datatables',
-		actions: [
-			{
-				url: '#/items/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/items/',
-				content: '<i class="fa fa-2x fa-binoculars"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
-});
+	var p = $http.get('/menus/' + $routeParams.id);
 
-app.controller('ItemsShowController', function(
-	datatables, navMgr, messenger, pod, itemSchema, $scope, $http, $routeParams
-) {
+	p.error(function(err) {
+		console.log('ItemsListController: menu ajax failed');
+		console.log(err);
+	});
 
-	$scope.path = 'options';
-	itemSchema.defaults.item.id = $routeParams.id;
+	p.then(function(res) {
+		$scope.menu = res.data;
+	});
 
-	datatables.build($scope, {
-		id: 'fms-options-grid',
-		ajax: '/options/datatables',
-		actions: [
-			{
-				url: '#/options/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/options/',
-				content: '<i class="fa fa-2x fa-search"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
+	var r = $http.get('/items/byMenuId/' + $routeParams.id);
+
+	r.error(function(err) {
+		console.log('MenusListController: items ajax failed');
+		console.log(err);
+	});
+
+	r.then(function(res) {
+		$scope.items = res.data;
+	});
+
 });
 
 app.controller('ItemsAddController', function(
-	navMgr, messenger, pod, areaSchema, restaurantSchema, menuSchema, itemSchema, $scope, $http, $window
+	navMgr, messenger, pod, itemSchema, $scope, $http, $routeParams, $window
 ) {
 
-	// todo: this is clunky and gives the user an odd experience
-	// if there is no menu id to associate this item with
-	if(!menuSchema.defaults.menu.id) {
-		// send the user back to the areas list page
-		window.location.href = '/';
-	};
-	
 	navMgr.protect(function() { return $scope.form.$dirty; });
 	pod.podize($scope);
 
 	$scope.itemSchema = itemSchema;
 	$scope.item = itemSchema.populateDefaults({});
 
-	$scope.item.menuId = menuSchema.defaults.menu.id;
+	$scope.item.menuId = $routeParams.id;
 
 	$scope.save = function save(item, options) {
 		options || (options = {});
@@ -1342,12 +1186,12 @@ app.controller('ItemsAddController', function(
 			}
 
 			navMgr.protect(false);
-			$window.location.href = '#/items/' + data.id;
+			$window.location.href = '#/items/' + $routeParams.id;
 		});
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/items');
+		navMgr.cancel('#/items/'+$routeParams.id);
 	};
 });
 
@@ -1456,68 +1300,44 @@ app.factory('optionSchema', function() {
 	return service;
 });
 
-app.controller('OptionsListController', function(datatables, $scope) {
-	$scope.name = 'Item';
-	$scope.pluralName = 'Options';
+app.controller('OptionsListController', function(datatables, $http, $routeParams, $scope) {
 	$scope.path = 'options';
 
-	datatables.build($scope, {
-		id: 'fms-options-grid',
-		ajax: '/options/datatables',
-		actions: [
-			{
-				url: '#/options/edit/',
-				content: '<i class="fa fa-2x fa-pencil-square-o"></i>'
-			},
-			{
-				url: '#/options/',
-				content: '<i class="fa fa-2x fa-binoculars"></i>'
-			}
-		],
-		cols: [
-			{label: 'Actions', data: 'id'},
-			{label: 'Name', data: 'name'},
-			{label: 'Created', data: 'createdAt', type: 'time'},
-			{label: 'Updated', data: 'updatedAt', type: 'time'},
-		]
-	}); 
-});
+	var p = $http.get('/items/' + $routeParams.id);
 
-app.controller('OptionsShowController', function(
-	datatables, navMgr, messenger, pod, optionSchema, $scope, $http, $routeParams
-) {
+	p.error(function(err) {
+		console.log('ItemsListController: item ajax failed');
+		console.log(err);
+	});
 
-	$scope.path = '';
-	optionSchema.defaults.option.id = $routeParams.id;
+	p.then(function(res) {
+		$scope.item = res.data;
+	});
 
-	datatables.build($scope, {
-		id: '',
-		ajax: '',
-		actions: [
-		],
-		cols: [
-		]
-	}); 
+	var r = $http.get('/options/byItemId/' + $routeParams.id);
+
+	r.error(function(err) {
+		console.log('MenusListController: items ajax failed');
+		console.log(err);
+	});
+
+	r.then(function(res) {
+		$scope.options = res.data;
+	});
+
 });
 
 app.controller('OptionsAddController', function(
-	navMgr, messenger, pod, areaSchema, restaurantSchema, menuSchema, itemSchema, optionSchema, $scope, $http, $window
+	navMgr, messenger, pod, optionSchema, $scope, $http, $routeParams, $window
 ) {
 
-	// todo: this is clunky and gives the user an odd experience
-	// if there is no item id to associate this option with
-	if(!itemSchema.defaults.item.id) {
-		// send the user back to the areas list page
-		window.location.href = '/';
-	};
-	
 	navMgr.protect(function() { return $scope.form.$dirty; });
 	pod.podize($scope);
 
 	$scope.optionSchema = optionSchema;
 	$scope.option = optionSchema.populateDefaults({});
 
-	$scope.option.itemId = itemSchema.defaults.item.id;
+	$scope.option.itemId = $routeParams.id;
 
 	$scope.save = function save(option, options) {
 		options || (options = {});
@@ -1535,12 +1355,12 @@ app.controller('OptionsAddController', function(
 			}
 
 			navMgr.protect(false);
-			$window.location.href = '#/options/' + data.id;
+			$window.location.href = '#/options/' + $routeParams.id;
 		});
 	};
 
 	$scope.cancel = function cancel() {
-		navMgr.cancel('#/options');
+		navMgr.cancel('#/options/'+$routeParams.id);
 	};
 });
 

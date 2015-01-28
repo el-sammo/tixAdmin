@@ -1,0 +1,38 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{menu.name}} <small>ITEMS</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add/{{menu.id}}" class="pull-right">
+    <button id="itemAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="itemAdd" class="fa-btn-text divspan">Add Item to {{menu.name}}</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Item</h3>
+			</td>
+			<td>
+				<h3>Edit</h3>
+			</td>
+			<td>
+				<h3>View Options</h3>
+			</td>
+		</tr>
+		<tr ng-init="itemId = item.id" ng-repeat="item in items">
+			<td>
+				<span>{{item.name}}</span>
+			</td>
+			<td>
+				<span><a href="#/items/edit/{{itemId}}">Edit {{item.name}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/options/{{itemId}}">View {{item.name}} Options</a></span>
+			</td>
+		</tr>
+	</table>
+</div>

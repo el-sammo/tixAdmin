@@ -18,7 +18,7 @@ module.exports = {
     });
   },
 
-	byRestaurant: function(req, res) {
+	byRestaurantId: function(req, res) {
 		Menus.findByRestaurantId(req.params.id).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
