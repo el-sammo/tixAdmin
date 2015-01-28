@@ -728,6 +728,7 @@ app.factory('restaurantSchema', function() {
 				cuisine: '',
 				featured: '',
 				active: '',
+				slug: '',
 				hours0open: '',
 				hours0close: '',
 				hours1open: '',
@@ -825,7 +826,40 @@ app.controller('RestaurantsAddController', function(
 
 	$scope.restaurant.areaId = $routeParams.id;
 
+	$scope.getSlug = function(name) {
+		var namePcs = name.split(" ");
+		var namePcsLength = namePcs.length;
+		var counter = 0;
+		var first = true;
+		var slug = '';
+		while(counter < namePcsLength) {
+			if(first) {
+				var a = namePcs[counter].toLowerCase();
+				var b = a.replace(/&/g, 'and');
+				var c = b.replace(/\-/g, '');
+				var d = c.replace(/[^A-Za-z0-9]/g, '');
+				if(d.length > 0) {
+					slug += d;
+					first = false;
+				}
+			} else {
+				var e = namePcs[counter].toLowerCase();
+				var f = e.replace(/&/g, 'and');
+				var g = f.replace(/\-/g, '');
+				var h = g.replace(/[^A-Za-z0-9]/g, '');
+				if(h.length > 0) {
+					slug += '-';
+					slug += h;
+				}
+			}
+			counter ++;
+		}
+		return slug;
+	}
+
 	$scope.save = function save(restaurant, options) {
+		restaurant.slug = $scope.getSlug(restaurant.name);
+
 		options || (options = {});
 
 		$http.post(
@@ -912,6 +946,7 @@ app.factory('menuSchema', function() {
 				name: '',
 				desc: '',
 				active: '',
+				slug: '',
 				availStart: '',
 				availEnd: ''
 			}
@@ -998,23 +1033,72 @@ app.controller('MenusAddController', function(
 
 	$scope.menu.restaurantId = $routeParams.id
 
-	$scope.save = function save(menu, options) {
-		options || (options = {});
-
-		$http.post(
-			'/menus/create', menu
-		).success(function(data, status, headers, config) {
-			if(status >= 400) return;
-
-			messenger.show('The menu has been created.', 'Success!');
-
-			if(options.addMore) {
-				$scope.menu = {};
-				return;
+	$scope.getSlug = function(name) {
+		var namePcs = name.split(" ");
+		var namePcsLength = namePcs.length;
+		var counter = 0;
+		var first = true;
+		var slug = '';
+		while(counter < namePcsLength) {
+			if(first) {
+				var a = namePcs[counter].toLowerCase();
+				var b = a.replace(/&/g, 'and');
+				var c = b.replace(/\-/g, '');
+				var d = c.replace(/[^A-Za-z0-9]/g, '');
+				if(d.length > 0) {
+					slug += d;
+					first = false;
+				}
+			} else {
+				var e = namePcs[counter].toLowerCase();
+				var f = e.replace(/&/g, 'and');
+				var g = f.replace(/\-/g, '');
+				var h = g.replace(/[^A-Za-z0-9]/g, '');
+				if(h.length > 0) {
+					slug += '-';
+					slug += h;
+				}
 			}
+			counter ++;
+		}
 
-			navMgr.protect(false);
-			$window.location.href = '#/menus/' + $routeParams.id;
+		return slug;
+	}
+
+	$scope.save = function save(menu, options) {
+
+		var p = $http.get('/restaurants/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('MenusAddController: restaurant ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.menu.slug = res.data.slug;
+
+			$scope.menu.slug += '-';
+			$scope.menu.slug += $scope.getSlug(menu.name);
+
+			console.log($scope.menu.slug);
+	
+			options || (options = {});
+	
+			$http.post(
+				'/menus/create', menu
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+	
+				messenger.show('The menu has been created.', 'Success!');
+	
+				if(options.addMore) {
+					$scope.menu = {};
+					return;
+				}
+	
+				navMgr.protect(false);
+				$window.location.href = '#/menus/' + $routeParams.id;
+			});
 		});
 	};
 
