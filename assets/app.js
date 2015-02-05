@@ -728,6 +728,7 @@ app.factory('restaurantSchema', function() {
 				cuisine: '',
 				featured: '',
 				active: '',
+				image: '',
 				slug: '',
 				hours0open: '',
 				hours0close: '',
