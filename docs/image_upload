@@ -1,0 +1,16 @@
+from: https://github.com/blueimp/jQuery-File-Upload/wiki/Setup
+--------------------------------------------------------------
+
+Using jQuery File Upload (UI version) with Node.js
+
+You can install the sample Node.js upload service on your server via npm:
+
+npm install blueimp-file-upload-node
+You can start the service by running the following command:
+
+./node_modules/blueimp-file-upload-node/server.js
+
+Next, download the plugin archive, extract it, and adjust the url option in main.js to the url of your Node.js service (e.g. "http://localhost:8080").
+You can then upload the project folder (without the unnecessary server subfolder) to any static file server and use it as interface to your Node.js upload service.
+
+Make sure to have imagemagick CLI tools installed on the server running the node upload service.
