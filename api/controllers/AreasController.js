@@ -9,7 +9,7 @@ module.exports = {
   datatables: function(req, res) {
     var options = req.query;
 
-    Areas.datatables(options).then(function(results) {
+    Areas.datatables(options).sort({name: 1}).then(function(results) {
       res.send(JSON.stringify(results));
     }).catch(function(err) {
       res.json({error: 'Server error'}, 500);
