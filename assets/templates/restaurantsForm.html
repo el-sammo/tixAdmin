@@ -563,7 +563,48 @@
 			</div>
 		</div>
 
-		<br><br>
+		<br/>
+		<br/>
+
+		<div>
+			<img src="{{restaurant.image}}">
+		</div>
+
+		<br/>
+		<br/>
+
+		<div class="form-group">
+			<label for="image" class="col-md-1 control-label">Image</label>
+			<div class="col-md-9">
+				<button
+					ng-hide="imageCropResult||imageCropStep!=1"
+					class="btn btn-primary"
+					ng-click="showImageCropper=true;imageCropStep=1"
+				>Upload Image</button>
+				<button
+					class="btn btn-default" 
+					ng-click="imageCropResult=null;imageCropStep=1"
+				>Reset</button>
+			</div>
+      <image-crop
+         data-width="316"
+         data-height="194"
+         data-shape="square"
+         data-step="imageCropStep"
+         data-result="imageCropResult"
+         ng-show="showImageCropper"
+      ></image-crop>
+		</div>
+
+		<br/>
+		<br/>
+		<br/>
+		<br/>
+		<br/>
+		<br/>
+		<br/>
+		<!-- Image Upload -->
+
 
 		<div class="navbar navbar-default navbar-fixed-bottom">
 			<div class="container-fluid">

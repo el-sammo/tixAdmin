@@ -830,6 +830,15 @@
 
 		$scope.restaurant.areaId = $routeParams.id;
 
+		$scope.imageCropResult = null;
+		$scope.showImageCropper = false;
+
+		$scope.$watch('imageCropResult', function(image) {
+			if($scope.restaurant) {
+				$scope.restaurant.image = image;
+			}
+		});
+
 		$scope.getSlug = function(name) {
 			var namePcs = name.split(" ");
 			var namePcsLength = namePcs.length;
@@ -901,6 +910,15 @@
 			'/restaurants/' + $routeParams.id
 		).success(function(data, status, headers, config) {
 			$scope.restaurant = restaurantSchema.populateDefaults(data);
+		});
+
+		$scope.imageCropResult = null;
+		$scope.showImageCropper = false;
+
+		$scope.$watch('imageCropResult', function(image) {
+			if($scope.restaurant) {
+				$scope.restaurant.image = image;
+			}
 		});
 
 		$scope.save = function save(restaurant, options) {
@@ -1258,6 +1276,15 @@
 
 		$scope.item.menuId = $routeParams.id;
 
+		$scope.imageCropResult = null;
+		$scope.showImageCropper = false;
+
+		$scope.$watch('imageCropResult', function(image) {
+			if($scope.item) {
+				$scope.item.image = image;
+			}
+		});
+
 		$scope.save = function save(item, options) {
 			options || (options = {});
 
@@ -1286,6 +1313,7 @@
 	app.controller('ItemsEditController', function(
 		navMgr, messenger, pod, itemSchema, $scope, $http, $routeParams
 	) {
+		
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
 
