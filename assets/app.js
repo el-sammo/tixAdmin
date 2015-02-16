@@ -309,6 +309,7 @@
 
 					// Handle unauthorized by prompting for login
 					if(response.status === 401) {
+						console.log('unauthorized');
 						$rootScope.$broadcast('httpForbidden');
 						return response;
 					}
