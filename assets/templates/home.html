@@ -1,0 +1,23 @@
+
+<div class="col-md-6 page-header">
+	<h3>G2U Management System</h3>
+</div>
+<div class="col-md-12">
+	<div class="row">
+		<div class="col-md-3">
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/customers/add">Customer Add</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/customers/search">Customer Search</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/dispatch">Dispatch Center</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/orders/add">Order Add</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/orders/search">Order Search</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/payroll/process">Process Payroll</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 3 && authLevel < 5"><a href="#/reports/basic">Reports</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 4"><a href="#/reports/advanced">Reports</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/schedules/add">Schedule Add</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/schedules/view">Schedule View</a></span><br/>
+			<span class="leftNavLink" ng-show="authLevel > 1"><a href="#/shifts/view">Shift History</a></span><br/>
+		</div>
+		<div class="col-md-9">
+		</div>
+	</div>
+</div>

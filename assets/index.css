@@ -51,6 +51,18 @@ td {
 	background-color: rgba(0, 0, 0, .3);
 }
 
+#searchHead {
+	border-bottom: 1px solid #C0C2FF;
+	padding-bottom: 12px;
+}
+
+#searchResultsHead {
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #C0C2FF;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
 /** Angular Bootstrap **/
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

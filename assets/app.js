@@ -11,11 +11,21 @@
 	///
 
 	app.config(function($routeProvider) {
+
+		///
+		// Home
+		///
+
+		$routeProvider.when('/', {
+			controller: 'HomeController',
+			templateUrl: '/templates/home.html'
+		});
+
 		///
 		// Areas
 		///
 
-		$routeProvider.when('/', {
+		$routeProvider.when('/areas', {
 			controller: 'AreasListController',
 			templateUrl: '/templates/areasList.html'
 		});
@@ -28,6 +38,30 @@
 		$routeProvider.when('/areas/edit/:id', {
 			controller: 'AreasEditController',
 			templateUrl: '/templates/areasForm.html'
+		});
+
+		///
+		// Customers
+		///
+
+		$routeProvider.when('/customers/add', {
+			controller: 'CustomersAddController',
+			templateUrl: '/templates/customersForm.html'
+		});
+
+		$routeProvider.when('/customers/edit/:id', {
+			controller: 'CustomersEditController',
+			templateUrl: '/templates/customersForm.html'
+		});
+
+		$routeProvider.when('/customers/search', {
+			controller: 'CustomersSearchController',
+			templateUrl: '/templates/customersSearch.html'
+		});
+
+		$routeProvider.when('/customers/view/:id', {
+			controller: 'CustomersViewController',
+			templateUrl: '/templates/customersView.html'
 		});
 
 		///
@@ -394,7 +428,21 @@
 	// Event-Based Services Loader
 	///
 
-	app.controller('LoadServices', function(loginModal, errMgr) {});
+	app.controller('LoadServices', function(loginModal, errMgr, fakeAuth) {});
+
+	app.factory('fakeAuth', function($rootScope) {
+		// TODO
+		// get customerId
+		$rootScope.customerId = '54c6644c0517463077a759aa';
+		// TODO
+		// get areaId
+		$rootScope.areaId = '54b32e4c3756f5d15ad4ca49';
+		// TODO
+		// get authLevel
+		$rootScope.authLevel = 5;
+	
+		return {};
+	});
 
 
 	///
@@ -521,6 +569,25 @@
 	});
 
 
+
+	///
+	// Controllers: Home
+	///
+
+	app.controller('HomeController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders, dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+	});
+
 	///
 	// Controllers: Areas
 	///
@@ -602,10 +669,8 @@
 		return service;
 	});
 
-	app.controller('AreasListController', function($scope, $http, $routeParams) {
-		//TODO
-		//get areaId
-		var areaId = '54b32e4c3756f5d15ad4ca49';
+	app.controller('AreasListController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
 
 		$scope.path = 'restaurants';
 
@@ -699,6 +764,242 @@
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/areas');
 		};
+	});
+
+
+	///
+	// Controllers: Customers
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/customers/);
+	});
+
+	app.factory('customerSchema', function() {
+		function nameTransform(customer) {
+			if(! customer || ! customer.fName || customer.fName.length < 1) {
+				return 'customer-name';
+			}
+			return (customer.fName
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				customer: {
+					areaId: '',
+					fName: '',
+					lName: '',
+					addresses: {
+						primary: {
+							street: '',
+							apt: '',
+							city: '',
+							state: '',
+							zip: ''
+						}
+					},
+					password: '',
+					phone: '',
+					email: ''
+				}
+			},
+	
+			links: {
+				website: {
+					placeholder: function(customer) {
+						return 'www.' + nameTransform(customer) + '.com';
+					},
+					addon: 'http://'
+				},
+				facebook: {
+					placeholder: nameTransform,
+					addon: 'facebook.com/'
+				},
+				twitter: {
+					placeholder: nameTransform,
+					addon: '@'
+				},
+				instagram: {
+					placeholder: nameTransform,
+					addon: 'instagram.com/'
+				},
+				pinterest: {
+					placeholder: nameTransform,
+					addon: 'pinterest.com/'
+				},
+			},
+	
+			populateDefaults: function(customer) {
+				$.map(service.defaults.customer, function(value, key) {
+					if(customer[key]) return;
+					if(typeof value === 'object') {
+						customer[key] = angular.copy(value);
+						return;
+					}
+					customer[key] = value;
+				});
+				return customer;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('AreasListController', function($scope, $http, $routeParams) {
+		//TODO
+		//get customerId
+		var customerId = '54b32e4c3756f5d15ad4ca49';
+
+		$scope.path = 'restaurants';
+
+		var p = $http.get('/customers/' + customerId);
+
+		p.error(function(err) {
+			console.log('AreasListController: customer ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.customer = res.data;
+		});
+
+		var r = $http.get('/restaurants/byAreaId/' + customerId);
+
+		r.error(function(err) {
+			console.log('AreasListController: restaurants ajax failed');
+			console.log(err);
+		});
+
+		r.then(function(res) {
+			$scope.restaurants = res.data;
+		});
+
+	});
+
+	app.controller('CustomersAddController', function(
+		navMgr, messenger, pod, customerSchema,
+		$scope, $http, $window, $rootScope
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.customerSchema = customerSchema;
+		$scope.customer = customerSchema.populateDefaults({});
+
+		$scope.customer.areaId = $rootScope.areaId;
+
+		// TODO 
+		// clean phone number; integers only
+
+		$scope.save = function save(customer, options) {
+			options || (options = {});
+
+			$http.post(
+				'/customers/create', customer
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The customer has been created.', 'Success!');
+
+				if(options.addMore) {
+					$scope.customer = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/customers/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/customers');
+		};
+	});
+
+	app.controller('CustomersEditController', function(
+		navMgr, messenger, pod, customerSchema, $scope, $http, $routeParams
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.customerSchema = customerSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/customers/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.customer = customerSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(customer, options) {
+			options || (options = {});
+
+			// TODO 
+			// clean phone number; integers only
+
+			$http.put(
+				'/customers/' + customer.id, customer
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The customer has been updated.', 'Success!');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/customers');
+		};
+	});
+
+	app.controller('CustomersSearchController', function(
+		customerSchema,	$scope, $http, $window, $rootScope
+	) {
+
+		$scope.fNameSearch = function() {
+			var p = $http.get('/customers/byFName/' + $scope.fName);
+	
+			p.error(function(err) {
+				console.log('CustomersSearchController: customers-fName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.customers = res.data;
+			});
+		};
+
+		$scope.lNameSearch = function() {
+			var p = $http.get('/customers/byLName/' + $scope.lName);
+	
+			p.error(function(err) {
+				console.log('CustomersSearchController: customers-lName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.customers = res.data;
+			});
+		}
+
+		$scope.phoneSearch = function() {
+			var p = $http.get('/customers/byPhone/' + $scope.phone);
+	
+			p.error(function(err) {
+				console.log('CustomersSearchController: customers-phone ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.customers = res.data;
+			});
+		}
+
 	});
 
 
