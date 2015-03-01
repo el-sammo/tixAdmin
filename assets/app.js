@@ -54,14 +54,14 @@
 			templateUrl: '/templates/customersForm.html'
 		});
 
+		$routeProvider.when('/customers/orders/:id', {
+			controller: 'CustomersOrdersController',
+			templateUrl: '/templates/customersOrders.html'
+		});
+
 		$routeProvider.when('/customers/search', {
 			controller: 'CustomersSearchController',
 			templateUrl: '/templates/customersSearch.html'
-		});
-
-		$routeProvider.when('/customers/view/:id', {
-			controller: 'CustomersViewController',
-			templateUrl: '/templates/customersView.html'
 		});
 
 		///
@@ -582,7 +582,7 @@
 		// Should Exist in a Config
 		// 1 - basic auth level; access to minimal functionality
 		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders, dispatch (operator)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
 
@@ -849,25 +849,23 @@
 		return service;
 	});
 
-	app.controller('AreasListController', function($scope, $http, $routeParams) {
-		//TODO
-		//get customerId
-		var customerId = '54b32e4c3756f5d15ad4ca49';
+	app.controller('AreasListController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
 
 		$scope.path = 'restaurants';
 
-		var p = $http.get('/customers/' + customerId);
+		var p = $http.get('/areas/' + areaId);
 
 		p.error(function(err) {
-			console.log('AreasListController: customer ajax failed');
+			console.log('AreasListController: area ajax failed');
 			console.log(err);
 		});
 
 		p.then(function(res) {
-			$scope.customer = res.data;
+			$scope.area = res.data;
 		});
 
-		var r = $http.get('/restaurants/byAreaId/' + customerId);
+		var r = $http.get('/restaurants/byAreaId/' + areaId);
 
 		r.error(function(err) {
 			console.log('AreasListController: restaurants ajax failed');
@@ -923,8 +921,28 @@
 	app.controller('CustomersEditController', function(
 		navMgr, messenger, pod, customerSchema, $scope, $http, $routeParams
 	) {
+
+		$scope.completedCount = 0;
+
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
+
+		var p = $http.get('/orders/byCustomerId/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('CustomersEditController: customers-orders ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			res.data.forEach(function(order) {
+				if(order.orderStatus > 8) {
+					$scope.completedCount ++;
+				}
+			});
+			$scope.orders = res.data;
+			$scope.ordersCount = res.data.length;
+		});
 
 		$scope.customerSchema = customerSchema;
 		$scope.editMode = true;
@@ -952,9 +970,30 @@
 			});
 		};
 
+		$scope.orderHistory = function orderHistory() {
+			navMgr.cancel('#/customers/orders/' +$routeParams.id);
+		};
+
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/customers');
 		};
+	});
+
+	app.controller('CustomersOrdersController', function(
+		customerSchema,	$scope, $http, $window, $rootScope
+	) {
+
+		var p = $http.get('/orders/byCustomerId/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('CustomersOrdersController: customers-orders ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.orders = res.data;
+		});
+
 	});
 
 	app.controller('CustomersSearchController', function(
