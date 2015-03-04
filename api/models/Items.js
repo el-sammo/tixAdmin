@@ -24,7 +24,29 @@ module.exports = {
 		}
   },
 
+  ///
+  // Waterline Mutations
+  ///
+
+  beforeCreate: function(values, next) {
+    handleImages(Images, values, next);
+  },
+
+  beforeUpdate: function(values, next) {
+    handleImages(Images, values, next);
+  },
+
 };
 
 tablize(module.exports);
+
+function handleImages(Images, doc, next) {
+  if(doc.id && doc.image) {
+    var p = Images.process(doc, 'items', 'id', 'image');
+    p.then(next);
+    p.catch(next);
+  } else {
+    next();
+  }
+}
 
