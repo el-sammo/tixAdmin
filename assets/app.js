@@ -1444,8 +1444,6 @@
 				$scope.menu.slug += '-';
 				$scope.menu.slug += $scope.getSlug(menu.name);
 
-				console.log($scope.menu.slug);
-		
 				options || (options = {});
 		
 				$http.post(
