@@ -614,6 +614,7 @@
 					name: '',
 					phone: '',
 					subdomain: '',
+					hiring: '',
 					franchisee: {
 						name: '',
 						phone: '',
