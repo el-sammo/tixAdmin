@@ -1,0 +1,33 @@
+<div class="col-md-6 page-header" ng-cloak>
+	<h3>Order Details</h3>
+</div>
+<div class="col-md-12">
+	<div class="row">
+		<div class="col-md-3">
+			<div class="row" ng-repeat="restaurant in orderRestaurants">
+				<div class="col-md-12">
+					<div class="row">
+						<span class="orderDetailsRestaurantInfo">{{restaurant.name}}<br/></span>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="row" ng-repeat="item in restaurant.items">
+						<span class="orderDetailsItemInfo">{{item.quantity}} {{item.name}} - {{item.option}}<br/></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<div class="row">
+				<div class="col-md-12">
+					<span class="orderDetailsDestinationInfo"><b>Destination Information</b>: {{fName}} {{lName}} {{phone}} {{address}}<br/><br/></span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<iframe width="600" height="450" frameborder="0" style="border:0" src={{src}}></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

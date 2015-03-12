@@ -21,6 +21,7 @@
 			templateUrl: '/templates/home.html'
 		});
 
+
 		///
 		// Areas
 		///
@@ -39,6 +40,7 @@
 			controller: 'AreasEditController',
 			templateUrl: '/templates/areasForm.html'
 		});
+
 
 		///
 		// Customers
@@ -64,6 +66,27 @@
 			templateUrl: '/templates/customersSearch.html'
 		});
 
+
+		///
+		// Dispatch
+		///
+
+		$routeProvider.when('/dispatch', {
+			controller: 'DispatchController',
+			templateUrl: '/templates/dispatch.html'
+		});
+
+
+		///
+		// Order
+		///
+
+		$routeProvider.when('/orderDetails/:id', {
+			controller: 'OrderDetailsController',
+			templateUrl: '/templates/orderDetails.html'
+		});
+
+
 		///
 		// Restaurants
 		///
@@ -82,6 +105,7 @@
 			controller: 'RestaurantsEditController',
 			templateUrl: '/templates/restaurantsForm.html'
 		});
+
 
 		///
 		// Menus
@@ -102,6 +126,7 @@
 			templateUrl: '/templates/menusForm.html'
 		});
 
+
 		///
 		// Items
 		///
@@ -121,6 +146,7 @@
 			templateUrl: '/templates/itemsForm.html'
 		});
 
+
 		///
 		// Options
 		///
@@ -139,6 +165,7 @@
 			controller: 'OptionsEditController',
 			templateUrl: '/templates/optionsForm.html'
 		});
+
 
 		///
 		// Other
@@ -588,6 +615,7 @@
 
 	});
 
+
 	///
 	// Controllers: Areas
 	///
@@ -796,7 +824,8 @@
 					lName: '',
 					addresses: {
 						primary: {
-							street: '',
+							streetNumber: '',
+							streetName: '',
 							apt: '',
 							city: '',
 							state: '',
@@ -849,35 +878,6 @@
 		};
 
 		return service;
-	});
-
-	app.controller('AreasListController', function($scope, $http, $routeParams, $rootScope) {
-		var areaId = $rootScope.areaId;
-
-		$scope.path = 'restaurants';
-
-		var p = $http.get('/areas/' + areaId);
-
-		p.error(function(err) {
-			console.log('AreasListController: area ajax failed');
-			console.log(err);
-		});
-
-		p.then(function(res) {
-			$scope.area = res.data;
-		});
-
-		var r = $http.get('/restaurants/byAreaId/' + areaId);
-
-		r.error(function(err) {
-			console.log('AreasListController: restaurants ajax failed');
-			console.log(err);
-		});
-
-		r.then(function(res) {
-			$scope.restaurants = res.data;
-		});
-
 	});
 
 	app.controller('CustomersAddController', function(
@@ -1040,6 +1040,162 @@
 				$scope.customers = res.data;
 			});
 		}
+
+	});
+
+
+	///
+	// Controllers: Dispatch
+	///
+
+	app.controller('DispatchController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+		var p = $http.get('/orders/last24Hours/' + areaId);
+	
+		p.error(function(err) {
+			console.log('DispatchController: orders-last24hours ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.orders = res.data;
+			console.log('orders.length: '+res.data.length);
+		});
+	});
+
+
+	///
+	// Controllers: Order
+	///
+
+	app.controller('OrderDetailsController', function($scope, $http, $routeParams, $rootScope, $q) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		var orderRestaurants = [];
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+		var p = $http.get('/orders/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('OrderDetailsController: order ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			var items = [];
+			var restaurants = [];
+			res.data.things.forEach(function(thing) {
+				var quantity = thing.quantity;
+				var name = thing.name;
+				var option = thing.option;
+				
+				var thisRestaurant;
+				$scope.getRestaurantName(thing.optionId).then(function(name) {
+					thisRestaurant = name;
+					if(restaurants.indexOf(name) >= 0) {
+						console.log(name+' found');
+					} else {
+						restaurants.push(name);
+						console.log(name+' not found');
+					}
+				});
+
+				var itemRow = {
+					quantity: quantity,
+					name: thing.name,
+					option: thing.option,
+					restaurant: thisRestaurant
+				};
+
+				console.log('itemRow: '+itemRow);
+				items.push(itemRow);
+			});
+
+			console.log('items: '+items);
+
+			var r = $http.get('/customers/' + res.data.customerId);
+			
+			r.error(function(err) {
+				console.log('OrderDetailsController: customer ajax failed');
+				console.log(err);
+			});
+			
+			r.then(function(res) {
+				$scope.fName = res.data.fName;
+				$scope.lName = res.data.lName;
+				$scope.phone = res.data.phone;
+				$scope.address = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName+' '+res.data.addresses.primary.city;
+
+				$scope.src = '"https://www.google.com/maps/embed/v1/place?key=AIzaSyBwQ6li-KWa87WfqhkJGBQm9vKE5gRnwi4&q='+res.data.addresses.primary.streetNumber+'+'+res.data.addresses.primary.streetName+'+'+res.data.addresses.primary.city+'+'+res.data.addresses.primary.state+'+'+res.data.addresses.primary.zip+'"';
+				console.log('$scope.src: '+$scope.src);
+
+			});
+		});
+
+		$scope.getRestaurantName = function(optionId) {
+			return $q(function(resolve, reject) {
+				var r = $http.get('/options/' + optionId);
+				
+				r.error(function(err) {
+					console.log('OrderDetailsController: getRestaurantName-options ajax failed');
+					console.log(err);
+					reject(err);
+				});
+				
+				r.then(function(res) {
+					var s = $http.get('/items/' + res.data.itemId);
+					
+					s.error(function(err) {
+						console.log('OrderDetailsController: getRestaurantName-items ajax failed');
+						console.log(err);
+						reject(err);
+					});
+					
+					s.then(function(res) {
+						var t = $http.get('/menus/' + res.data.menuId);
+						
+						t.error(function(err) {
+							console.log('OrderDetailsController: getRestaurantName-menus ajax failed');
+							console.log(err);
+							reject(err);
+						});
+						
+						t.then(function(res) {
+							var u = $http.get('/restaurants/' + res.data.restaurantId);
+							
+							u.error(function(err) {
+								console.log('OrderDetailsController: getRestaurantName-restaurants ajax failed');
+								console.log(err);
+								reject(err);
+							});
+							
+							u.then(function(res) {
+								console.log(res.data.name);
+								resolve(res.data.name);
+							});
+						});
+					});
+				});
+			});
+		};
 
 	});
 
