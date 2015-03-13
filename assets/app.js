@@ -242,6 +242,47 @@
 		return service;
 	});
 
+	///
+	// Querystring builder
+	///
+	
+	app.factory('querystring', function querystringFactory() {
+			var service = {
+				stringify: function(query, noEncode) {
+					var items = [];
+					angular.forEach(query, function(value, key) {
+						if(noEncode) {
+							items.push(key + '=' + value);
+						} else {
+							items.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+						}
+					});
+					return items.join('&');
+				}
+			};
+
+			return service;
+	});
+
+
+	///
+	// Configuration managements
+	///
+	
+	app.factory('configMgr', function configMgrFactory() {
+			var service = {
+				config: {
+					vendors: {
+						googleMaps: {
+							key: 'AIzaSyCmRFaH2ROz5TueD8XapBCTAdBppUir_Bs'
+						}
+					}
+				},
+			};
+
+			return service;
+	});
+
 
 	///
 	// Error management
@@ -1078,11 +1119,23 @@
 	// Controllers: Order
 	///
 
-	app.controller('OrderDetailsController', function($scope, $http, $routeParams, $rootScope, $q) {
+	app.controller('OrderDetailsController', function(
+		$scope, $http, $routeParams, $rootScope, $q, $sce, configMgr, querystring
+	) {
 		var areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
 
-		var orderRestaurants = [];
+		// $scope.orderRestaurants = [
+		//   {
+		//     name: ...
+		//     items: [
+		//       name: ...
+		//       quantity: ...
+		//       option: ...
+		//     ]
+		//   }
+		// ];
+		$scope.orderRestaurants = [];
 
 		// Auth Level Map
 		// Should Exist in a Config
@@ -1100,36 +1153,18 @@
 		});
 	
 		p.then(function(res) {
-			var items = [];
-			var restaurants = [];
 			res.data.things.forEach(function(thing) {
-				var quantity = thing.quantity;
-				var name = thing.name;
-				var option = thing.option;
-				
-				var thisRestaurant;
 				$scope.getRestaurantName(thing.optionId).then(function(name) {
-					thisRestaurant = name;
-					if(restaurants.indexOf(name) >= 0) {
-						console.log(name+' found');
-					} else {
-						restaurants.push(name);
-						console.log(name+' not found');
+					var restaurant = _.find($scope.orderRestaurants, {name: name});
+					if(! restaurant) {
+						restaurant = {name: name, items: []};
+						$scope.orderRestaurants.push(restaurant);
 					}
+					restaurant.items.push(
+						_.pick(thing, ['quantity', 'name', 'option'])
+					);
 				});
-
-				var itemRow = {
-					quantity: quantity,
-					name: thing.name,
-					option: thing.option,
-					restaurant: thisRestaurant
-				};
-
-				console.log('itemRow: '+itemRow);
-				items.push(itemRow);
 			});
-
-			console.log('items: '+items);
 
 			var r = $http.get('/customers/' + res.data.customerId);
 			
@@ -1144,9 +1179,18 @@
 				$scope.phone = res.data.phone;
 				$scope.address = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName+' '+res.data.addresses.primary.city;
 
-				$scope.src = '"https://www.google.com/maps/embed/v1/place?key=AIzaSyBwQ6li-KWa87WfqhkJGBQm9vKE5gRnwi4&q='+res.data.addresses.primary.streetNumber+'+'+res.data.addresses.primary.streetName+'+'+res.data.addresses.primary.city+'+'+res.data.addresses.primary.state+'+'+res.data.addresses.primary.zip+'"';
-				console.log('$scope.src: '+$scope.src);
-
+				$scope.src = $sce.trustAsResourceUrl(
+					'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
+						key: configMgr.config.vendors.googleMaps.key,
+						q: ([
+							res.data.addresses.primary.streetNumber,
+							res.data.addresses.primary.streetName,
+							res.data.addresses.primary.city,
+							res.data.addresses.primary.state,
+							res.data.addresses.primary.zip
+						].join('+'))
+					})
+				);
 			});
 		});
 
@@ -1232,6 +1276,7 @@
 					active: '',
 					image: '',
 					slug: '',
+					addresses: [ ],
 					hours0open: '',
 					hours0close: '',
 					hours1open: '',
@@ -1246,6 +1291,13 @@
 					hours5close: '',
 					hours6open: '',
 					hours6close: '',
+				},
+				address: {
+					streetNumber: '',
+					streetName: '',
+					city: '',
+					state: '',
+					zip: '',
 				}
 			},
 
@@ -1282,6 +1334,21 @@
 						return;
 					}
 					restaurant[key] = value;
+				});
+
+				if(restaurant.addresses.length < 1) {
+					restaurant.addresses.push(service.defaults.address);
+				}
+
+				restaurant.addresses.forEach(function(address) {
+					_.forEach(service.defaults.address, function(value, key) {
+						if(address[key]) return;
+						if(typeof value === 'object') {
+							address[key] = angular.copy(value);
+							return;
+						}
+						address[key] = value;
+					});
 				});
 				return restaurant;
 			}

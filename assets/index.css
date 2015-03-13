@@ -127,6 +127,11 @@ td {
 	margin-bottom: 10px;
 }
 
+#pod-locations .pod-body .addon-label {
+	text-align: right;
+	width: 120px;
+}
+
 /** Layout **/
 
 .navbar-brand img {
