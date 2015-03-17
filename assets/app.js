@@ -23,6 +23,16 @@
 
 
 		///
+		// Applicants
+		///
+
+		$routeProvider.when('/applicants', {
+			controller: 'ApplicantsListController',
+			templateUrl: '/templates/applicantsList.html'
+		});
+
+
+		///
 		// Areas
 		///
 
@@ -104,6 +114,21 @@
 		$routeProvider.when('/restaurants/edit/:id', {
 			controller: 'RestaurantsEditController',
 			templateUrl: '/templates/restaurantsForm.html'
+		});
+
+
+		///
+		// Stories
+		///
+
+		$routeProvider.when('/stories/add', {
+			controller: 'StoriesAddController',
+			templateUrl: '/templates/storyForm.html'
+		});
+
+		$routeProvider.when('/stories/view', {
+			controller: 'StoriesListController',
+			templateUrl: '/templates/storiesList.html'
 		});
 
 
@@ -654,6 +679,25 @@
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
 
+	});
+
+	///
+	// Controllers: Applicants
+	///
+
+	app.controller('ApplicantsListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.areaName = $rootScope.areaName;
+
+		var p = $http.get('/applicants');
+
+		p.error(function(err) {
+			console.log('ApplicantsListController: ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.applicants = res.data;
+		});
 	});
 
 
@@ -1505,6 +1549,59 @@
 			navMgr.cancel('#/');
 		};
 	});
+
+
+	///
+	// Controllers: Stories
+	///
+
+	app.controller('StoriesListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.areaName = $rootScope.areaName;
+		$scope.areaId = $rootScope.areaId;
+
+		var p = $http.get('/stories/byAreaId/' +$scope.areaId);
+
+		p.error(function(err) {
+			console.log('StoriesListController: ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.stories = res.data;
+		});
+	});
+
+	app.controller('StoriesAddController', function(navMgr, messenger, pod, $scope, $http, $routeParams, $window, $rootScope) {
+		$scope.areaId = $rootScope.areaId;
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.save = function save(story) {
+
+			console.log('$scope.areaId: '+$scope.areaId);
+			console.log('story:');
+			console.log(story);
+
+			story.areaId = $scope.areaId;
+
+			$http.post(
+				'/stories/create', story
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+		
+				messenger.show('The story has been created.', 'Success!');
+		
+				navMgr.protect(false);
+				$window.location.href = '#/stories/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/stories');
+		};
+	});
+
 
 
 	///

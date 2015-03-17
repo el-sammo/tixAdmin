@@ -1,0 +1,25 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="nav-away-modal-title">
+		Create New Story
+  </h3>
+</div>
+<div class="modal-body">
+	<form name="createApplicantForm">
+		<div class="row">
+			<div class="col-md-12">
+				<label for="story.headline">Headline</label>
+				<input type="text" name="story.headline" class="form-control" ng-model="story.headline">
+				<label for="story.body">Body</label>
+				<input type="text" name="story.body" class="form-control" ng-model="story.body">
+			</div>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary pull-left" ng-click="$close('discard')">
+    <i class="fa fa-reply"></i> &nbsp; Go Back
+  </button>
+  <button type="button" class="btn btn-success pull-right" ng-click="save(story)">
+    <i class="fa fa-plus"></i> &nbsp; Publish
+  </button>
+</div>

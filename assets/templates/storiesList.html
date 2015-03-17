@@ -1,0 +1,30 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{areaName}} <small>Stories</small></h3>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Headline</h3>
+			</td>
+			<td>
+				<h3>Created</h3>
+			</td>
+			<td>
+				<h3>Update</h3>
+			</td>
+		</tr>
+		<tr ng-repeat="story in stories">
+			<td>
+				<span>{{story.headline}}</span>
+			</td>
+			<td>
+				<span>{{story.createdAt}}</span>
+			</td>
+			<td>
+				<span>{{story.updatedAt}}</span>
+			</td>
+		</tr>
+	</table>
+</div>
