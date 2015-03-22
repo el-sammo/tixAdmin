@@ -1,17 +1,50 @@
-<div class="col-md-6 page-header" ng-cloak>
-	<h3>G2U Management System</h3>
+<div class="col-md-12 page-header" ng-cloak>
+	<h3>Order Dispatch</h3>
 </div>
 <div class="col-md-12">
 	<div class="row">
-		<div class="col-md-12">
-			<h4>Order Dispatch</h4>
+		<div class="col-md-2">
+			<h4>Order Updated</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Order Status</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Order Total</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Order Restaurants</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Driver</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Destination</h4>
 		</div>
 	</div>
-	<div class="row" ng-repeat="order in orders">
-		<div class="col-md-3">
-			<span class="leftNavLink"><a href="#/orders/{{order.id}}">{{order.updatedAt}}</a><br/></span>
+	<div class="row" ng-init="things = order.things" ng-repeat="order in orders">
+		<div class="col-md-2">
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.updatedAt}}</a><br/></span>
 		</div>
-		<div class="col-md-9">
+		<div class="col-md-2">
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.orderStatus}}</a><br/></span>
+		</div>
+		<div class="col-md-2">
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.total}}</a><br/></span>
+		</div>
+		<div class="col-md-2">
+			<div class="row" ng-repeat="thing in things">
+				<div class="col-md-12">
+					<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{thing.restaurantName}}</a> </span>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-2">
+			<span class="leftNavLink" ng-show="order.driver"><a href="#/orderDetails/{{order.id}}">{{order.driver}}</a><br/></span>
+			<span class="leftNavLink" ng-show="!order.driver"><a href="#/orders/dispatch/{{order.id}}">Dispatch Order</a><br/></span>
+		</div>
+		<div class="col-md-2">
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">5519 Pathfinder</a><br/></span>
 		</div>
 	</div>
 </div>

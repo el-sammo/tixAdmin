@@ -1153,8 +1153,39 @@
 		});
 	
 		p.then(function(res) {
+			res.data.map(function(order) {
+				var orderDate = new Date(order.updatedAt);
+				var orderDateSecsPre = orderDate.getTime();
+				var orderDateSecsPost = orderDateSecsPre - 21600;
+				var ampm = 'am';
+				order.updatedYear = new Date(orderDateSecsPost).getFullYear();
+				order.updatedMonth = new Date(orderDateSecsPost).getMonth() + 1;
+				order.updatedDate = new Date(orderDateSecsPost).getDate();
+				if(order.updatedMonth.toString().length < 2) {
+					order.updatedMonth = '0'+order.updatedMonth.toString();
+				}
+				if(order.updatedDate.toString().length < 2) {
+					order.updatedDate = '0'+order.updatedDate.toString();
+				}
+				order.updatedAtDate = order.updatedYear+'-'+order.updatedMonth+'-'+order.updatedDate;
+				order.updatedHours = new Date(orderDateSecsPost).getHours();
+				order.updatedMinutes = new Date(orderDateSecsPost).getMinutes();
+				if(order.updatedHours > 12) {
+					ampm = 'pm';
+					order.updatedHours = order.updatedHours - 12;
+				}
+				if(order.updatedHours.toString().length < 2) {
+					order.updatedHours = '0'+order.updatedHours.toString();
+				}
+				if(order.updatedMinutes.toString().length < 2) {
+					order.updatedMinutes = '0'+order.updatedMinutes.toString();
+				}
+				order.updatedAtTime = order.updatedHours+':'+order.updatedMinutes;
+				order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
+				order.total = parseFloat(order.total).toFixed(2);
+			});
+	
 			$scope.orders = res.data;
-			console.log('orders.length: '+res.data.length);
 		});
 	});
 
@@ -1197,6 +1228,8 @@
 		});
 	
 		p.then(function(res) {
+			$scope.paymentMethod = res.data.paymentMethod;
+			$scope.total = '$'+res.data.total;
 			res.data.things.forEach(function(thing) {
 				$scope.getRestaurantName(thing.optionId).then(function(name) {
 					var restaurant = _.find($scope.orderRestaurants, {name: name});
@@ -1578,10 +1611,6 @@
 		pod.podize($scope);
 
 		$scope.save = function save(story) {
-
-			console.log('$scope.areaId: '+$scope.areaId);
-			console.log('story:');
-			console.log(story);
 
 			story.areaId = $scope.areaId;
 
