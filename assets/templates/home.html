@@ -23,6 +23,95 @@
 			<span class="leftNavLink" ng-show="authLevel > 1"><a href="#/shifts/view">Shift History</a><br/></span>
 		</div>
 		<div class="col-md-9">
+			<div class="row">
+				<div class="col-md-3">
+					&nbsp;
+				</div>
+				<div class="col-md-3">
+					<h4>Daily Trends</h4>
+				</div>
+				<div class="col-md-3">
+					<h4>Weekly Trends</h4>
+				</div>
+				<div class="col-md-3">
+					<h4>4-Week Trends</h4>
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-md-3">
+					Completed Orders
+				</div>
+				<div class="col-md-3">
+					{{dayOrders}}
+				</div>
+				<div class="col-md-3">
+					{{weekOrders}}
+				</div>
+				<div class="col-md-3">
+					{{weeksOrders}}
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-md-3">
+					Orphaned Orders
+				</div>
+				<div class="col-md-3">
+					{{dayOrphans}}
+				</div>
+				<div class="col-md-3">
+					{{weekOrphans}}
+				</div>
+				<div class="col-md-3">
+					{{weeksOrphans}}
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-md-3">
+					Revenue
+				</div>
+				<div class="col-md-3">
+					{{dayRevenue}}
+				</div>
+				<div class="col-md-3">
+					{{weekRevenue}}
+				</div>
+				<div class="col-md-3">
+					{{weeksRevenue}}
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-md-3">
+					Signups
+				</div>
+				<div class="col-md-3">
+					{{daySignups}}
+				</div>
+				<div class="col-md-3">
+					{{weekSignups}}
+				</div>
+				<div class="col-md-3">
+					{{weeksSignups}}
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-md-3">
+					Applicants
+				</div>
+				<div class="col-md-3">
+					{{dayApplicants}}
+				</div>
+				<div class="col-md-3">
+					{{weekApplicants}}
+				</div>
+				<div class="col-md-3">
+					{{weeksApplicants}}
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

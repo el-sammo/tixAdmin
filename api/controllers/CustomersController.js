@@ -56,7 +56,49 @@ module.exports = {
       console.error(err);
       throw err;
 		});
-	}
+	},
+	
+	daily: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000);
+		var yesterdayDate = new Date(yesterday);
+
+		Customers.find({'areaId': req.params.id, 'createdAt': { '>=': yesterdayDate}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	weekly: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 7);
+		var yesterdayDate = new Date(yesterday);
+
+		Customers.find({'areaId': req.params.id, 'createdAt': { '>=': yesterdayDate}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	monthly: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 28);
+		var yesterdayDate = new Date(yesterday);
+
+		Customers.find({'areaId': req.params.id, 'createdAt': { '>=': yesterdayDate}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
 	
 };
 

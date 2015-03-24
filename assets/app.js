@@ -678,6 +678,175 @@
 		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
+	
+		var od = $http.get('/orders/daily/' +areaId);
+
+		od.error(function(err) {
+			console.log('HomeController: orders-daily ajax failed');
+			console.log(err);
+			$scope.dayOrders = 'err';
+		});
+
+		od.then(function(res) {
+			var dailyOrders = res.data;
+			var dayRevenue = 0;
+			if(dailyOrders && dailyOrders.length > 0) {
+				dailyOrders.forEach(function(order) {
+					dayRevenue += parseFloat(order.total);
+				});
+			}
+			$scope.dayRevenue = dayRevenue.toFixed();
+			$scope.dayOrders = res.data.length;
+		});
+
+		var ow = $http.get('/orders/weekly/' +areaId);
+
+		ow.error(function(err) {
+			console.log('HomeController: orders-weekly ajax failed');
+			console.log(err);
+			$scope.weekOrders = 'err';
+		});
+
+		ow.then(function(res) {
+			var weekOrders = res.data;
+			var weekRevenue = 0;
+			if(weekOrders && weekOrders.length > 0) {
+				weekOrders.forEach(function(order) {
+					weekRevenue += parseFloat(order.total);
+				});
+			}
+			$scope.weekRevenue = weekRevenue.toFixed();
+			$scope.weekOrders = res.data.length;
+		});
+
+		var om = $http.get('/orders/monthly/' +areaId);
+
+		om.error(function(err) {
+			console.log('HomeController: orders-monthly ajax failed');
+			console.log(err);
+			$scope.weeksOrders = 'err';
+		});
+
+		om.then(function(res) {
+			var weeksOrders = res.data;
+			var weeksRevenue = 0;
+			if(weeksOrders && weeksOrders.length > 0) {
+				weeksOrders.forEach(function(order) {
+					weeksRevenue += parseFloat(order.total);
+				});
+			}
+			$scope.weeksRevenue = weeksRevenue.toFixed();
+			$scope.weeksOrders = res.data.length;
+		});
+
+		var odo = $http.get('/orders/dailyOrphaned/' +areaId);
+
+		odo.error(function(err) {
+			console.log('HomeController: orphans-daily ajax failed');
+			console.log(err);
+			$scope.dayOrphans = 'err';
+		});
+
+		odo.then(function(res) {
+			$scope.dayOrphans = res.data.length;
+		});
+
+		var owo = $http.get('/orders/weeklyOrphaned/' +areaId);
+
+		owo.error(function(err) {
+			console.log('HomeController: orphans-weekly ajax failed');
+			console.log(err);
+			$scope.weekOrphans = 'err';
+		});
+
+		owo.then(function(res) {
+			$scope.weekOrphans = res.data.length;
+		});
+
+		var omo = $http.get('/orders/monthlyOrphaned/' +areaId);
+
+		omo.error(function(err) {
+			console.log('HomeController: orphans-monthly ajax failed');
+			console.log(err);
+			$scope.weeksOrphans = 'err';
+		});
+
+		omo.then(function(res) {
+			$scope.weeksOrphans = res.data.length;
+		});
+
+		var cd = $http.get('/customers/daily/' +areaId);
+
+		cd.error(function(err) {
+			console.log('HomeController: customers-daily ajax failed');
+			console.log(err);
+			$scope.daySignups = 'err';
+		});
+
+		cd.then(function(res) {
+			$scope.daySignups = res.data.length;
+		});
+
+		var cw = $http.get('/customers/weekly/' +areaId);
+
+		cw.error(function(err) {
+			console.log('HomeController: customers-weekly ajax failed');
+			console.log(err);
+			$scope.weekSignups = 'err';
+		});
+
+		cw.then(function(res) {
+			$scope.weekSignups = res.data.length;
+		});
+
+		var cm = $http.get('/customers/monthly/' +areaId);
+
+		cm.error(function(err) {
+			console.log('HomeController: customers-monthly ajax failed');
+			console.log(err);
+			$scope.weeksSignups = 'err';
+		});
+
+		cm.then(function(res) {
+			$scope.weeksSignups = res.data.length;
+		});
+
+		var ad = $http.get('/applicants/daily/' +areaId);
+
+		ad.error(function(err) {
+			console.log('HomeController: applicants-daily ajax failed');
+			console.log(err);
+			$scope.dayApplicants = 'err';
+		});
+
+		ad.then(function(res) {
+			$scope.dayApplicants = res.data.length;
+		});
+
+		var aw = $http.get('/applicants/weekly/' +areaId);
+
+		aw.error(function(err) {
+			console.log('HomeController: applicants-weekly ajax failed');
+			console.log(err);
+			$scope.weekApplicants = 'err';
+		});
+
+		aw.then(function(res) {
+			$scope.weekApplicants = res.data.length;
+		});
+
+		var am = $http.get('/applicants/monthly/' +areaId);
+
+		am.error(function(err) {
+			console.log('HomeController: applicants-monthly ajax failed');
+			console.log(err);
+			$scope.weeksApplicants = 'err';
+		});
+
+		am.then(function(res) {
+			$scope.weeksApplicants = res.data.length;
+		});
+
 
 	});
 

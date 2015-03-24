@@ -52,5 +52,89 @@ module.exports = {
 		});
 	},
 	
+	daily: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	weekly: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 7);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	monthly: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 28);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	dailyOrphaned: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	weeklyOrphaned: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 7);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	monthlyOrphaned: function(req, res) {
+		var ts = new Date().getTime();
+		var yesterday = ts - (24 * 3600000 * 28);
+		var yesterdayDate = new Date(yesterday);
+
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
 };
 
