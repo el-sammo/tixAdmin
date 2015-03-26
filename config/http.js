@@ -56,7 +56,7 @@ module.exports.http = {
     if(req.session.isAuthenticated) return next();
     var baseUrl = req.url.replace(/\?.*/, '');
 
-    if(baseUrl.match(/^\/$/) || baseUrl.match(/^\/login/)) return next();
+    if(baseUrl.match(/^\/login/)) return next();
 
     if(req.headers.accept.match(/text\/html/)) {
       return res.redirect('/login');
