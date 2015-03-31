@@ -1,0 +1,50 @@
+<div class="col-md-12" ng-controller="UsersSearchController">
+	<div class="row" id="searchHead">
+		<div class="col-md-2">
+			Search by Phone:
+		</div>
+		<div class="col-md-2">
+			<input type="text" placeholder="1234567890" id="phone" ng-change="phoneSearch()" ng-model="phone">
+		</div>
+		<div class="col-md-2">
+			Search by First Name:
+		</div>
+		<div class="col-md-2">
+			<input type="text" placeholder="John" id="fName" ng-change="fNameSearch()" ng-model="fName">
+		</div>
+		<div class="col-md-2">
+			Search by Last Name:
+		</div>
+		<div class="col-md-2">
+			<input type="text" placeholder="Smith" id="lName" ng-change="lNameSearch()" ng-model="lName">
+		</div>
+	</div>
+	<div class="row" id="searchResultsHead">
+		<div class="col-md-3">
+			<h5>First Name</h5>
+		</div>
+		<div class="col-md-3">
+			<h5>Last Name</h5>
+		</div>
+		<div class="col-md-3">
+			<h5>Phone</h5>
+		</div>
+		<div class="col-md-3">
+			Role
+		</div>
+	</div>
+	<div class="row" ng-repeat="user in users">
+		<div class="col-md-3">
+			<a href="#/users/edit/{{user.id}}" style="text-decoration: none;">{{user.fName}}</a>
+		</div>
+		<div class="col-md-3">
+			<a href="#/users/edit/{{user.id}}" style="text-decoration: none;">{{user.lName}}</a>
+		</div>
+		<div class="col-md-3">
+			<a href="#/users/edit/{{user.id}}" style="text-decoration: none;">{{user.phone}}</a>
+		</div>
+		<div class="col-md-3">
+			<a href="#/users/edit/{{user.id}}" style="text-decoration: none;">{{user.authLevel}}</a>
+		</div>
+	</div>
+</div>

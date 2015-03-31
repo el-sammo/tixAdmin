@@ -1,0 +1,112 @@
+<div id="fms-users-form" class="col-md-12" ng-cloak>
+	<div class="page-header" ng-show="!user.fName && !editMode">
+		<h3>Add User</h3>
+	</div>
+	<div class="page-header" ng-show="!user.fName && editMode">
+		<h3>Update User</h3>
+	</div>
+	<form name="form" class="form-horizontal">
+		<div class="form-group">
+			<label for="fName" class="col-md-3 control-label">First Name</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="John"
+					ng-model="user.fName" id="fName"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="lName" class="col-md-3 control-label">Last Name</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="Smith"
+					ng-model="user.lName" id="lName"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="email" class="col-md-3 control-label">Email</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="john.smith@gmail.com"
+					ng-model="user.email" id="email"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="phone" class="col-md-3 control-label">Phone</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="4089563132"
+					ng-model="user.phone" id="phone"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="username" class="col-md-3 control-label">Username</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="ducky4lyfe"
+					ng-model="user.username" id="username"
+				>
+			</div>
+		</div>
+
+		<div class="form-group" ng-show="!editMode">
+			<label for="password" class="col-md-3 control-label">Password</label>
+			<div class="col-md-9">
+				<input 
+					type="password" class="form-control" placeholder="******"
+					ng-model="user.password" id="password"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="authLevel" class="col-md-3 control-label">Role</label>
+			<div class="col-md-9">
+				<select id="authLevel" ng-model="authLevel" class="form-control" 
+					ng-options="authLevel.id as authLevel.name for authLevel in authLevels">
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="wage" class="col-md-3 control-label">Wage</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="7.25"
+					ng-model="user.wage" id="wage"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="dependants" class="col-md-3 control-label">Dependants</label>
+			<div class="col-md-9">
+				<input 
+					type="number" class="form-control"
+					ng-model="user.dependants" id="dependants"
+				>
+			</div>
+		</div>
+
+		<br/>
+		<br/>
+
+		<div class="navbar navbar-default navbar-fixed-bottom">
+			<div class="container-fluid">
+				<button type="button" class="btn btn-danger col-md-1" ng-click="cancel()" > Cancel </button>
+				<button type="button" class="btn btn-primary col-md-1 pull-right" ng-click="save(user)" > <i class="fa fa-save"></i> &nbsp; Save </button>
+				<button ng-show="completedCount > 0" type="button" class="btn btn-warning col-md-1 pull-right" ng-click="orderHistory()"><i class="fa fa-search"></i> &nbsp; Order History</button>
+				<button type="button" class="btn btn-default col-md-1 pull-right" ng-click="save(user, {addMore: true})" ng-show="!editMode" >
+					Save &amp; Add More
+				</button>
+			</div>
+		</div>
+	</form>
+</div>

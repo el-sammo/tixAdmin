@@ -15,6 +15,46 @@ var layout = 'users/loginLayout';
 var view = 'login';
 
 module.exports = {
+	drivers: function(req, res) {
+		Users.find({authLevel: 2}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	byFName: function(req, res) {
+		Users.find({fName: {contains: req.params.id}}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	byLName: function(req, res) {
+		Users.find({lName: {contains: req.params.id}}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	byPhone: function(req, res) {
+		Users.find({phone: {contains: req.params.id}}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
   login: function(req, res) {
     var isAjax = req.headers.accept.match(/application\/json/);
 

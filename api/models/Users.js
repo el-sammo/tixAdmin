@@ -6,6 +6,8 @@
 */
 var bcrypt = require('bcrypt');
 
+var tablize = require('sd-datatables');
+
 module.exports = {
 
   attributes: {
@@ -45,3 +47,4 @@ module.exports = {
   }
 };
 
+tablize(module.exports);

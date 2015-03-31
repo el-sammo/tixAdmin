@@ -86,6 +86,11 @@
 			templateUrl: '/templates/dispatch.html'
 		});
 
+		$routeProvider.when('/dispatch/:id', {
+			controller: 'DispatchOrderController',
+			templateUrl: '/templates/dispatchOrder.html'
+		});
+
 
 		///
 		// Order
@@ -189,6 +194,26 @@
 		$routeProvider.when('/options/edit/:id', {
 			controller: 'OptionsEditController',
 			templateUrl: '/templates/optionsForm.html'
+		});
+
+
+		///
+		// Users
+		///
+
+		$routeProvider.when('/users/add', {
+			controller: 'UsersAddController',
+			templateUrl: '/templates/usersForm.html'
+		});
+
+		$routeProvider.when('/users/edit/:id', {
+			controller: 'UsersEditController',
+			templateUrl: '/templates/usersForm.html'
+		});
+
+		$routeProvider.when('/users/search', {
+			controller: 'UsersSearchController',
+			templateUrl: '/templates/usersSearch.html'
 		});
 
 
@@ -1352,10 +1377,139 @@
 				order.updatedAtTime = order.updatedHours+':'+order.updatedMinutes;
 				order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
 				order.total = parseFloat(order.total).toFixed(2);
+
+				// TODO
+				// put this in a config? or what?
+				// orderStatus map
+				// < 1 = not started
+				// 1   = started (ordering)
+				// 2   = payment initiated
+				// 3   = payment accepted
+				// 4   = payment declined
+				// 5   = order completed
+				// 6   = order ordered (at restaurant)
+				// 7   = order picked up
+				// 8   = order en route
+				// 9   = order delivered
+				
+				var orderStatusMap = [
+					'No status',
+					'Ordering',
+					'Payment initiated',
+					'Payment accepted',
+					'Payment declined',
+					'Order submitted',
+					'Order placed',
+					'Order picked up',
+					'Order en route',
+					'Order delivered'
+				];
+
+				order.currStatus = orderStatusMap[order.orderStatus];
+	
+				order.restaurants = 'no restaurants yet';
+				if(order.things.length > 0) {
+					order.restaurants = '';
+					var firstRest = true;
+					order.things.forEach(function(thing) {
+						if(!order.restaurants.match(thing.restaurantName)) {
+							if(firstRest) {
+								order.restaurants = thing.restaurantName;
+								firstRest = false;
+							} else {
+								order.restaurants = order.restaurants + ', ' + thing.restaurantName;
+							}
+						}
+					});
+				}
+
+				if(order.driverId) {
+					var r = $http.get('/users/' + order.driverId);
+				
+					r.error(function(err) {
+						console.log('DispatchController: users ajax failed');
+						console.log(err);
+					});
+				
+					r.then(function(res) {
+						order.driver = res.data.fName;
+					});
+				}
+
+				if(order.customerId) {
+					var r = $http.get('/customers/' + order.customerId);
+				
+					r.error(function(err) {
+						console.log('DispatchController: customers ajax failed');
+						console.log(err);
+					});
+				
+					r.then(function(res) {
+						order.destination = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName;
+					});
+				} else {
+					order.destination = 'not entered yet';
+				}
 			});
 	
 			$scope.orders = res.data;
 		});
+	});
+
+
+	///
+	// Controllers: Dispatch Order
+	///
+
+	app.controller('DispatchOrderController', function($scope, $http, $routeParams, $rootScope, messenger) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+		var p = $http.get('/orders/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('DispatchOrderController: orders ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.order = res.data;
+			var r = $http.get('/users/drivers/');
+		
+			r.error(function(err) {
+				console.log('DispatchOrderController: users ajax failed');
+				console.log(err);
+			});
+		
+			r.then(function(res) {
+				$scope.drivers = res.data;
+			});
+		});
+
+		$scope.dispatchOrder = function(orderId, driverId) {
+			$scope.order.driverId = driverId;
+
+			$scope.order.orderStatus = parseInt($scope.order.orderStatus);
+
+			$http.put(
+				'/orders/' + orderId, $scope.order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been dispatched.', 'Success!');
+				$http.post('/mail/sendOrderToDriver/'+orderId);
+
+				$window.location.href = '#/dispatch/';
+			});
+		};
 	});
 
 
@@ -2380,6 +2534,238 @@
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/options');
 		};
+	});
+
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/users/);
+	});
+
+	app.factory('userSchema', function() {
+		function nameTransform(user) {
+			if(! user || ! user.fName || user.fName.length < 1) {
+				return 'user-name';
+			}
+			return (user.fName
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				user: {
+					areaId: '',
+					fName: '',
+					lName: '',
+					username: '',
+					phone: '',
+					authLevel: '',
+					wage: '',
+					dependants: '',
+					email: ''
+				}
+			},
+	
+			links: {
+				website: {
+					placeholder: function(user) {
+						return 'www.' + nameTransform(user) + '.com';
+					},
+					addon: 'http://'
+				},
+				facebook: {
+					placeholder: nameTransform,
+					addon: 'facebook.com/'
+				},
+				twitter: {
+					placeholder: nameTransform,
+					addon: '@'
+				},
+				instagram: {
+					placeholder: nameTransform,
+					addon: 'instagram.com/'
+				},
+				pinterest: {
+					placeholder: nameTransform,
+					addon: 'pinterest.com/'
+				},
+			},
+	
+			populateDefaults: function(user) {
+				$.map(service.defaults.user, function(value, key) {
+					if(user[key]) return;
+					if(typeof value === 'object') {
+						user[key] = angular.copy(value);
+						return;
+					}
+					user[key] = value;
+				});
+				return user;
+			}
+		};
+
+		return service;
+	});
+
+	// Auth Level Map
+	// Should Exist in a Config
+	// 1 - basic auth level; access to minimal functionality
+	// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+	// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+	// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+	// 5 - unrestricted auth level
+	
+	app.controller('UsersAddController', function(
+		navMgr, messenger, pod, userSchema,
+		$scope, $http, $window, $rootScope
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.authLevels = [
+			{id: 0, name: 'None'},
+			{id: 1, name: 'Basic'},
+			{id: 2, name: 'Driver'},
+			{id: 3, name: 'Operator'},
+			{id: 4, name: 'Manager'}
+		];
+
+		$scope.userSchema = userSchema;
+		$scope.user = userSchema.populateDefaults({});
+
+		$scope.user.areaId = $rootScope.areaId;
+
+		// TODO 
+		// clean phone number; integers only
+
+		$scope.save = function save(user, options) {
+			options || (options = {});
+
+			$http.post(
+				'/users/create', user
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The user has been created.', 'Success!');
+
+				if(options.addMore) {
+					$scope.user = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/users/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/users');
+		};
+	});
+
+	app.controller('UsersEditController', function(
+		navMgr, messenger, pod, userSchema, $scope, $http, $routeParams
+	) {
+
+		$scope.authLevels = [
+			{id: 0, name: 'None'},
+			{id: 1, name: 'Basic'},
+			{id: 2, name: 'Driver'},
+			{id: 3, name: 'Operator'},
+			{id: 4, name: 'Manager'}
+		];
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.userSchema = userSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/users/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.user = userSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(user, options) {
+			options || (options = {});
+
+			// TODO 
+			// clean phone number; integers only
+
+			$http.put(
+				'/users/' + user.id, user
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The user has been updated.', 'Success!');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/users');
+		};
+	});
+
+	app.controller('UsersSearchController', function(
+		userSchema,	$scope, $http, $window, $rootScope
+	) {
+		var areaId = $rootScope.areaId;
+		
+		var authLevelMap = [
+			'None',
+			'Basic',
+			'Driver',
+			'Operator',
+			'Manager'
+		];
+
+		$scope.fNameSearch = function() {
+			var p = $http.get('/users/byFName/' + $scope.fName);
+	
+			p.error(function(err) {
+				console.log('UsersSearchController: users-fName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				res.data.map(function(user) {
+					user.authLevel = authLevelMap[user.authLevel];
+				});
+				$scope.users = res.data;
+			});
+		};
+
+		$scope.lNameSearch = function() {
+			var p = $http.get('/users/byLName/' + $scope.lName);
+	
+			p.error(function(err) {
+				console.log('UsersSearchController: users-lName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.users = res.data;
+			});
+		}
+
+		$scope.phoneSearch = function() {
+			var p = $http.get('/users/byPhone/' + $scope.phone);
+	
+			p.error(function(err) {
+				console.log('UsersSearchController: users-phone ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.users = res.data;
+			});
+		}
+
 	});
 
 

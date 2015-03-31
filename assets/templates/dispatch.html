@@ -1,5 +1,5 @@
 <div class="col-md-12 page-header" ng-cloak>
-	<h3>Order Dispatch</h3>
+	<h3>Current Orders</h3>
 </div>
 <div class="col-md-12">
 	<div class="row">
@@ -27,24 +27,20 @@
 			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.updatedAt}}</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.orderStatus}}</a><br/></span>
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.currStatus}}</a><br/></span>
 		</div>
 		<div class="col-md-2">
 			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.total}}</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<div class="row" ng-repeat="thing in things">
-				<div class="col-md-12">
-					<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{thing.restaurantName}}</a> </span>
-				</div>
-			</div>
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.restaurants}}</a> </span>
 		</div>
 		<div class="col-md-2">
 			<span class="leftNavLink" ng-show="order.driver"><a href="#/orderDetails/{{order.id}}">{{order.driver}}</a><br/></span>
-			<span class="leftNavLink" ng-show="!order.driver"><a href="#/orders/dispatch/{{order.id}}">Dispatch Order</a><br/></span>
+			<span class="leftNavLink" ng-show="!order.driver"><a href="#/dispatch/{{order.id}}">Dispatch Order</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">5519 Pathfinder</a><br/></span>
+			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.destination}}</a><br/></span>
 		</div>
 	</div>
 </div>
