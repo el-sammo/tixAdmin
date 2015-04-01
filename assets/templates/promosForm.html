@@ -1,0 +1,76 @@
+<div id="fms-promos-form" class="col-md-12" ng-cloak>
+	<div class="page-header" ng-show="!promo.name && !editMode">
+		<h3>Add Promo</h3>
+	</div>
+	<div class="page-header" ng-show="!promo.name && editMode">
+		<h3>Update Promo</h3>
+	</div>
+	<div class="page-header" ng-show="promo.name">
+		<h3>
+			<small>PROMO: </small>
+			{{promo.name}} 
+		</h3>
+	</div>
+	<form name="form" class="form-horizontal">
+		<div class="form-group">
+			<label for="name" class="col-md-3 control-label">Promo Name</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="Name"
+					ng-model="promo.name" id="name"
+				>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="amount" class="col-md-3 control-label">Amount</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="1"
+					ng-model="promo.amount" id="amount"
+				>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="uses" class="col-md-3 control-label">Uses</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="1"
+					ng-model="promo.uses" id="uses"
+				>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="expires" class="col-md-3 control-label">Expires</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control" placeholder="12-31-2015"
+					ng-model="promo.expires" id="expires"
+				>
+			</div>
+		</div>
+		<div class="navbar navbar-default navbar-fixed-bottom">
+			<div class="container-fluid">
+				<button
+					type="button" class="btn btn-danger col-md-1" 
+					ng-click="cancel()"
+				>
+					Cancel
+				</button>
+				<button 
+					type="button" class="btn btn-primary col-md-1 pull-right" 
+					ng-click="save(promo)"
+				>
+					<i class="fa fa-save"></i> &nbsp;
+					Save
+				</button>
+				<button
+					type="button" class="btn btn-default col-md-1 pull-right" 
+					ng-click="save(promo, {addMore: true})"
+					ng-show="!editMode"
+				>
+					Save &amp; Add More
+				</button>
+			</div>
+		</div>
+	</form>
+</div>

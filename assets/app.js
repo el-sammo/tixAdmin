@@ -103,6 +103,46 @@
 
 
 		///
+		// Hotels
+		///
+
+		$routeProvider.when('/hotels', {
+			controller: 'HotelsListController',
+			templateUrl: '/templates/hotelsList.html'
+		});
+
+		$routeProvider.when('/hotels/add/:id', {
+			controller: 'HotelsAddController',
+			templateUrl: '/templates/hotelsForm.html'
+		});
+
+		$routeProvider.when('/hotels/edit/:id', {
+			controller: 'HotelsEditController',
+			templateUrl: '/templates/hotelsForm.html'
+		});
+
+
+		///
+		// Promos
+		///
+
+		$routeProvider.when('/promos', {
+			controller: 'PromosListController',
+			templateUrl: '/templates/promosList.html'
+		});
+
+		$routeProvider.when('/promos/add/:id', {
+			controller: 'PromosAddController',
+			templateUrl: '/templates/promosForm.html'
+		});
+
+		$routeProvider.when('/promos/edit/:id', {
+			controller: 'PromosEditController',
+			templateUrl: '/templates/promosForm.html'
+		});
+
+
+		///
 		// Restaurants
 		///
 
@@ -694,6 +734,7 @@
 
 	app.controller('HomeController', function($scope, $http, $routeParams, $rootScope) {
 		var areaId = $rootScope.areaId;
+		$scope.areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
 
 		// Auth Level Map
@@ -1641,6 +1682,321 @@
 			});
 		};
 
+	});
+
+
+	///
+	// Controllers: Hotels
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/hotels/);
+	});
+
+	app.factory('hotelSchema', function() {
+		function nameTransform(hotel) {
+			if(! hotel || ! hotel.name || hotel.name.length < 1) {
+				return 'hotel-name';
+			}
+			return (hotel.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				hotel: {
+					areaId: '',
+					name: '',
+					addresses: [ ],
+					phone: ''
+				}
+			},
+
+			populateDefaults: function(hotel) {
+				$.map(service.defaults.hotel, function(value, key) {
+					if(hotel[key]) return;
+					if(typeof value === 'object') {
+						hotel[key] = angular.copy(value);
+						return;
+					}
+					hotel[key] = value;
+				});
+
+				if(hotel.addresses.length < 1) {
+					hotel.addresses.push(service.defaults.address);
+				}
+
+				hotel.addresses.forEach(function(address) {
+					_.forEach(service.defaults.address, function(value, key) {
+						if(address[key]) return;
+						if(typeof value === 'object') {
+							address[key] = angular.copy(value);
+							return;
+						}
+						address[key] = value;
+					});
+				});
+				return hotel;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('HotelsListController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
+
+		$scope.path = 'hotels';
+
+		var p = $http.get('/areas/' + areaId);
+
+		p.error(function(err) {
+			console.log('HotelsListController: area ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.area = res.data;
+		});
+
+		var r = $http.get('/hotels/byAreaId/' + areaId);
+
+		r.error(function(err) {
+			console.log('HotelsListController: hotels ajax failed');
+			console.log(err);
+		});
+
+		r.then(function(res) {
+			$scope.hotels = res.data;
+			console.log(res.data);
+		});
+
+	});
+
+	app.controller('HotelsAddController', function(
+		navMgr, messenger, pod, hotelSchema, $scope, $http, $routeParams, $window
+	) {
+		
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.hotelSchema = hotelSchema;
+		$scope.hotel = hotelSchema.populateDefaults({});
+
+		$scope.hotel.areaId = $routeParams.id;
+
+		$scope.save = function save(hotel, options) {
+
+			options || (options = {});
+
+			$http.post(
+				'/hotels/create', hotel
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The hotel has been created.', 'Success!');
+
+				if(options.addMore) {
+					$scope.hotel = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/hotels/';
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/');
+		};
+	});
+
+	app.controller('HotelsEditController', function(
+		navMgr, messenger, pod, hotelSchema, $scope, $http, $routeParams
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.hotelSchema = hotelSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/hotels/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.hotel = hotelSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(hotel, options) {
+			options || (options = {});
+
+			$http.put(
+				'/hotels/' + hotel.id, hotel
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The hotel has been updated.', 'Success!');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/');
+		};
+	});
+
+
+	///
+	// Controllers: Promos
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/promos/);
+	});
+
+	app.factory('promoSchema', function() {
+		function nameTransform(promo) {
+			if(! promo || ! promo.name || promo.name.length < 1) {
+				return 'promo-name';
+			}
+			return (promo.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				promo: {
+					areaId: '',
+					name: '',
+					uses: '',
+					expires: '',
+					amount: ''
+				}
+			},
+
+			populateDefaults: function(promo) {
+				$.map(service.defaults.promo, function(value, key) {
+					if(promo[key]) return;
+					if(typeof value === 'object') {
+						promo[key] = angular.copy(value);
+						return;
+					}
+					promo[key] = value;
+				});
+
+				return promo;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('PromosListController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
+
+		$scope.path = 'promos';
+
+		var p = $http.get('/areas/' + areaId);
+
+		p.error(function(err) {
+			console.log('PromosListController: area ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.area = res.data;
+		});
+
+		var r = $http.get('/promos/byAreaId/' + areaId);
+
+		r.error(function(err) {
+			console.log('PromosListController: promos ajax failed');
+			console.log(err);
+		});
+
+		r.then(function(res) {
+			$scope.promos = res.data;
+			console.log(res.data);
+		});
+
+	});
+
+	app.controller('PromosAddController', function(
+		navMgr, messenger, pod, promoSchema, $scope, $http, $routeParams, $window
+	) {
+		
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.promoSchema = promoSchema;
+		$scope.promo = promoSchema.populateDefaults({});
+
+		$scope.promo.areaId = $routeParams.id;
+
+		$scope.save = function save(promo, options) {
+
+			options || (options = {});
+
+			$http.post(
+				'/promos/create', promo
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The promo has been created.', 'Success!');
+
+				if(options.addMore) {
+					$scope.promo = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/promos/';
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/');
+		};
+	});
+
+	app.controller('PromosEditController', function(
+		navMgr, messenger, pod, promoSchema, $scope, $http, $routeParams
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.promoSchema = promoSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/promos/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.promo = promoSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(promo, options) {
+			options || (options = {});
+
+			$http.put(
+				'/promos/' + promo.id, promo
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The promo has been updated.', 'Success!');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/');
+		};
 	});
 
 

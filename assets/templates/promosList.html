@@ -1,0 +1,44 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{area.name}} <small>PROMOS</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add/{{area.id}}" class="pull-right">
+    <button id="promoAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="promoAdd" class="fa-btn-text divspan">Add a Promo to {{area.name}}</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Promo</h3>
+			</td>
+			<td>
+				<h3>Amount</h3>
+			</td>
+			<td>
+				<h3>Uses</h3>
+			</td>
+			<td>
+				<h3>Expires</h3>
+			</td>
+		</tr>
+		<tr ng-init="promoId = promo.id" ng-repeat="promo in promos">
+			<td>
+				<span><a href="#/promos/edit/{{promoId}}">{{promo.name}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/promos/edit/{{promoId}}">{{promo.amount}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/promos/edit/{{promoId}}">{{promo.uses}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/promos/edit/{{promoId}}">{{promo.expires}}</a></span>
+			</td>
+		</tr>
+	</table>
+</div>
