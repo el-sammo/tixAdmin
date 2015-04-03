@@ -1711,6 +1711,13 @@
 					areaId: '',
 					name: '',
 					addresses: [ ],
+					address: {
+						streetNumber: '',
+						streetName: '',
+						city: '',
+						state: '',
+						zip: '',
+					},
 					phone: ''
 				}
 			},
@@ -1832,6 +1839,8 @@
 		$scope.save = function save(hotel, options) {
 			options || (options = {});
 
+			console.log(hotel);
+
 			$http.put(
 				'/hotels/' + hotel.id, hotel
 			).success(function(data, status, headers, config) {
@@ -1876,6 +1885,7 @@
 					name: '',
 					uses: '',
 					expires: '',
+					effect: '',
 					amount: ''
 				}
 			},
@@ -1981,6 +1991,7 @@
 		});
 
 		$scope.save = function save(promo, options) {
+
 			options || (options = {});
 
 			$http.put(
