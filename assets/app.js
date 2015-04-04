@@ -1711,15 +1711,15 @@
 					areaId: '',
 					name: '',
 					addresses: [ ],
-					address: {
-						streetNumber: '',
-						streetName: '',
-						city: '',
-						state: '',
-						zip: '',
-					},
 					phone: ''
-				}
+				},
+				address: {
+					streetNumber: '',
+					streetName: '',
+					city: '',
+					state: '',
+					zip: '',
+				},
 			},
 
 			populateDefaults: function(hotel) {
@@ -1731,11 +1731,11 @@
 					}
 					hotel[key] = value;
 				});
-
 				if(hotel.addresses.length < 1) {
-					hotel.addresses.push(service.defaults.address);
+					hotel.addresses.push(angular.copy(
+						service.defaults.address
+					));
 				}
-
 				hotel.addresses.forEach(function(address) {
 					_.forEach(service.defaults.address, function(value, key) {
 						if(address[key]) return;
@@ -1778,7 +1778,6 @@
 
 		r.then(function(res) {
 			$scope.hotels = res.data;
-			console.log(res.data);
 		});
 
 	});
@@ -1838,8 +1837,6 @@
 
 		$scope.save = function save(hotel, options) {
 			options || (options = {});
-
-			console.log(hotel);
 
 			$http.put(
 				'/hotels/' + hotel.id, hotel
