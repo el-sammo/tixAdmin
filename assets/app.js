@@ -1436,19 +1436,18 @@
 				var orderStatusMap = [
 					'No status',
 					'Ordering',
-					'Payment initiated',
-					'Payment accepted',
-					'Payment declined',
-					'Order submitted',
-					'Order placed',
-					'Order picked up',
-					'Order en route',
-					'Order delivered'
+					'Payment Initiated',
+					'Payment Not Processed',
+					'Payment Declined',
+					'Payment Accepted',
+					'Order Placed',
+					'Order Picked up',
+					'Order In Route',
+					'Order Delivered'
 				];
 
 				order.currStatus = orderStatusMap[order.orderStatus];
 	
-				order.restaurants = 'no restaurants yet';
 				if(order.things.length > 0) {
 					order.restaurants = '';
 					var firstRest = true;
@@ -1592,7 +1591,7 @@
 		});
 	
 		p.then(function(res) {
-			$scope.paymentMethod = res.data.paymentMethod;
+			$scope.paymentMethod = res.data.paymentMethods;
 			$scope.total = '$'+res.data.total;
 			res.data.things.forEach(function(thing) {
 				$scope.getRestaurantName(thing.optionId).then(function(name) {

@@ -57,7 +57,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -71,7 +71,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000 * 7);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -85,7 +85,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000 * 28);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 8}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -99,7 +99,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -113,7 +113,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000 * 7);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -127,7 +127,7 @@ module.exports = {
 		var yesterday = ts - (24 * 3600000 * 28);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 9}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
