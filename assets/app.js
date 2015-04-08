@@ -1594,14 +1594,14 @@
 			$scope.paymentMethod = res.data.paymentMethods;
 			$scope.total = '$'+res.data.total;
 			res.data.things.forEach(function(thing) {
-				$scope.getRestaurantName(thing.optionId).then(function(name) {
-					var restaurant = _.find($scope.orderRestaurants, {name: name});
+				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
+					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
 					if(! restaurant) {
-						restaurant = {name: name, items: []};
+						restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
 						$scope.orderRestaurants.push(restaurant);
 					}
 					restaurant.items.push(
-						_.pick(thing, ['quantity', 'name', 'option'])
+						_.pick(thing, ['quantity', 'name', 'option', 'specInst'])
 					);
 				});
 			});
@@ -1672,8 +1672,7 @@
 							});
 							
 							u.then(function(res) {
-								console.log(res.data.name);
-								resolve(res.data.name);
+								resolve(res.data);
 							});
 						});
 					});
@@ -1928,7 +1927,6 @@
 
 		r.then(function(res) {
 			$scope.promos = res.data;
-			console.log(res.data);
 		});
 
 	});
@@ -2039,6 +2037,7 @@
 					active: '',
 					image: '',
 					slug: '',
+					phone: '',
 					addresses: [ ],
 					hours0open: '',
 					hours0close: '',

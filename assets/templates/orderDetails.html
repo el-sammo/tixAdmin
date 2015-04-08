@@ -24,13 +24,14 @@
 			<div class="row" ng-repeat="restaurant in orderRestaurants">
 				<div class="col-md-12">
 					<div class="row">
-						<span class="orderDetailsRestaurantInfo"><h4>{{restaurant.name}}</h4></span>
+						<span class="orderDetailsRestaurantInfo"><h4>{{restaurant.name}} ({{restaurant.phone}})</h4></span>
 					</div>
 				</div>
 				<div class="col-md-12">
 					<div class="row" ng-repeat="item in restaurant.items">
 						<div class="col-md-11 col-md-offset-1">
 							<span class="orderDetailsItemInfo">{{item.quantity}} {{item.name}} - {{item.option}}<br/></span>
+							<span class="orderDetailsItemInfo">{{item.specInst}}<br/></span>
 						</div>
 					</div>
 				</div>
