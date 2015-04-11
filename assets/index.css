@@ -70,6 +70,13 @@ td {
 	padding-bottom: 12px;
 }
 
+.orderActionLink {
+	font-size: 14px;
+	font-weight: 500;
+	color: blue;
+	cursor: pointer;
+}
+
 /** Angular Bootstrap **/
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

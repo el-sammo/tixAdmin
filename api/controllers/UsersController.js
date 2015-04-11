@@ -16,7 +16,7 @@ var view = 'login';
 
 module.exports = {
 	drivers: function(req, res) {
-		Users.find({authLevel: 2}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
+		Users.find({authLevel: {'>=': 2}}).sort({fName: 'asc', lName: 'asc'}).limit(20).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);

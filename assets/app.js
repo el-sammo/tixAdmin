@@ -1368,7 +1368,7 @@
 	// Controllers: Dispatch
 	///
 
-	app.controller('DispatchController', function($scope, $http, $routeParams, $rootScope) {
+	app.controller('DispatchController', function($scope, $http, $routeParams, $rootScope, $window) {
 		var areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
 
@@ -1379,6 +1379,12 @@
 		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
+
+		
+		setTimeout(function() {
+			$window.location.reload();
+		}, 30000);
+
 
 		var p = $http.get('/orders/last24Hours/' + areaId);
 	
@@ -1419,6 +1425,27 @@
 				order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
 				order.total = parseFloat(order.total).toFixed(2);
 
+				var now = new Date().getTime();
+
+				var old = (now - order.paymentAcceptedAt).toString();
+
+				var formattedNow = old.substr(0, (old.length - 3)); 
+
+				var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
+				var formattedAgeSec = parseInt(formattedNow) % 60;
+
+				if(formattedAgeSec < 10) {
+					formattedAgeSec = '0' + formattedAgeSec;
+				}
+
+				if(formattedAgeHour > 0) {
+					var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+					order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
+				} else {
+					var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
+					order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
+				}
+
 				// TODO
 				// put this in a config? or what?
 				// orderStatus map
@@ -1429,7 +1456,7 @@
 				// 4   = payment declined
 				// 5   = order completed
 				// 6   = order ordered (at restaurant)
-				// 7   = order picked up
+				// 7   = order collected (from restaurant)
 				// 8   = order en route
 				// 9   = order delivered
 				
@@ -1501,7 +1528,10 @@
 	// Controllers: Dispatch Order
 	///
 
-	app.controller('DispatchOrderController', function($scope, $http, $routeParams, $rootScope, messenger) {
+	app.controller('DispatchOrderController', function(
+		$scope, $http, $routeParams, 
+		$rootScope, messenger, $window
+	) {
 		var areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
 
@@ -1558,7 +1588,9 @@
 	///
 
 	app.controller('OrderDetailsController', function(
-		$scope, $http, $routeParams, $rootScope, $q, $sce, configMgr, querystring
+		$scope, $http, $routeParams, $rootScope, 
+		$q, $sce, configMgr, querystring, messenger,
+		$window
 	) {
 		var areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
@@ -1591,9 +1623,11 @@
 		});
 	
 		p.then(function(res) {
-			$scope.paymentMethod = res.data.paymentMethods;
-			$scope.total = '$'+res.data.total;
-			res.data.things.forEach(function(thing) {
+			$scope.order = res.data;
+			$scope.orderStatus = $scope.order.orderStatus;
+			$scope.paymentMethod = $scope.order.paymentMethods;
+			$scope.total = '$'+$scope.order.total;
+			$scope.order.things.forEach(function(thing) {
 				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
 					if(! restaurant) {
@@ -1606,7 +1640,7 @@
 				});
 			});
 
-			var r = $http.get('/customers/' + res.data.customerId);
+			var r = $http.get('/customers/' + $scope.order.customerId);
 			
 			r.error(function(err) {
 				console.log('OrderDetailsController: customer ajax failed');
@@ -1614,25 +1648,82 @@
 			});
 			
 			r.then(function(res) {
-				$scope.fName = res.data.fName;
-				$scope.lName = res.data.lName;
-				$scope.phone = res.data.phone;
-				$scope.address = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName+' '+res.data.addresses.primary.city;
+				$scope.customer = res.data;
+				$scope.fName = $scope.customer.fName;
+				$scope.lName = $scope.customer.lName;
+				$scope.phone = $scope.customer.phone;
+				$scope.address = $scope.customer.addresses.primary.streetNumber+' '+$scope.customer.addresses.primary.streetName+' '+$scope.customer.addresses.primary.city;
 
 				$scope.src = $sce.trustAsResourceUrl(
 					'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
 						key: configMgr.config.vendors.googleMaps.key,
 						q: ([
-							res.data.addresses.primary.streetNumber,
-							res.data.addresses.primary.streetName,
-							res.data.addresses.primary.city,
-							res.data.addresses.primary.state,
-							res.data.addresses.primary.zip
+							$scope.customer.addresses.primary.streetNumber,
+							$scope.customer.addresses.primary.streetName,
+							$scope.customer.addresses.primary.city,
+							$scope.customer.addresses.primary.state,
+							$scope.customer.addresses.primary.zip
 						].join('+'))
 					})
 				);
 			});
 		});
+
+		$scope.setOrderPlaced = function(order) {
+			order.orderStatus = 6;
+			order.orderPlacedAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been placed.', 'Success!');
+
+				$window.location.href = '#/dispatch/';
+			});
+		}
+
+		$scope.setOrderCollected = function(order) {
+			order.orderStatus = 7;
+			order.orderCollectedAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been collected.', 'Success!');
+
+				$window.location.href = '#/orderDetails/' + order.id;
+			});
+		}
+
+		$scope.setOrderEnRoute = function(order) {
+			order.orderStatus = 8;
+			order.orderEnRouteAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order is en route.', 'Success!');
+
+				$window.location.href = '#/orderDetails/' + order.id;
+			});
+		}
+
+		$scope.setOrderDelivered = function(order) {
+			order.orderStatus = 9;
+			order.orderDeliveredAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been delivered.', 'Success!');
+
+				$window.location.href = '#/dispatch/';
+			});
+		}
 
 		$scope.getRestaurantName = function(optionId) {
 			return $q(function(resolve, reject) {
@@ -2998,6 +3089,7 @@
 		$scope.user = userSchema.populateDefaults({});
 
 		$scope.user.areaId = $rootScope.areaId;
+		console.log('$rootScope.areaId: '+$rootScope.areaId);
 
 		// TODO 
 		// clean phone number; integers only

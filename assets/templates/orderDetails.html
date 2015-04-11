@@ -13,7 +13,13 @@
 			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod != 'cash'">CC - {{total}}</span>
 			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod == 'cash'">Cash - {{total}}</span>
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-2">
+			<span class="orderActionLink" ng-show="orderStatus < 6" ng-click="setOrderPlaced(order)">Set Order Placed</span>
+			<span class="orderActionLink" ng-show="orderStatus > 5 && orderStatus < 7" ng-click="setOrderCollected(order)">Set Order Collected</span>
+			<span class="orderActionLink" ng-show="orderStatus > 6 && orderStatus < 8" ng-click="setOrderEnRoute(order)">Set Order En Route</span>
+			<span class="orderActionLink" ng-show="orderStatus > 7 && orderStatus < 9" ng-click="setOrderDelivered(order)">Set Order Delivered</span>
+		</div>
+		<div class="col-md-2">
 			&nbsp;
 		</div>
 	</div>
