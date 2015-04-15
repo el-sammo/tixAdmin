@@ -39,11 +39,15 @@ module.exports = {
 	},
 
 	last24Hours: function(req, res) {
-		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000);
-		var yesterdayDate = new Date(yesterday);
+		var today = new Date();
+	
+		var thisYear = today.getFullYear();
+		var thisMonth = today.getMonth();
+		var thisDate = today.getDate();
+	
+		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': todayMilliseconds}}).sort({paymentAcceptedAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -53,11 +57,15 @@ module.exports = {
 	},
 	
 	daily: function(req, res) {
-		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000);
-		var yesterdayDate = new Date(yesterday);
+		var today = new Date();
+	
+		var thisYear = today.getFullYear();
+		var thisMonth = today.getMonth();
+		var thisDate = today.getDate();
+	
+		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -67,11 +75,17 @@ module.exports = {
 	},
 	
 	weekly: function(req, res) {
-		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000 * 7);
-		var yesterdayDate = new Date(yesterday);
+		var today = new Date();
+	
+		var thisYear = today.getFullYear();
+		var thisMonth = today.getMonth();
+		var thisDate = today.getDate();
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		var sevDaysMilli = 7 * 24 * 60 * 60 * 1000;
+	
+		var weekAgoMilliseconds = (new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime()) - sevDaysMilli;
+
+		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': weekAgoMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -81,11 +95,17 @@ module.exports = {
 	},
 	
 	monthly: function(req, res) {
-		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000 * 28);
-		var yesterdayDate = new Date(yesterday);
+		var today = new Date();
+	
+		var thisYear = today.getFullYear();
+		var thisMonth = today.getMonth();
+		var thisDate = today.getDate();
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		var thirtyDaysMilli = 30 * 24 * 60 * 60 * 1000;
+	
+		var monthAgoMilliseconds = (new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime()) - thirtyDaysMilli;
+
+		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': monthAgoMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -96,10 +116,10 @@ module.exports = {
 	
 	dailyOrphaned: function(req, res) {
 		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000);
+		var yesterday = ts - (24 * 3600000 * 7);
 		var yesterdayDate = new Date(yesterday);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, updatedAt: { '>=': yesterdayDate}, orderStatus: { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -110,10 +130,10 @@ module.exports = {
 	
 	weeklyOrphaned: function(req, res) {
 		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000 * 7);
-		var yesterdayDate = new Date(yesterday);
+		var weekAgo = ts - (24 * 3600000 * 7);
+		var weekAgoDate = new Date(weekAgo);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, updatedAt: { '>=': weekAgoDate}, orderStatus: { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -124,10 +144,10 @@ module.exports = {
 	
 	monthlyOrphaned: function(req, res) {
 		var ts = new Date().getTime();
-		var yesterday = ts - (24 * 3600000 * 28);
-		var yesterdayDate = new Date(yesterday);
+		var monthAgo = ts - (24 * 3600000 * 7);
+		var monthAgoDate = new Date(monthAgo);
 
-		Orders.find({'areaId': req.params.id, 'updatedAt': { '>=': yesterdayDate}, 'orderStatus': { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, updatedAt: { '>=': monthAgoDate}, orderStatus: { '<': 5}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);

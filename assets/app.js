@@ -409,6 +409,36 @@
 	});
 
 
+	app.factory('homeMgmt', function homeMgmtFactory(
+		$modal, $rootScope, $http
+	) {
+		var service = {
+			dailyOrders: function() {
+				$modal.open({
+					templateUrl: '/templates/dailyOrders.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
+			weeklyOrders: function() {
+				$modal.open({
+					templateUrl: '/templates/weeklyOrders.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
+			monthlyOrders: function() {
+				$modal.open({
+					templateUrl: '/templates/monthlyOrders.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
+		};
+		return service;
+	});
+
+
 	///
 	// Authentication / Login management
 	///
@@ -732,7 +762,10 @@
 	// Controllers: Home
 	///
 
-	app.controller('HomeController', function($scope, $http, $routeParams, $rootScope) {
+	app.controller('HomeController', function(
+		$scope, $http, $routeParams, $rootScope,
+		homeMgmt
+	) {
 		var areaId = $rootScope.areaId;
 		$scope.areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
@@ -745,6 +778,10 @@
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
 	
+		$scope.dailyOrders = homeMgmt.dailyOrders;
+		$scope.weeklyOrders = homeMgmt.weeklyOrders;
+		$scope.monthlyOrders = homeMgmt.monthlyOrders;
+
 		var od = $http.get('/orders/daily/' +areaId);
 
 		od.error(function(err) {
@@ -1380,11 +1417,9 @@
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
 
-		
 		setTimeout(function() {
 			$window.location.reload();
 		}, 30000);
-
 
 		var p = $http.get('/orders/last24Hours/' + areaId);
 	
@@ -1626,7 +1661,7 @@
 			$scope.order = res.data;
 			$scope.orderStatus = $scope.order.orderStatus;
 			$scope.paymentMethod = $scope.order.paymentMethods;
-			$scope.total = '$'+$scope.order.total;
+			$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
 			$scope.order.things.forEach(function(thing) {
 				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
