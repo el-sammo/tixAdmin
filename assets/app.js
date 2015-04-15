@@ -792,13 +792,20 @@
 
 		od.then(function(res) {
 			var dailyOrders = res.data;
-			var dayRevenue = 0;
+			var dayGrossRevenue = 0;
+			var dayNetRevenue = 0;
 			if(dailyOrders && dailyOrders.length > 0) {
 				dailyOrders.forEach(function(order) {
-					dayRevenue += parseFloat(order.total);
+					dayGrossRevenue += parseFloat(order.total);
+					if(order.discount) {
+						dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+					} else {
+						dayNetRevenue += parseFloat(order.deliveryFee);
+					}
 				});
 			}
-			$scope.dayRevenue = dayRevenue.toFixed();
+			$scope.dayGrossRevenue = dayGrossRevenue.toFixed();
+			$scope.dayNetRevenue = dayNetRevenue.toFixed();
 			$scope.dayOrders = res.data.length;
 		});
 
@@ -812,13 +819,20 @@
 
 		ow.then(function(res) {
 			var weekOrders = res.data;
-			var weekRevenue = 0;
+			var weekGrossRevenue = 0;
+			var weekNetRevenue = 0;
 			if(weekOrders && weekOrders.length > 0) {
 				weekOrders.forEach(function(order) {
-					weekRevenue += parseFloat(order.total);
+					weekGrossRevenue += parseFloat(order.total);
+					if(order.discount) {
+						weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+					} else {
+						weekNetRevenue += parseFloat(order.deliveryFee);
+					}
 				});
 			}
-			$scope.weekRevenue = weekRevenue.toFixed();
+			$scope.weekGrossRevenue = weekGrossRevenue.toFixed();
+			$scope.weekNetRevenue = weekNetRevenue.toFixed();
 			$scope.weekOrders = res.data.length;
 		});
 
@@ -832,13 +846,20 @@
 
 		om.then(function(res) {
 			var weeksOrders = res.data;
-			var weeksRevenue = 0;
+			var weeksGrossRevenue = 0;
+			var weeksNetRevenue = 0;
 			if(weeksOrders && weeksOrders.length > 0) {
 				weeksOrders.forEach(function(order) {
-					weeksRevenue += parseFloat(order.total);
+					weeksGrossRevenue += parseFloat(order.total);
+					if(order.discount) {
+						weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+					} else {
+						weeksNetRevenue += parseFloat(order.deliveryFee);
+					}
 				});
 			}
-			$scope.weeksRevenue = weeksRevenue.toFixed();
+			$scope.weeksGrossRevenue = weeksGrossRevenue.toFixed();
+			$scope.weeksNetRevenue = weeksNetRevenue.toFixed();
 			$scope.weeksOrders = res.data.length;
 		});
 
@@ -1475,6 +1496,9 @@
 
 				if(formattedAgeHour > 0) {
 					var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+					if(formattedAgeMin < 10) {
+						formattedAgeMin = '0' + formattedAgeMin;
+					}
 					order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
 				} else {
 					var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
@@ -1705,7 +1729,7 @@
 		});
 
 		$scope.setOrderPlaced = function(order) {
-			order.orderStatus = 6;
+			order.orderStatus = parseInt(6);
 			order.orderPlacedAt = new Date().getTime();
 			$http.put(
 				'/orders/' + order.id, order
@@ -1719,7 +1743,7 @@
 		}
 
 		$scope.setOrderCollected = function(order) {
-			order.orderStatus = 7;
+			order.orderStatus = parseInt(7);
 			order.orderCollectedAt = new Date().getTime();
 			$http.put(
 				'/orders/' + order.id, order
@@ -1733,7 +1757,7 @@
 		}
 
 		$scope.setOrderEnRoute = function(order) {
-			order.orderStatus = 8;
+			order.orderStatus = parseInt(8);
 			order.orderEnRouteAt = new Date().getTime();
 			$http.put(
 				'/orders/' + order.id, order
@@ -1747,7 +1771,7 @@
 		}
 
 		$scope.setOrderDelivered = function(order) {
-			order.orderStatus = 9;
+			order.orderStatus = parseInt(9);
 			order.orderDeliveredAt = new Date().getTime();
 			$http.put(
 				'/orders/' + order.id, order

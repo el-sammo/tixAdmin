@@ -16,7 +16,7 @@ module.exports = {
 
   attributes: {
     orderStatus: {
-      type: 'int',
+      type: 'integer',
       required: true
     },
 		customerId: {
