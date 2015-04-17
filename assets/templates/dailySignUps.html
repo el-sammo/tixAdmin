@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="nav-away-modal-title">
+		Today's Sign Ups
+  </h3>
+</div>
+<div class="modal-body">
+	<div class="row" ng-repeat="customer in daySignUps" style="border-bottom: 1px solid #E5E5E5;">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-12">
+					<h4>{{customer.fName}} {{customer.lName}}</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="muted-text">
+						{{customer.addresses.primary.streetNumber}} {{customer.addresses.primary.streetName}}
+					</div>
+					<div class="muted-text">
+						{{customer.addresses.primary.city}}, {{customer.addresses.primary.state}} {{customer.addresses.primary.zip}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary pull-left" ng-click="$close('discard')">
+    <i class="fa fa-reply"></i> &nbsp; OK
+  </button>
+</div>

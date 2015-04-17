@@ -434,6 +434,27 @@
 					controller: 'HomeController'
 				});
 			},
+			dailySignUps: function() {
+				$modal.open({
+					templateUrl: '/templates/dailySignUps.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
+			weeklySignUps: function() {
+				$modal.open({
+					templateUrl: '/templates/weeklySignUps.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
+			monthlySignUps: function() {
+				$modal.open({
+					templateUrl: '/templates/monthlySignUps.html',
+					backdrop: true,
+					controller: 'HomeController'
+				});
+			},
 		};
 		return service;
 	});
@@ -782,6 +803,10 @@
 		$scope.weeklyOrders = homeMgmt.weeklyOrders;
 		$scope.monthlyOrders = homeMgmt.monthlyOrders;
 
+		$scope.dailySignUps = homeMgmt.dailySignUps;
+		$scope.weeklySignUps = homeMgmt.weeklySignUps;
+		$scope.monthlySignUps = homeMgmt.monthlySignUps;
+
 		var od = $http.get('/orders/daily/' +areaId);
 
 		od.error(function(err) {
@@ -908,6 +933,7 @@
 		});
 
 		cd.then(function(res) {
+			$scope.daySignUps = res.data;
 			$scope.daySignups = res.data.length;
 		});
 
@@ -920,6 +946,7 @@
 		});
 
 		cw.then(function(res) {
+			$scope.weekSignUps = res.data;
 			$scope.weekSignups = res.data.length;
 		});
 
@@ -932,6 +959,7 @@
 		});
 
 		cm.then(function(res) {
+			$scope.weeksSignUps = res.data;
 			$scope.weeksSignups = res.data.length;
 		});
 
