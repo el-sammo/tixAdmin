@@ -1713,6 +1713,12 @@
 			$scope.order = res.data;
 			$scope.orderStatus = $scope.order.orderStatus;
 			$scope.paymentMethod = $scope.order.paymentMethods;
+			$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
+			if($scope.order.gratuity) {
+				$scope.gratuity = '$'+parseFloat($scope.order.gratuity).toFixed(2);
+			} else {
+				$scope.gratuity = '$0.00';
+			}
 			$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
 			$scope.order.things.forEach(function(thing) {
 				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {

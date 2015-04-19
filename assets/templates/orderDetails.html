@@ -12,6 +12,10 @@
 		<div class="col-md-2">
 			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod != 'cash'">CC - {{total}}</span>
 			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod == 'cash'">Cash - {{total}}</span>
+			<br/>
+			<span class="orderDetailsDestinationInfo">Delivery Fee - {{deliveryFee}}</span>
+			<br/>
+			<span class="orderDetailsDestinationInfo">Gratuity - {{gratuity}}</span>
 		</div>
 		<div class="col-md-2">
 			<span class="orderActionLink" ng-show="orderStatus < 6" ng-click="setOrderPlaced(order)">Set Order Placed</span>
