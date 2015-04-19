@@ -1722,7 +1722,7 @@
 						$scope.orderRestaurants.push(restaurant);
 					}
 					restaurant.items.push(
-						_.pick(thing, ['quantity', 'name', 'option', 'specInst'])
+						_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
 					);
 				});
 			});
