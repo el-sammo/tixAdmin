@@ -409,6 +409,32 @@
 	});
 
 
+	app.factory('customerMgmt', function customerMgmtFactory(
+		$modal, $rootScope, $http
+	) {
+		var service = {
+			specialCharge: function(customerId) {
+				$modal.open({
+					templateUrl: '/templates/specialCharge.html',
+					backdrop: true,
+					controller: 'ChargeController',
+					resolve: {
+						args: function() {
+							return {
+								customerId: customerId
+							}
+						}
+					}
+				});
+			}
+		};
+
+		return service;
+	});
+
+
+
+
 	app.factory('homeMgmt', function homeMgmtFactory(
 		$modal, $rootScope, $http
 	) {
@@ -1326,16 +1352,21 @@
 		};
 	});
 
+
 	app.controller('CustomersEditController', function(
-		navMgr, messenger, pod, customerSchema, $scope, $http, $routeParams
+		navMgr, messenger, pod, customerSchema, 
+		$scope, $http, $routeParams, customerMgmt
 	) {
 
+		$scope.customerId = $routeParams.id;
+
 		$scope.completedCount = 0;
+		$scope.orderToComplete = false;
 
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
 
-		var p = $http.get('/orders/byCustomerId/' + $routeParams.id);
+		var p = $http.get('/orders/byCustomerId/' + $scope.customerId);
 	
 		p.error(function(err) {
 			console.log('CustomersEditController: customers-orders ajax failed');
@@ -1343,10 +1374,16 @@
 		});
 	
 		p.then(function(res) {
+			var firstOrder = true;
 			res.data.forEach(function(order) {
+				if(firstOrder && order.orderStatus < 9) {
+					$scope.assumeOrderId = order.id;
+					$scope.orderToComplete = true;
+				}
 				if(order.orderStatus > 8) {
 					$scope.completedCount ++;
 				}
+				firstOrder = false;
 			});
 			$scope.orders = res.data;
 			$scope.ordersCount = res.data.length;
@@ -1381,6 +1418,13 @@
 		$scope.orderHistory = function orderHistory() {
 			navMgr.cancel('#/customers/orders/' +$routeParams.id);
 		};
+
+		$scope.assumeOrder = function(orderId) {
+			console.log('$scope.assumeOrder() called with: '+orderId);
+//			navMgr.cancel('#/customers/assumeOrder/' +orderId);
+		};
+
+		$scope.specialCharge = customerMgmt.specialCharge;
 
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/customers');
@@ -1447,6 +1491,33 @@
 			});
 		}
 
+	});
+
+
+	app.controller('ChargeController', function(
+		navMgr, messenger, pod, customerSchema, 
+		$scope, $http, $routeParams, customerMgmt,
+		args, $modalInstance
+	) {
+		var p = $http.get('/customers/' + args.customerId).then(function(res) {
+			$scope.customer = res.data;
+			console.log($scope.customer);
+		}).catch(function(err) {
+			console.log('ChargeController: customers ajax failed');
+			console.log(err);
+		});
+
+		$scope.makeCharge = function() {
+			var r = $http.post('/checkout/processPayment', {customer: $scope.customer, paymentMethodId: $scope.selMethod, amount: $scope.amount}).then(function(res) {
+				return $modalInstance.dismiss('done');
+				messenger.show('The charge has been processed.', 'Success!');
+			}).catch(function(err) {
+				// if orders ajax fails...
+				console.log('ChargeController: makeCharge-processPayment ajax failed');
+				// console.error(err);
+				$scope.paymentFailed = true;
+			});
+		};
 	});
 
 

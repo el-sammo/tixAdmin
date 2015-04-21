@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="nav-away-modal-title">
+		Special Charge
+  </h3>
+</div>
+<div class="modal-body">
+	<form name="checkoutForm">
+		<div class="row" ng-show="paymentFailed">
+			<div class="col-md-12">
+				<span class="error"><strong>The payment method you selected was declined. Please select another</strong></span><br/>
+			</div>
+		</div>
+		<div class="form-section">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="row no-margin">
+						<h4>Select the Payment Method</h4>
+						<div class="radio" ng-repeat="method in customer.paymentMethods">
+							<label>
+								<input type="radio" name="method" ng-value="method.id" ng-model="$parent.selMethod">
+								{{method.lastFour}}
+							</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+							<span class="gratuityLabel">Amount?</span>
+						</div>
+						<div class="col-md-8">
+							<input 
+								type="text" name="amount" class="form-control col-md-10"
+								ng-model="amount" id="amount"
+							>
+						</div>
+					</div>
+					<br/>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<div>
+		<button type="button" class="btn btn-primary pull-left" ng-click="$close('discard')">
+			<i class="fa fa-reply"></i> &nbsp; Go Back
+		</button>
+		<button type="button" class="btn btn-success pull-right" ng-click="makeCharge()" ng-disabled="!selMethod">
+			<i class="fa fa-lock"></i> &nbsp; Charge
+		</button>
+	</div>
+</div>

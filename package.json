@@ -25,7 +25,9 @@
     "rc": "~0.5.0",
     "sails": "~0.10.5",
     "sails-disk": "~0.10.0",
-    "sails-mongo": "*"
+    "sails-mongo": "*",
+		"auth-net-types": "*",
+		"auth-net-cim": "*"
   },
   "scripts": {
     "start": "node app.js",
