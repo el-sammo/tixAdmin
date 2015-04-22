@@ -37,6 +37,18 @@ td {
 	cursor: pointer;
 }
 
+.error {
+	font-size: 14px;
+	font-weight: 500;
+	color: red;
+}
+
+.errorBig {
+	font-size: 18px;
+	font-weight: 700;
+	color: red;
+}
+
 /** Bootstrap overrides **/
 
 .page-header {

@@ -2905,6 +2905,7 @@
 		$scope.item = itemSchema.populateDefaults({});
 
 		$scope.item.menuId = $routeParams.id;
+		$scope.item.active = true;
 
 		$scope.imageCropResult = null;
 		$scope.showImageCropper = false;
