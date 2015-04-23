@@ -18,6 +18,7 @@
 			<span class="orderDetailsDestinationInfo">Gratuity - {{gratuity}}</span>
 		</div>
 		<div class="col-md-2">
+			<br/>
 			<span class="orderActionLink" ng-show="orderStatus < 6" ng-click="setOrderPlaced(order)">Set Order Placed</span>
 			<span class="orderActionLink" ng-show="orderStatus > 5 && orderStatus < 7" ng-click="setOrderCollected(order)">Set Order Collected</span>
 			<span class="orderActionLink" ng-show="orderStatus > 6 && orderStatus < 8" ng-click="setOrderEnRoute(order)">Set Order En Route</span>
@@ -27,6 +28,13 @@
 			&nbsp;
 		</div>
 	</div>
+	<br/>
+	<div class="row" style="border: 1px solid red; padding: 5px;" ng-show="order.specDelInstr.length > 0">
+		<div class="col-md-12">
+			Delivery Instructions: {{order.specDelInstr}}
+		</div>
+	</div>
+	<br/>
 </div>
 <div class="col-md-12">
 	<div class="row">
