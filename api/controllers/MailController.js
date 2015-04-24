@@ -129,9 +129,36 @@ function sendMail(email, subject, template, data) {
 
 	if(template == 'dispatch') {
 
-		var readyMins = 'now:'
+		var rests = [];
+		data.things.forEach(function(thing) {
+			if(rests.indexOf(thing.restaurantName) < 0) {
+				rests.push(thing.restaurantName);
+			}
+		});
+		
+		var addRests = 0;
+		if(rests.length > 1) {
+			addRests = rests.length - 1;
+		}
+		
+		var restNames = '';
+		var firstName = true;
+		rests.forEach(function(rest) {
+			if(firstName) {
+				restNames = rest;
+				firstName = false;
+			} else {
+				if(rests.indexOf(rest) < addRests) {
+					restNames = restNames + ', ' + rest;
+				} else {
+					restNames = restNames + ' and ' + rest;
+				}
+			}
+		})
+
+		var readyMins = 'now at ' + restNames + ':';
 		if(parseInt(data.readyMins) > 1) {
-			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes:';
+			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes at ' + restNames + ':';
 		}
 
 		mailOptions = {
