@@ -433,6 +433,29 @@
 	});
 
 
+	app.factory('dispatchOrderMgmt', function dispatchOrderFactory(
+		$modal, $rootScope, $http
+	) {
+		var service = {
+			dispatchOrder: function(orderId, driverId) {
+				$modal.open({
+					templateUrl: '/templates/dispatchOrderToDriver.html',
+					backdrop: true,
+					controller: 'DispatchOrderToDriverController',
+					resolve: {
+						args: function() {
+							return {
+								orderId: orderId,
+								driverId: driverId
+							}
+						}
+					}
+				});
+			}
+		};
+
+		return service;
+	});
 
 
 	app.factory('homeMgmt', function homeMgmtFactory(
@@ -1495,9 +1518,7 @@
 
 
 	app.controller('ChargeController', function(
-		navMgr, messenger, pod, customerSchema, 
-		$scope, $http, $routeParams, customerMgmt,
-		args, $modalInstance
+		messenger, $scope, $http, args, $modalInstance
 	) {
 		var p = $http.get('/customers/' + args.customerId).then(function(res) {
 			$scope.customer = res.data;
@@ -1687,8 +1708,8 @@
 	///
 
 	app.controller('DispatchOrderController', function(
-		$scope, $http, $routeParams, 
-		$rootScope, messenger, $window
+		$scope, $http, $routeParams, $rootScope,
+		$window, messenger, dispatchOrderMgmt
 	) {
 		var areaId = $rootScope.areaId;
 		$scope.authLevel = $rootScope.authLevel;
@@ -1710,31 +1731,114 @@
 	
 		p.then(function(res) {
 			$scope.order = res.data;
+
 			var r = $http.get('/users/drivers/');
-		
+			
 			r.error(function(err) {
 				console.log('DispatchOrderController: users ajax failed');
 				console.log(err);
 			});
-		
+			
 			r.then(function(res) {
 				$scope.drivers = res.data;
 			});
 		});
 
-		$scope.dispatchOrder = function(orderId, driverId) {
-			$scope.order.driverId = driverId;
+		$scope.dispatchOrderToDriver = dispatchOrderMgmt.dispatchOrder;
 
-			$scope.order.orderStatus = parseInt($scope.order.orderStatus);
+	});
+
+
+	///
+	// Controllers: Dispatch Order to Driver
+	///
+
+	app.controller('DispatchOrderToDriverController', function(
+		$scope, $http, $routeParams, $rootScope,
+		$window, messenger, args, $modalInstance
+	) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+		var p = $http.get('/orders/' + args.orderId);
+	
+		p.error(function(err) {
+			console.log('DispatchOrderToDriverController: orders ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.order = res.data;
+
+			var rests = [];
+			$scope.order.things.forEach(function(thing) {
+				if(rests.indexOf(thing.restaurantName) < 0) {
+					rests.push(thing.restaurantName);
+				}
+			});
+		
+			$scope.addRests = 0;
+			if(rests.length > 1) {
+				$scope.addRests = rests.length - 1;
+			}
+		
+			$scope.restNames = '';
+			var firstName = true;
+			rests.forEach(function(rest) {
+				if(firstName) {
+					$scope.restNames = rest;
+					firstName = false;
+				} else {
+					if(rests.indexOf(rest) < $scope.addRests) {
+						$scope.restNames = $scope.restNames + ', ' + rest;
+					} else {
+						$scope.restNames = $scope.restNames + ' and ' + rest;
+					}
+				}
+			})
+
+			var r = $http.get('/users/' + args.driverId);
+			
+			r.error(function(err) {
+				console.log('DispatchOrderToDriverController: users ajax failed');
+				console.log(err);
+			});
+			
+			r.then(function(res) {
+				$scope.driver = res.data;
+			});
+		});
+
+		$scope.dispatchOrder = function() {
+			if(! args.orderId && args.driverId) {
+				console.log('dispatchOrder args not present');
+				$modalInstance.dismiss('cancel');
+			}
+
+			$scope.order.driverId = args.driverId;
+			if($scope.readyMins && $scope.readyMins > 0) {
+				$scope.order.readyMins = $scope.readyMins;
+			} else {
+				$scope.order.readyMins = '0';
+			}
 
 			$http.put(
-				'/orders/' + orderId, $scope.order
+				'/orders/' + $scope.order.id, $scope.order
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
 				messenger.show('The order has been dispatched.', 'Success!');
-				$http.post('/mail/sendOrderToDriver/'+orderId);
+				$http.post('/mail/sendOrderToDriver/'+$scope.order.id);
 
+				return $modalInstance.dismiss('done');
 				$window.location.href = '#/dispatch/';
 			});
 		};

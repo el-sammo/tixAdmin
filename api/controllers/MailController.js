@@ -128,16 +128,19 @@ function sendMail(email, subject, template, data) {
 	}
 
 	if(template == 'dispatch') {
+
+		var readyMins = 'now:'
+		if(parseInt(data.readyMins) > 1) {
+			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes:';
+		}
+
 		mailOptions = {
 			from: 'Grub2You Dispatch <dispatch@grub2you.com>',
 			to: email,
 			subject: subject,
-			text: 'http://grub2you.com:3001/#/orderDetails/' + data.id
+			text: 'The following order is ready for pickup ' + readyMins + ' http://grub2you.com:3001/#/orderDetails/' + data.id
 		};
 	}
-
-	console.log('mailOptions:');
-	console.log(mailOptions);
 
 	transporter.sendMail(mailOptions, function(err, info) {
 		if(err) {
