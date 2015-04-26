@@ -123,6 +123,21 @@
 
 
 		///
+		// Messaging
+		///
+
+		$routeProvider.when('/messages', {
+			controller: 'MessagesListController',
+			templateUrl: '/templates/messagesList.html'
+		});
+
+		$routeProvider.when('/messages/:id', {
+			controller: 'MessageDetailsController',
+			templateUrl: '/templates/messageDetails.html'
+		});
+
+
+		///
 		// Promos
 		///
 
@@ -406,6 +421,23 @@
 
 	app.controller('ErrController', function($scope, options) {
 		$scope.options = options;
+	});
+
+
+	app.factory('messageMgmt', function messageMgmtFactory(
+		$modal, $rootScope, $http
+	) {
+		var service = {
+			send: function() {
+				$modal.open({
+					templateUrl: '/templates/sendMassMessage.html',
+					backdrop: true,
+					controller: 'MessageSendController'
+				});
+			}
+		};
+
+		return service;
 	});
 
 
@@ -834,7 +866,7 @@
 
 	app.controller('HomeController', function(
 		$scope, $http, $routeParams, $rootScope,
-		homeMgmt
+		homeMgmt, messageMgmt
 	) {
 		var areaId = $rootScope.areaId;
 		$scope.areaId = $rootScope.areaId;
@@ -847,6 +879,8 @@
 		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
 		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
 		// 5 - unrestricted auth level
+		
+		$scope.sendMessage = messageMgmt.send;
 	
 		$scope.dailyOrders = homeMgmt.dailyOrders;
 		$scope.weeklyOrders = homeMgmt.weeklyOrders;
@@ -2209,6 +2243,93 @@
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/');
 		};
+	});
+
+
+	///
+	// Messages
+	///
+	
+
+	app.controller('MessagesListController', function($scope, $http, $routeParams, $rootScope) {
+		var areaId = $rootScope.areaId;
+
+		$scope.path = 'messages';
+
+		var p = $http.get('/areas/' + areaId);
+
+		p.error(function(err) {
+			console.log('MessagesListController: area ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.area = res.data;
+		});
+
+		var r = $http.get('/messages/byAreaId/' + areaId);
+
+		r.error(function(err) {
+			console.log('MessagesListController: messages ajax failed');
+			console.log(err);
+		});
+
+		r.then(function(res) {
+			$scope.messages = res.data;
+		});
+
+	});
+
+
+	app.controller('MessageDetailsController', function($scope, $http, $routeParams, $rootScope) {
+		var messageId = $routeParams.id;
+
+		var p = $http.get('/messages/' + messageId);
+
+		p.error(function(err) {
+			console.log('MessageDetailsController: message ajax failed');
+			console.log(err);
+		});
+
+		p.then(function(res) {
+			$scope.message = res.data;
+		});
+	});
+
+
+	app.controller('MessageSendController', function(
+		$scope, $http, $routeParams, $rootScope, 
+		messageMgmt, $modalInstance, messenger,
+		$window
+	) {
+		var areaId = $rootScope.areaId;
+
+
+		$scope.sendMassMessage = function() {
+			var message = {};
+
+			message.areaId = areaId;
+			message.mType = $scope.mType;
+			message.content = $scope.content;
+
+			$http.post('/messages/create', message).success(
+			function(data, status, headers, config) {
+				messenger.show('The message has been queued for sending.', 'Success!');
+				if(message.mType === 'email') {
+					$http.post('/blaster/sendEmail/'+data.id);
+					$window.location.href = '#/messages';
+					return $modalInstance.dismiss('done');
+				} else if(message.mType === 'text') {
+					$http.post('/blaster/sendText/'+data.id);
+					$window.location.href = '#/messages';
+					return $modalInstance.dismiss('done');
+				} else {
+					console.log('BAD message:');
+					console.log(message);
+				}
+			});
+		}
+
 	});
 
 
