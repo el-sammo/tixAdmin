@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="nav-away-modal-title">
+		Send Mass Message
+  </h3>
+</div>
+<div class="modal-body">
+	<form name="sendMassMessageForm">
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Message Type</h4>
+			</div>
+			<div class="col-md-8 select">
+				<select name="mType" ng-model="mType">
+					<option value="email">Email</option>
+					<option value="text">Text</option>
+				</select>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-12">
+				<label for="content">Message Content:</label>
+				<textarea class="form-control" rows="5" ng-model="content"></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary pull-left" ng-click="$close('discard')">
+    <i class="fa fa-reply"></i> &nbsp; Go Back
+  </button>
+  <button type="button" class="btn btn-success pull-right" ng-click="sendMassMessage()" ng-disabled="!content">
+    Send Message
+  </button>
+</div>
