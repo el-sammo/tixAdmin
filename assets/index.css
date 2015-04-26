@@ -49,6 +49,11 @@ td {
 	color: red;
 }
 
+.leftNavLink {
+	color: #428ECB;
+	cursor: pointer;
+}
+
 /** Bootstrap overrides **/
 
 .page-header {
