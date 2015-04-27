@@ -902,19 +902,23 @@
 			var dailyOrders = res.data;
 			var dayGrossRevenue = 0;
 			var dayNetRevenue = 0;
+			var dayOrders = 0;
 			if(dailyOrders && dailyOrders.length > 0) {
 				dailyOrders.forEach(function(order) {
-					dayGrossRevenue += parseFloat(order.total);
-					if(order.discount) {
-						dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-					} else {
-						dayNetRevenue += parseFloat(order.deliveryFee);
+					if(order.orderStatus > 4) {
+						dayOrders ++;
+						dayGrossRevenue += parseFloat(order.total);
+						if(order.discount) {
+							dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+						} else {
+							dayNetRevenue += parseFloat(order.deliveryFee);
+						}
 					}
 				});
 			}
 			$scope.dayGrossRevenue = dayGrossRevenue.toFixed();
 			$scope.dayNetRevenue = dayNetRevenue.toFixed();
-			$scope.dayOrders = res.data.length;
+			$scope.dayOrders = dayOrders;
 		});
 
 		var ow = $http.get('/orders/weekly/' +areaId);
@@ -929,19 +933,23 @@
 			var weekOrders = res.data;
 			var weekGrossRevenue = 0;
 			var weekNetRevenue = 0;
+			var weeklyOrders = 0;
 			if(weekOrders && weekOrders.length > 0) {
 				weekOrders.forEach(function(order) {
-					weekGrossRevenue += parseFloat(order.total);
-					if(order.discount) {
-						weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-					} else {
-						weekNetRevenue += parseFloat(order.deliveryFee);
+					if(order.orderStatus > 4) {
+						weeklyOrders ++;
+						weekGrossRevenue += parseFloat(order.total);
+						if(order.discount) {
+							weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+						} else {
+							weekNetRevenue += parseFloat(order.deliveryFee);
+						}
 					}
 				});
 			}
 			$scope.weekGrossRevenue = weekGrossRevenue.toFixed();
 			$scope.weekNetRevenue = weekNetRevenue.toFixed();
-			$scope.weekOrders = res.data.length;
+			$scope.weekOrders = weeklyOrders;
 		});
 
 		var om = $http.get('/orders/monthly/' +areaId);
@@ -956,55 +964,23 @@
 			var weeksOrders = res.data;
 			var weeksGrossRevenue = 0;
 			var weeksNetRevenue = 0;
+			var monthlyOrders = 0;
 			if(weeksOrders && weeksOrders.length > 0) {
 				weeksOrders.forEach(function(order) {
-					weeksGrossRevenue += parseFloat(order.total);
-					if(order.discount) {
-						weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-					} else {
-						weeksNetRevenue += parseFloat(order.deliveryFee);
+					if(order.orderStatus > 4) {
+						monthlyOrders ++;
+						weeksGrossRevenue += parseFloat(order.total);
+						if(order.discount) {
+							weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+						} else {
+							weeksNetRevenue += parseFloat(order.deliveryFee);
+						}
 					}
 				});
 			}
 			$scope.weeksGrossRevenue = weeksGrossRevenue.toFixed();
 			$scope.weeksNetRevenue = weeksNetRevenue.toFixed();
-			$scope.weeksOrders = res.data.length;
-		});
-
-		var odo = $http.get('/orders/dailyOrphaned/' +areaId);
-
-		odo.error(function(err) {
-			console.log('HomeController: orphans-daily ajax failed');
-			console.log(err);
-			$scope.dayOrphans = 'err';
-		});
-
-		odo.then(function(res) {
-			$scope.dayOrphans = res.data.length;
-		});
-
-		var owo = $http.get('/orders/weeklyOrphaned/' +areaId);
-
-		owo.error(function(err) {
-			console.log('HomeController: orphans-weekly ajax failed');
-			console.log(err);
-			$scope.weekOrphans = 'err';
-		});
-
-		owo.then(function(res) {
-			$scope.weekOrphans = res.data.length;
-		});
-
-		var omo = $http.get('/orders/monthlyOrphaned/' +areaId);
-
-		omo.error(function(err) {
-			console.log('HomeController: orphans-monthly ajax failed');
-			console.log(err);
-			$scope.weeksOrphans = 'err';
-		});
-
-		omo.then(function(res) {
-			$scope.weeksOrphans = res.data.length;
+			$scope.weeksOrders = monthlyOrders;
 		});
 
 		var cd = $http.get('/customers/daily/' +areaId);
@@ -1596,10 +1572,11 @@
 			$window.location.reload();
 		}, 30000);
 
-		var p = $http.get('/orders/last24Hours/' + areaId);
+		var p = $http.get('/orders/daily/' + areaId);
+		console.log('now using orders-daily ajax call');
 	
 		p.error(function(err) {
-			console.log('DispatchController: orders-last24hours ajax failed');
+			console.log('DispatchController: orders-daily ajax failed');
 			console.log(err);
 		});
 	
@@ -1637,26 +1614,30 @@
 
 				var now = new Date().getTime();
 
-				var old = (now - order.paymentAcceptedAt).toString();
-
-				var formattedNow = old.substr(0, (old.length - 3)); 
-
-				var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
-				var formattedAgeSec = parseInt(formattedNow) % 60;
-
-				if(formattedAgeSec < 10) {
-					formattedAgeSec = '0' + formattedAgeSec;
-				}
-
-				if(formattedAgeHour > 0) {
-					var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
-					if(formattedAgeMin < 10) {
-						formattedAgeMin = '0' + formattedAgeMin;
+				if(order.paymentAcceptedAt) {
+					var old = (now - order.paymentAcceptedAt).toString();
+	
+					var formattedNow = old.substr(0, (old.length - 3)); 
+	
+					var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
+					var formattedAgeSec = parseInt(formattedNow) % 60;
+	
+					if(formattedAgeSec < 10) {
+						formattedAgeSec = '0' + formattedAgeSec;
 					}
-					order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
+	
+					if(formattedAgeHour > 0) {
+						var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+						if(formattedAgeMin < 10) {
+							formattedAgeMin = '0' + formattedAgeMin;
+						}
+						order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
+					} else {
+						var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
+						order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
+					}
 				} else {
-					var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
-					order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
+					order.finalAge = 'Pending';
 				}
 
 				// TODO

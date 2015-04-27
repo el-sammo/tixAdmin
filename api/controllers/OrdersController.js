@@ -65,7 +65,7 @@ module.exports = {
 	
 		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
 
-		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 1}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -85,7 +85,7 @@ module.exports = {
 	
 		var weekAgoMilliseconds = (new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime()) - sevDaysMilli;
 
-		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': weekAgoMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': weekAgoMilliseconds}, orderStatus: { '>': 1}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
@@ -105,7 +105,7 @@ module.exports = {
 	
 		var monthAgoMilliseconds = (new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime()) - thirtyDaysMilli;
 
-		Orders.find({areaId: req.params.id, paymentAcceptedAt: { '>=': monthAgoMilliseconds}, orderStatus: { '>': 4}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': monthAgoMilliseconds}, orderStatus: { '>': 1}}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);

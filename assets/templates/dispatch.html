@@ -24,23 +24,30 @@
 	</div>
 	<div class="row" ng-init="things = order.things" ng-repeat="order in orders">
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.finalAge}}</a><br/></span>
+			<span class="leftNavLink" ng-show="order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.finalAge}}</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.finalAge}}</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.currStatus}}</a><br/></span>
+			<span class="leftNavLink" ng-show="order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.currStatus}} ({{order.orderStatus}})</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.currStatus}} ({{order.orderStatus}})</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.total}}</a><br/></span>
+			<span class="leftNavLink" ng-show="order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.total}}</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.total}}</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.restaurants}}</a> </span>
+			<span class="leftNavLink" ng-show="order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.restaurants}}</a> </span>
+			<span class="leftNavLinkRed" ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.restaurants}}</a> </span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink" ng-show="order.driver"><a href="#/orderDetails/{{order.id}}">{{order.driver}}</a><br/></span>
-			<span class="leftNavLink" ng-show="!order.driver"><a href="#/dispatch/{{order.id}}">Dispatch Order</a><br/></span>
+			<span class="leftNavLink" ng-show="order.driver && order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.driver}}</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="order.driver && order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.driver}}</a><br/></span>
+			<span class="leftNavLink" ng-show="!order.driver && order.orderStatus > 4"><a href="#/dispatch/{{order.id}}">Dispatch Order</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="!order.driver && order.orderStatus < 5" style="color: red;">Pending<br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="leftNavLink"><a href="#/orderDetails/{{order.id}}">{{order.destination}}</a><br/></span>
+			<span class="leftNavLink" ng-show="order.orderStatus > 4"><a href="#/orderDetails/{{order.id}}">{{order.destination}}</a><br/></span>
+			<span class="leftNavLinkRed" ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" style="color: red;">{{order.destination}}</a><br/></span>
 		</div>
 	</div>
 </div>

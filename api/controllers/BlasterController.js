@@ -24,13 +24,13 @@ module.exports = {
 				emailsPromise = Emails.find();
 
 				emailsPromise.then(function(emails) {
-					console.log('there are '+emails.length+' email addresses in this list');
 					// TODO: cheating here, too - see above
 					emails.forEach(function(email) {
 						if(email.active) {
 							sendMail(email.email, 'Howdy!', 'cta', message[0]);
 						}
 					});
+					console.log('there are '+emails.length+' email addresses in this list');
 				});
 			});
 		}
@@ -48,7 +48,6 @@ module.exports = {
 				phonesPromise = Phones.find();
 
 				phonesPromise.then(function(phones) {
-					console.log('there are '+phones.length+' phone numbers in this list');
 					// TODO: cheating here, too - see above
 					phones.forEach(function(phone) {
 						if(phone.active) {
@@ -56,6 +55,7 @@ module.exports = {
 							sendMail(qPhone, 'Howdy!', 'cta', message[0]);
 						}
 					});
+					console.log('there are '+phones.length+' phone numbers in this list');
 				});
 			});
 		}
