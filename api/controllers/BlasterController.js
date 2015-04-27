@@ -28,7 +28,7 @@ module.exports = {
 					// TODO: cheating here, too - see above
 					emails.forEach(function(email) {
 						if(email.active) {
-							sendMail(email.email, 'Howdy!', 'cta', message.content);
+							sendMail(email.email, 'Howdy!', 'cta', message[0]);
 						}
 					});
 				});
@@ -53,7 +53,7 @@ module.exports = {
 					phones.forEach(function(phone) {
 						if(phone.active) {
 							var qPhone = phone.phone.toString() + '@vtext.com';
-							sendMail(qPhone, 'Howdy!', 'cta', message.content);
+							sendMail(qPhone, 'Howdy!', 'cta', message[0]);
 						}
 					});
 				});
@@ -62,7 +62,7 @@ module.exports = {
 	},
 };
 
-function sendMail(email, subject, template, content) {
+function sendMail(email, subject, template, data) {
 	var p = Promise.defer();
 
 	var transporter = nodemailer.createTransport(directTransport());
@@ -80,8 +80,8 @@ function sendMail(email, subject, template, content) {
 			from: 'Grub2You <orders@grub2you.com>',
 			to: email,
 			subject: subject,
-			text: content,
-			html: content
+			text: data.content,
+			html: data.content
 		};
 	}
 
