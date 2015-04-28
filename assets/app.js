@@ -93,12 +93,22 @@
 
 
 		///
-		// Order
+		// Email List Mgmt
 		///
 
-		$routeProvider.when('/orderDetails/:id', {
-			controller: 'OrderDetailsController',
-			templateUrl: '/templates/orderDetails.html'
+		$routeProvider.when('/emailList/add', {
+			controller: 'EmailListAddController',
+			templateUrl: '/templates/emailListForm.html'
+		});
+
+		$routeProvider.when('/emailList/edit/:id', {
+			controller: 'EmailListEditController',
+			templateUrl: '/templates/emailListForm.html'
+		});
+
+		$routeProvider.when('/emailList/search', {
+			controller: 'EmailListSearchController',
+			templateUrl: '/templates/emailListSearch.html'
 		});
 
 
@@ -134,6 +144,16 @@
 		$routeProvider.when('/messages/:id', {
 			controller: 'MessageDetailsController',
 			templateUrl: '/templates/messageDetails.html'
+		});
+
+
+		///
+		// Order
+		///
+
+		$routeProvider.when('/orderDetails/:id', {
+			controller: 'OrderDetailsController',
+			templateUrl: '/templates/orderDetails.html'
 		});
 
 
@@ -1304,31 +1324,6 @@
 				}
 			},
 	
-			links: {
-				website: {
-					placeholder: function(customer) {
-						return 'www.' + nameTransform(customer) + '.com';
-					},
-					addon: 'http://'
-				},
-				facebook: {
-					placeholder: nameTransform,
-					addon: 'facebook.com/'
-				},
-				twitter: {
-					placeholder: nameTransform,
-					addon: '@'
-				},
-				instagram: {
-					placeholder: nameTransform,
-					addon: 'instagram.com/'
-				},
-				pinterest: {
-					placeholder: nameTransform,
-					addon: 'pinterest.com/'
-				},
-			},
-	
 			populateDefaults: function(customer) {
 				$.map(service.defaults.customer, function(value, key) {
 					if(customer[key]) return;
@@ -1573,7 +1568,6 @@
 		}, 30000);
 
 		var p = $http.get('/orders/daily/' + areaId);
-		console.log('now using orders-daily ajax call');
 	
 		p.error(function(err) {
 			console.log('DispatchController: orders-daily ajax failed');
@@ -1860,199 +1854,135 @@
 	});
 
 
-	///
-	// Controllers: Order
-	///
+	app.factory('emailListSchema', function() {
+		var service = {
+			defaults: {
+				email: {
+					email: '',
+					fName: '',
+					active: '',
+				}
+			},
 
-	app.controller('OrderDetailsController', function(
-		$scope, $http, $routeParams, $rootScope, 
-		$q, $sce, configMgr, querystring, messenger,
-		$window
-	) {
-		var areaId = $rootScope.areaId;
-		$scope.authLevel = $rootScope.authLevel;
-
-		// $scope.orderRestaurants = [
-		//   {
-		//     name: ...
-		//     items: [
-		//       name: ...
-		//       quantity: ...
-		//       option: ...
-		//     ]
-		//   }
-		// ];
-		$scope.orderRestaurants = [];
-
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
-
-		var p = $http.get('/orders/' + $routeParams.id);
-	
-		p.error(function(err) {
-			console.log('OrderDetailsController: order ajax failed');
-			console.log(err);
-		});
-	
-		p.then(function(res) {
-			$scope.order = res.data;
-			$scope.orderStatus = $scope.order.orderStatus;
-			$scope.paymentMethod = $scope.order.paymentMethods;
-			$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
-			if($scope.order.gratuity) {
-				$scope.gratuity = '$'+parseFloat($scope.order.gratuity).toFixed(2);
-			} else {
-				$scope.gratuity = '$0.00';
-			}
-			$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
-			$scope.order.things.forEach(function(thing) {
-				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
-					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
-					if(! restaurant) {
-						restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
-						$scope.orderRestaurants.push(restaurant);
+			populateDefaults: function(email) {
+				$.map(service.defaults.email, function(value, key) {
+					if(email[key]) return;
+					if(typeof value === 'object') {
+						email[key] = angular.copy(value);
+						return;
 					}
-					restaurant.items.push(
-						_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
-					);
+					email[key] = value;
 				});
-			});
+				return email;
+			}
+		};
 
-			var r = $http.get('/customers/' + $scope.order.customerId);
-			
-			r.error(function(err) {
-				console.log('OrderDetailsController: customer ajax failed');
-				console.log(err);
-			});
-			
-			r.then(function(res) {
-				$scope.customer = res.data;
-				$scope.fName = $scope.customer.fName;
-				$scope.lName = $scope.customer.lName;
-				$scope.phone = $scope.customer.phone;
-				$scope.address = $scope.customer.addresses.primary.streetNumber+' '+$scope.customer.addresses.primary.streetName+' '+$scope.customer.addresses.primary.city;
+		return service;
+	});
 
-				$scope.src = $sce.trustAsResourceUrl(
-					'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
-						key: configMgr.config.vendors.googleMaps.key,
-						q: ([
-							$scope.customer.addresses.primary.streetNumber,
-							$scope.customer.addresses.primary.streetName,
-							$scope.customer.addresses.primary.city,
-							$scope.customer.addresses.primary.state,
-							$scope.customer.addresses.primary.zip
-						].join('+'))
-					})
-				);
-			});
-		});
+	app.controller('EmailListAddController', function(
+		navMgr, messenger, pod,
+		$scope, $http, $window, $rootScope
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
 
-		$scope.setOrderPlaced = function(order) {
-			order.orderStatus = parseInt(6);
-			order.orderPlacedAt = new Date().getTime();
-			$http.put(
-				'/orders/' + order.id, order
+		$scope.save = function save(email, options) {
+			email.areaId = $rootScope.areaId;
+			email.active = true;
+
+			options || (options = {});
+
+			$http.post(
+				'/emails/create', email
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order has been placed.', 'Success!');
+				messenger.show('The email has been added.', 'Success!');
 
-				$window.location.href = '#/dispatch/';
-			});
-		}
-
-		$scope.setOrderCollected = function(order) {
-			order.orderStatus = parseInt(7);
-			order.orderCollectedAt = new Date().getTime();
-			$http.put(
-				'/orders/' + order.id, order
-			).success(function(data, status, headers, config) {
-				if(status >= 400) return;
-
-				messenger.show('The order has been collected.', 'Success!');
-
-				$window.location.href = '#/orderDetails/' + order.id;
-			});
-		}
-
-		$scope.setOrderEnRoute = function(order) {
-			order.orderStatus = parseInt(8);
-			order.orderEnRouteAt = new Date().getTime();
-			$http.put(
-				'/orders/' + order.id, order
-			).success(function(data, status, headers, config) {
-				if(status >= 400) return;
-
-				messenger.show('The order is en route.', 'Success!');
-
-				$window.location.href = '#/orderDetails/' + order.id;
-			});
-		}
-
-		$scope.setOrderDelivered = function(order) {
-			order.orderStatus = parseInt(9);
-			order.orderDeliveredAt = new Date().getTime();
-			$http.put(
-				'/orders/' + order.id, order
-			).success(function(data, status, headers, config) {
-				if(status >= 400) return;
-
-				messenger.show('The order has been delivered.', 'Success!');
-
-				$window.location.href = '#/dispatch/';
-			});
-		}
-
-		$scope.getRestaurantName = function(optionId) {
-			return $q(function(resolve, reject) {
-				var r = $http.get('/options/' + optionId);
-				
-				r.error(function(err) {
-					console.log('OrderDetailsController: getRestaurantName-options ajax failed');
-					console.log(err);
-					reject(err);
-				});
-				
-				r.then(function(res) {
-					var s = $http.get('/items/' + res.data.itemId);
-					
-					s.error(function(err) {
-						console.log('OrderDetailsController: getRestaurantName-items ajax failed');
-						console.log(err);
-						reject(err);
-					});
-					
-					s.then(function(res) {
-						var t = $http.get('/menus/' + res.data.menuId);
-						
-						t.error(function(err) {
-							console.log('OrderDetailsController: getRestaurantName-menus ajax failed');
-							console.log(err);
-							reject(err);
-						});
-						
-						t.then(function(res) {
-							var u = $http.get('/restaurants/' + res.data.restaurantId);
-							
-							u.error(function(err) {
-								console.log('OrderDetailsController: getRestaurantName-restaurants ajax failed');
-								console.log(err);
-								reject(err);
-							});
-							
-							u.then(function(res) {
-								resolve(res.data);
-							});
-						});
-					});
-				});
+				navMgr.protect(false);
+				$window.location.href = '#/emailList/search';
 			});
 		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/emailList/search');
+		};
+	});
+
+	app.controller('EmailListEditController', function(
+		navMgr, messenger, pod, emailListSchema, $scope, $http, $routeParams
+	) {
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.emailListSchema = emailListSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/emails/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.email = emailListSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(email, options) {
+			options || (options = {});
+
+			$http.put(
+				'/emails/' + email.id, email
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The email list has been updated.', 'Success!');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/emailList/search');
+		};
+	});
+
+	app.controller('EmailListSearchController', function(
+		emailListSchema,	$scope, $http, $window, $rootScope
+	) {
+		var areaId = $rootScope.areaId;
+		
+		var authLevelMap = [
+			'None',
+			'Basic',
+			'Driver',
+			'Operator',
+			'Manager'
+		];
+
+		$scope.fNameSearch = function() {
+			var p = $http.get('/emails/byFName/' + $scope.fName);
+	
+			p.error(function(err) {
+				console.log('EmailListSearchController: emails-fName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.emails = res.data;
+			});
+		};
+
+		$scope.emailSearch = function() {
+			var p = $http.get('/emails/byEmail/' + $scope.email);
+	
+			p.error(function(err) {
+				console.log('EmailListSearchController: emails-phone ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.emails = res.data;
+			});
+		}
 
 	});
 
@@ -2310,6 +2240,203 @@
 				}
 			});
 		}
+
+	});
+
+
+	///
+	// Controllers: Order
+	///
+
+	app.controller('OrderDetailsController', function(
+		$scope, $http, $routeParams, $rootScope, 
+		$q, $sce, configMgr, querystring, messenger,
+		$window
+	) {
+		var areaId = $rootScope.areaId;
+		$scope.authLevel = $rootScope.authLevel;
+
+		// $scope.orderRestaurants = [
+		//   {
+		//     name: ...
+		//     items: [
+		//       name: ...
+		//       quantity: ...
+		//       option: ...
+		//     ]
+		//   }
+		// ];
+		$scope.orderRestaurants = [];
+
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+
+		var p = $http.get('/orders/' + $routeParams.id);
+	
+		p.error(function(err) {
+			console.log('OrderDetailsController: order ajax failed');
+			console.log(err);
+		});
+	
+		p.then(function(res) {
+			$scope.order = res.data;
+			$scope.orderStatus = $scope.order.orderStatus;
+			$scope.paymentMethod = $scope.order.paymentMethods;
+			$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
+			if($scope.order.gratuity) {
+				$scope.gratuity = '$'+parseFloat($scope.order.gratuity).toFixed(2);
+			} else {
+				$scope.gratuity = '$0.00';
+			}
+			$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
+			$scope.order.things.forEach(function(thing) {
+				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
+					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
+					if(! restaurant) {
+						restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
+						$scope.orderRestaurants.push(restaurant);
+					}
+					restaurant.items.push(
+						_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
+					);
+				});
+			});
+
+			var r = $http.get('/customers/' + $scope.order.customerId);
+			
+			r.error(function(err) {
+				console.log('OrderDetailsController: customer ajax failed');
+				console.log(err);
+			});
+			
+			r.then(function(res) {
+				$scope.customer = res.data;
+				$scope.fName = $scope.customer.fName;
+				$scope.lName = $scope.customer.lName;
+				$scope.phone = $scope.customer.phone;
+				$scope.address = $scope.customer.addresses.primary.streetNumber+' '+$scope.customer.addresses.primary.streetName+' '+$scope.customer.addresses.primary.city;
+
+				$scope.src = $sce.trustAsResourceUrl(
+					'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
+						key: configMgr.config.vendors.googleMaps.key,
+						q: ([
+							$scope.customer.addresses.primary.streetNumber,
+							$scope.customer.addresses.primary.streetName,
+							$scope.customer.addresses.primary.city,
+							$scope.customer.addresses.primary.state,
+							$scope.customer.addresses.primary.zip
+						].join('+'))
+					})
+				);
+			});
+		});
+
+		$scope.setOrderPlaced = function(order) {
+			order.orderStatus = parseInt(6);
+			order.orderPlacedAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been placed.', 'Success!');
+
+				$window.location.href = '#/dispatch/';
+			});
+		}
+
+		$scope.setOrderCollected = function(order) {
+			order.orderStatus = parseInt(7);
+			order.orderCollectedAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been collected.', 'Success!');
+
+				$window.location.href = '#/orderDetails/' + order.id;
+			});
+		}
+
+		$scope.setOrderEnRoute = function(order) {
+			order.orderStatus = parseInt(8);
+			order.orderEnRouteAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order is en route.', 'Success!');
+
+				$window.location.href = '#/orderDetails/' + order.id;
+			});
+		}
+
+		$scope.setOrderDelivered = function(order) {
+			order.orderStatus = parseInt(9);
+			order.orderDeliveredAt = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('The order has been delivered.', 'Success!');
+
+				$window.location.href = '#/dispatch/';
+			});
+		}
+
+		$scope.getRestaurantName = function(optionId) {
+			return $q(function(resolve, reject) {
+				var r = $http.get('/options/' + optionId);
+				
+				r.error(function(err) {
+					console.log('OrderDetailsController: getRestaurantName-options ajax failed');
+					console.log(err);
+					reject(err);
+				});
+				
+				r.then(function(res) {
+					var s = $http.get('/items/' + res.data.itemId);
+					
+					s.error(function(err) {
+						console.log('OrderDetailsController: getRestaurantName-items ajax failed');
+						console.log(err);
+						reject(err);
+					});
+					
+					s.then(function(res) {
+						var t = $http.get('/menus/' + res.data.menuId);
+						
+						t.error(function(err) {
+							console.log('OrderDetailsController: getRestaurantName-menus ajax failed');
+							console.log(err);
+							reject(err);
+						});
+						
+						t.then(function(res) {
+							var u = $http.get('/restaurants/' + res.data.restaurantId);
+							
+							u.error(function(err) {
+								console.log('OrderDetailsController: getRestaurantName-restaurants ajax failed');
+								console.log(err);
+								reject(err);
+							});
+							
+							u.then(function(res) {
+								resolve(res.data);
+							});
+						});
+					});
+				});
+			});
+		};
 
 	});
 

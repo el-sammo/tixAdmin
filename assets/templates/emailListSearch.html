@@ -1,0 +1,32 @@
+<div class="col-md-12" ng-controller="EmailListSearchController">
+	<div class="row" id="searchHead">
+		<div class="col-md-2">
+			Search by First Name:
+		</div>
+		<div class="col-md-2">
+			<input type="text" id="fName" ng-change="fNameSearch()" ng-model="fName">
+		</div>
+		<div class="col-md-2">
+			Search by Email:
+		</div>
+		<div class="col-md-2">
+			<input type="text" id="email" ng-change="emailSearch()" ng-model="email">
+		</div>
+	</div>
+	<div class="row" id="searchResultsHead">
+		<div class="col-md-3">
+			<h5>First Name</h5>
+		</div>
+		<div class="col-md-3">
+			<h5>Email</h5>
+		</div>
+	</div>
+	<div class="row" ng-repeat="email in emails">
+		<div class="col-md-3">
+			<a href="#/emailList/edit/{{email.id}}" style="text-decoration: none;">{{email.fName}}</a>
+		</div>
+		<div class="col-md-3">
+			<a href="#/emailList/edit/{{email.id}}" style="text-decoration: none;">{{email.email}}</a>
+		</div>
+	</div>
+</div>

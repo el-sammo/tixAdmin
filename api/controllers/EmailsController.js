@@ -18,6 +18,26 @@ module.exports = {
     });
   },
 
+	byFName: function(req, res) {
+		Emails.find({fName: {contains: req.params.id}}).sort({fName: 'asc', email: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
+	byEmail: function(req, res) {
+		Emails.find({email: {contains: req.params.id}}).sort({email: 'asc'}).limit(20).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
 	byAreaId: function(req, res) {
 		Emails.findByAreaId(req.params.id).then(function(results) {
 			res.send(JSON.stringify(results));
