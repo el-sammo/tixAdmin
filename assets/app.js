@@ -2375,6 +2375,9 @@
 			
 			r.then(function(res) {
 				$scope.customer = res.data;
+				if($scope.customer.addresses.primary.apt) {
+					$scope.apt = $scope.customer.addresses.primary.apt;
+				}
 				$scope.fName = $scope.customer.fName;
 				$scope.lName = $scope.customer.lName;
 				$scope.phone = $scope.customer.phone;

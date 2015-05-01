@@ -8,6 +8,7 @@
 		</div>
 		<div class="col-md-2">
 			<span class="orderDetailsDestinationInfo">{{address}}</span>
+			<span class="orderDetailsDestinationInfo" ng-show="apt"><br/>Apt/Unit: {{apt}}</span>
 		</div>
 		<div class="col-md-2">
 			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod != 'cash'">CC - {{total}}</span>
