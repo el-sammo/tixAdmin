@@ -54,6 +54,14 @@ td {
 	cursor: pointer;
 }
 
+.orderDetailsDestinationInfo {
+}
+
+.orderDetailsDestinationInfoRed {
+	font-weight: 700;
+	color: red;
+}
+
 /** Bootstrap overrides **/
 
 .page-header {
