@@ -1688,6 +1688,31 @@
 						var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
 						order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
 					}
+
+					if(order.orderStatus > 8 && order.orderDeliveredAt && order.paymentAcceptedAt) {
+						var timeToDelivery = parseInt(order.orderDeliveredAt) - parseInt(order.paymentAcceptedAt);
+
+						var formattedNow = timeToDelivery.toString().substr(0, (timeToDelivery.toString().length - 3)); 
+		
+						var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
+						var formattedAgeSec = parseInt(formattedNow) % 60;
+		
+						if(formattedAgeSec < 10) {
+							formattedAgeSec = '0' + formattedAgeSec;
+						}
+		
+						if(formattedAgeHour > 0) {
+							var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+							if(formattedAgeMin < 10) {
+								formattedAgeMin = '0' + formattedAgeMin;
+							}
+							order.timeToDelivery = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
+						} else {
+							var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
+							order.timeToDelivery = formattedAgeMin + ':' + formattedAgeSec;
+						}
+					}
+
 				} else {
 					order.finalAge = 'Pending';
 				}

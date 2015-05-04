@@ -54,6 +54,18 @@ td {
 	cursor: pointer;
 }
 
+.leftNavLinkRed {
+	font-weight: 700;
+	color: red;
+	cursor: pointer;
+}
+
+.leftNavLinkGreen {
+	font-weight: 700;
+	color: green;
+	cursor: pointer;
+}
+
 .orderDetailsDestinationInfo {
 }
 

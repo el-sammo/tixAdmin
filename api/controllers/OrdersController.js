@@ -65,7 +65,7 @@ module.exports = {
 	
 		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
 
-		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 1}}).sort({createdAt: 'asc'}).then(function(results) {
+		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 1}}).sort({updatedAt: 'desc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
