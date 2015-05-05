@@ -1517,12 +1517,12 @@
 			navMgr.cancel('#/customers/orders/' +$routeParams.id);
 		};
 
-		$scope.assumeOrder = function(orderId) {
-			console.log('one-time-use username: '+customer.id+' one-time use code: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
+		$scope.assumeOrder = function(customerId) {
+			console.log('one-time-use username: '+customerId+' one-time use password: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
 		};
 
 		$scope.startOrder = function(customerId) {
-			console.log('one-time-use username: '+customerId+' one-time use code: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
+			console.log('one-time-use username: '+customerId+' one-time use password: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
 		};
 
 		$scope.specialCharge = customerMgmt.specialCharge;
