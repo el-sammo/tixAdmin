@@ -104,6 +104,7 @@
 				<button type="button" class="btn btn-danger col-md-1" ng-click="cancel()" > Cancel </button>
 				<button ng-show="editMode" type="button" class="btn btn-danger col-md-1 pull-left" ng-click="specialCharge(customer.id)">Special Charge</button>
 				<button type="button" class="btn btn-primary col-md-1 pull-right" ng-click="save(customer)" > <i class="fa fa-save"></i> &nbsp; Save </button>
+				<button ng-show="startOrder" type="button" class="btn btn-success col-md-1 pull-right" ng-click="startOrder(customer.id)">Start Order</button>
 				<button ng-show="orderToComplete" type="button" class="btn btn-success col-md-1 pull-right" ng-click="assumeOrder(assumeOrderId)">Assume Order</button>
 				<button ng-show="completedCount > 0" type="button" class="btn btn-warning col-md-1 pull-right" ng-click="orderHistory()"><i class="fa fa-search"></i> &nbsp; Order History</button>
 				<button type="button" class="btn btn-default col-md-1 pull-right" ng-click="save(customer, {addMore: true})" ng-show="!editMode" >

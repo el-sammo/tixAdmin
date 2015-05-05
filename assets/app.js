@@ -1441,13 +1441,15 @@
 
 	app.controller('CustomersEditController', function(
 		navMgr, messenger, pod, customerSchema, 
-		$scope, $http, $routeParams, customerMgmt
+		$scope, $http, $routeParams, customerMgmt,
+		$window
 	) {
 
 		$scope.customerId = $routeParams.id;
 
 		$scope.completedCount = 0;
 		$scope.orderToComplete = false;
+		$scope.startOrder = true;
 
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
@@ -1461,10 +1463,20 @@
 	
 		p.then(function(res) {
 			var firstOrder = true;
+			var today = new Date();
+		
+			var thisYear = today.getFullYear();
+			var thisMonth = today.getMonth();
+			var thisDate = today.getDate();
+		
+			var todayMSecs = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+
 			res.data.forEach(function(order) {
-				if(firstOrder && order.orderStatus < 9) {
+				var thisOrderMSecs = new Date(order.updatedAt).getTime();
+				if(firstOrder && order.orderStatus < 9 && thisOrderMSecs > todayMSecs) {
 					$scope.assumeOrderId = order.id;
 					$scope.orderToComplete = true;
+					$scope.startOrder = false;
 				}
 				if(order.orderStatus > 8) {
 					$scope.completedCount ++;
@@ -1506,8 +1518,11 @@
 		};
 
 		$scope.assumeOrder = function(orderId) {
-			console.log('$scope.assumeOrder() called with: '+orderId);
-//			navMgr.cancel('#/customers/assumeOrder/' +orderId);
+			console.log('one-time-use username: '+customer.id+' one-time use code: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
+		};
+
+		$scope.startOrder = function(customerId) {
+			console.log('one-time-use username: '+customerId+' one-time use code: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
 		};
 
 		$scope.specialCharge = customerMgmt.specialCharge;
