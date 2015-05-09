@@ -443,6 +443,22 @@
 		$scope.options = options;
 	});
 
+	app.constant('bigScreenWidth', 1179);
+
+	app.factory('deviceMgr', function($window, bigScreenWidth) {
+		var service = {
+			getWindowWidth: function() {
+				return $($window).width();
+			},
+	
+			isBigScreen: function(width) {
+				width || (width = service.getWindowWidth());
+				return width >= bigScreenWidth;
+			}
+		};
+	
+		return service;
+	});
 
 	app.factory('messageMgmt', function messageMgmtFactory(
 		$modal, $rootScope, $http
@@ -1626,8 +1642,18 @@
 	// Controllers: Dispatch
 	///
 
-	app.controller('DispatchController', function($scope, $http, $routeParams, $rootScope, $window) {
+	app.controller('DispatchController', function(
+		$scope, $http, $routeParams, $rootScope, 
+		$window, deviceMgr
+	) {
 		var areaId = $rootScope.areaId;
+
+		if(deviceMgr.isBigScreen()) {
+			$scope.showBig = true;
+		} else {
+			$scope.showBig = false;
+		}
+
 		$scope.authLevel = $rootScope.authLevel;
 
 		// Auth Level Map
