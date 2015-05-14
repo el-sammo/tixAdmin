@@ -38,6 +38,24 @@ module.exports = {
 		});
 	},
 
+	byDriverIdToday: function(req, res) {
+		var today = new Date();
+	
+		var thisYear = today.getFullYear();
+		var thisMonth = today.getMonth();
+		var thisDate = today.getDate();
+	
+		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+
+		Orders.find({driverId: req.params.id, paymentAcceptedAt: { '>=': todayMilliseconds}}).sort({updatedAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+
 	last24Hours: function(req, res) {
 		var today = new Date();
 	
