@@ -1331,7 +1331,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The area has been created.', 'Success!');
+				messenger.show('Area created', '');
 
 				if(options.addMore) {
 					$scope.area = {};
@@ -1371,7 +1371,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The area has been updated.', 'Success!');
+				messenger.show('Area updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -1465,7 +1465,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The customer has been created.', 'Success!');
+				messenger.show('Customer created', '');
 
 				if(options.addMore) {
 					$scope.customer = {};
@@ -1551,7 +1551,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The customer has been updated.', 'Success!');
+				messenger.show('Customer updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -1655,7 +1655,7 @@
 		$scope.makeCharge = function() {
 			var r = $http.post('/checkout/processPayment', {customer: $scope.customer, paymentMethodId: $scope.selMethod, amount: $scope.amount}).then(function(res) {
 				return $modalInstance.dismiss('done');
-				messenger.show('The charge has been processed.', 'Success!');
+				messenger.show('Charge processed', '');
 			}).catch(function(err) {
 				// if orders ajax fails...
 				console.log('ChargeController: makeCharge-processPayment ajax failed');
@@ -1998,7 +1998,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order has been dispatched.', 'Success!');
+				messenger.show('Order dispatched', '');
 				$http.post('/mail/sendOrderToDriver/'+$scope.order.id);
 
 				var redirectTo = '/dispatch';
@@ -2054,7 +2054,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The email has been added.', 'Success!');
+				messenger.show('Email added', '');
 
 				navMgr.protect(false);
 				$window.location.href = '#/emailList/search';
@@ -2090,7 +2090,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The email list has been updated.', 'Success!');
+				messenger.show('Email list updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -2261,7 +2261,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The hotel has been created.', 'Success!');
+				messenger.show('Hotel created', '');
 
 				if(options.addMore) {
 					$scope.hotel = {};
@@ -2301,7 +2301,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The hotel has been updated.', 'Success!');
+				messenger.show('Hotel updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -2381,7 +2381,7 @@
 
 			$http.post('/messages/create', message).success(
 			function(data, status, headers, config) {
-				messenger.show('The message has been queued for sending.', 'Success!');
+				messenger.show('Message queued', '');
 				if(message.mType === 'email') {
 					$http.post('/blaster/sendEmail/'+data.id);
 					$window.location.href = '#/messages';
@@ -2701,7 +2701,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The promo has been created.', 'Success!');
+				messenger.show('Promo created', '');
 
 				if(options.addMore) {
 					$scope.promo = {};
@@ -2742,7 +2742,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The promo has been updated.', 'Success!');
+				messenger.show('Promo updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -2957,7 +2957,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The restaurant has been created.', 'Success!');
+				messenger.show('Restaurant created', '');
 
 				if(options.addMore) {
 					$scope.restaurant = {};
@@ -3006,7 +3006,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The restaurant has been updated.', 'Success!');
+				messenger.show('Restaurant updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -3053,7 +3053,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 		
-				messenger.show('The story has been created.', 'Success!');
+				messenger.show('Story created', '');
 		
 				navMgr.protect(false);
 				$window.location.href = '#/stories/' + data.id;
@@ -3235,7 +3235,7 @@
 				).success(function(data, status, headers, config) {
 					if(status >= 400) return;
 		
-					messenger.show('The menu has been created.', 'Success!');
+					messenger.show('Menu created', '');
 		
 					if(options.addMore) {
 						$scope.menu = {};
@@ -3277,7 +3277,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The menu has been updated.', 'Success!');
+				messenger.show('Menu updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -3418,7 +3418,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The item has been created.', 'Success!');
+				messenger.show('Item created', '');
 
 				if(options.addMore) {
 					$scope.item = {};
@@ -3468,7 +3468,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The item has been updated.', 'Success!');
+				messenger.show('Item updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -3597,7 +3597,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The option has been created.', 'Success!');
+				messenger.show('Option created', '');
 
 				if(options.addMore) {
 					$scope.option = {};
@@ -3637,7 +3637,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The option has been updated.', 'Success!');
+				messenger.show('Option updated', '');
 
 				$scope.form.$setPristine();
 			});
@@ -3740,7 +3740,6 @@
 		$scope.user = userSchema.populateDefaults({});
 
 		$scope.user.areaId = $rootScope.areaId;
-		console.log('$rootScope.areaId: '+$rootScope.areaId);
 
 		// TODO 
 		// clean phone number; integers only
@@ -3753,7 +3752,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The user has been created.', 'Success!');
+				messenger.show('User created', '');
 
 				if(options.addMore) {
 					$scope.user = {};
@@ -3805,7 +3804,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The user has been updated.', 'Success!');
+				messenger.show('User updated', '');
 
 				$scope.form.$setPristine();
 			});
