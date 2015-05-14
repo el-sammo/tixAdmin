@@ -22,7 +22,7 @@
 			<h4>Destination</h4>
 		</div>
 	</div>
-	<div class="row" ng-show="showBig" ng-init="things = order.things" ng-repeat="order in orders">
+	<div class="row" ng-show="showBig && (authLevel > 2 || userId === authUserId)" ng-init="things = order.things; userId = order.driverId" ng-repeat="order in orders">
 		<div class="col-md-2">
 			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.finalAge}}</a><br/></span>
 			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.timeToDelivery}}</a><br/></span>
@@ -47,7 +47,7 @@
 			<span ng-show="order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.driver}}</a><br/></span>
 			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.driver}}</a><br/></span>
 			<span ng-show="order.driver && order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.driver}}</a><br/></span>
-			<span ng-show="!order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/dispatch/{{order.id}}" class="leftNavLink">Dispatch Order</a><br/></span>
+			<span ng-show="authLevel > 2 && !order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/dispatch/{{order.id}}" class="leftNavLink">Dispatch Order ({{authLevel}})</a><br/></span>
 			<span ng-show="!order.driver && order.orderStatus < 5" class="leftNavLinkRed">Pending<br/></span>
 		</div>
 		<div class="col-md-2">
@@ -81,7 +81,7 @@
 			<span ng-show="order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.driver}}</a><br/></span>
 			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.driver}}</a><br/></span>
 			<span ng-show="order.driver && order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.driver}}</a><br/></span>
-			<span ng-show="!order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/dispatch/{{order.id}}" class="leftNavLink">Dispatch Order</a><br/></span>
+			<span ng-show="authLevel > 2 && !order.driver && order.orderStatus > 4 && order.orderStatus < 9"><a href="#/dispatch/{{order.id}}" class="leftNavLink">Dispatch Order ({{authLevel}})</a><br/></span>
 			<span ng-show="!order.driver && order.orderStatus < 5" class="leftNavLinkRed">Pending<br/></span>
 		</div>
 		<div class="col-md-2">

@@ -775,7 +775,38 @@
 	// Event-Based Services Loader
 	///
 
-	app.controller('LoadServices', function(loginModal, errMgr, fakeAuth) {});
+	app.controller('LoadServices', function(loginModal, errMgr, fakeAuth, authMgr) {});
+
+
+	app.factory('authMgr', function($rootScope, $http, $q) {
+		// Auth Level Map
+		// Should Exist in a Config
+		// 1 - basic auth level; access to minimal functionality
+		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
+		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
+		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
+		// 5 - unrestricted auth level
+			
+		var service = {
+			getAuthLevel: function() {
+				return $http.get('/users/authLevel').then(function(authRes) {
+					if(! (authRes && authRes.data)) {
+						return $q.reject(
+							'Invalid authLevel response: ' + JSON.stringify(authRes)
+						);
+					}
+					return authRes.data;
+	
+				}).catch(function(err) {
+					console.error(err);
+					$q.reject(err);
+				});
+			}
+		};
+	
+		return service;
+	});
+
 
 	app.factory('fakeAuth', function($rootScope) {
 		// TODO
@@ -923,235 +954,232 @@
 
 	app.controller('HomeController', function(
 		$scope, $http, $routeParams, $rootScope,
-		homeMgmt, messageMgmt
+		homeMgmt, messageMgmt, authMgr
 	) {
-		var areaId = $rootScope.areaId;
-		$scope.areaId = $rootScope.areaId;
-		$scope.authLevel = $rootScope.authLevel;
+		var authPromise = authMgr.getAuthLevel();
 
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
+		authPromise.then(function(authData) {
+
+			var areaId = $rootScope.areaId;
+			$scope.areaId = $rootScope.areaId;
+			$scope.authLevel = authData.authLevel;
+
+			$scope.sendMessage = messageMgmt.send;
 		
-		$scope.sendMessage = messageMgmt.send;
+			$scope.dailyOrders = homeMgmt.dailyOrders;
+			$scope.weeklyOrders = homeMgmt.weeklyOrders;
+			$scope.monthlyOrders = homeMgmt.monthlyOrders;
 	
-		$scope.dailyOrders = homeMgmt.dailyOrders;
-		$scope.weeklyOrders = homeMgmt.weeklyOrders;
-		$scope.monthlyOrders = homeMgmt.monthlyOrders;
-
-		$scope.dailyPromos = homeMgmt.dailyPromos;
-		$scope.weeklyPromos = homeMgmt.weeklyPromos;
-		$scope.monthlyPromos = homeMgmt.monthlyPromos;
-
-		$scope.dailySignUps = homeMgmt.dailySignUps;
-		$scope.weeklySignUps = homeMgmt.weeklySignUps;
-		$scope.monthlySignUps = homeMgmt.monthlySignUps;
-
-		var od = $http.get('/orders/daily/' +areaId);
-
-		od.error(function(err) {
-			console.log('HomeController: orders-daily ajax failed');
-			console.log(err);
-			$scope.dayOrders = 'err';
-		});
-
-		od.then(function(res) {
-			var dailyOrders = res.data;
-			var dayGrossRevenue = 0;
-			var dayNetRevenue = 0;
-			var dayOrders = 0;
-			var dayPromos = 0;
-			var dayPromosDisc = 0;
-			var dayPromosArr = [];
-			if(dailyOrders && dailyOrders.length > 0) {
-				dailyOrders.forEach(function(order) {
-					if(order.orderStatus > 4) {
-						dayOrders ++;
-						dayGrossRevenue += parseFloat(order.total);
-						if(order.discount) {
-							dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-							dayPromos ++;
-							dayPromosDisc = dayPromosDisc + parseFloat(order.discount);
-							if(dayPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-								dayPromosArr.push(order.promo.toLowerCase());
+			$scope.dailyPromos = homeMgmt.dailyPromos;
+			$scope.weeklyPromos = homeMgmt.weeklyPromos;
+			$scope.monthlyPromos = homeMgmt.monthlyPromos;
+	
+			$scope.dailySignUps = homeMgmt.dailySignUps;
+			$scope.weeklySignUps = homeMgmt.weeklySignUps;
+			$scope.monthlySignUps = homeMgmt.monthlySignUps;
+	
+			var od = $http.get('/orders/daily/' +areaId);
+	
+			od.error(function(err) {
+				console.log('HomeController: orders-daily ajax failed');
+				console.log(err);
+				$scope.dayOrders = 'err';
+			});
+	
+			od.then(function(res) {
+				var dailyOrders = res.data;
+				var dayGrossRevenue = 0;
+				var dayNetRevenue = 0;
+				var dayOrders = 0;
+				var dayPromos = 0;
+				var dayPromosDisc = 0;
+				var dayPromosArr = [];
+				if(dailyOrders && dailyOrders.length > 0) {
+					dailyOrders.forEach(function(order) {
+						if(order.orderStatus > 4) {
+							dayOrders ++;
+							dayGrossRevenue += parseFloat(order.total);
+							if(order.discount) {
+								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								dayPromos ++;
+								dayPromosDisc = dayPromosDisc + parseFloat(order.discount);
+								if(dayPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
+									dayPromosArr.push(order.promo.toLowerCase());
+								}
+							} else {
+								dayNetRevenue += parseFloat(order.deliveryFee);
 							}
-						} else {
-							dayNetRevenue += parseFloat(order.deliveryFee);
 						}
-					}
-				});
-			}
-			$scope.dayGrossRevenue = dayGrossRevenue.toFixed(2);
-			$scope.dayNetRevenue = dayNetRevenue.toFixed(2);
-			$scope.dayOrders = dayOrders;
-			$scope.dayPromos = dayPromos;
-			$scope.dayPromosDisc = dayPromosDisc.toFixed(2);
-			$scope.dayPromosArr = dayPromosArr;
-		});
-
-		var ow = $http.get('/orders/weekly/' +areaId);
-
-		ow.error(function(err) {
-			console.log('HomeController: orders-weekly ajax failed');
-			console.log(err);
-			$scope.weekOrders = 'err';
-		});
-
-		ow.then(function(res) {
-			var weekOrders = res.data;
-			var weekGrossRevenue = 0;
-			var weekNetRevenue = 0;
-			var weeklyOrders = 0;
-			var weeklyPromos = 0;
-			var weeklyPromosDisc = 0;
-			var weeklyPromosArr = [];
-			if(weekOrders && weekOrders.length > 0) {
-				weekOrders.forEach(function(order) {
-					if(order.orderStatus > 4) {
-						weeklyOrders ++;
-						weekGrossRevenue += parseFloat(order.total);
-						if(order.discount) {
-							weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-							weeklyPromos ++;
-							weeklyPromosDisc = weeklyPromosDisc + parseFloat(order.discount);
-							if(weeklyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-								weeklyPromosArr.push(order.promo.toLowerCase());
+					});
+				}
+				$scope.dayGrossRevenue = dayGrossRevenue.toFixed(2);
+				$scope.dayNetRevenue = dayNetRevenue.toFixed(2);
+				$scope.dayOrders = dayOrders;
+				$scope.dayPromos = dayPromos;
+				$scope.dayPromosDisc = dayPromosDisc.toFixed(2);
+				$scope.dayPromosArr = dayPromosArr;
+			});
+	
+			var ow = $http.get('/orders/weekly/' +areaId);
+	
+			ow.error(function(err) {
+				console.log('HomeController: orders-weekly ajax failed');
+				console.log(err);
+				$scope.weekOrders = 'err';
+			});
+	
+			ow.then(function(res) {
+				var weekOrders = res.data;
+				var weekGrossRevenue = 0;
+				var weekNetRevenue = 0;
+				var weeklyOrders = 0;
+				var weeklyPromos = 0;
+				var weeklyPromosDisc = 0;
+				var weeklyPromosArr = [];
+				if(weekOrders && weekOrders.length > 0) {
+					weekOrders.forEach(function(order) {
+						if(order.orderStatus > 4) {
+							weeklyOrders ++;
+							weekGrossRevenue += parseFloat(order.total);
+							if(order.discount) {
+								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								weeklyPromos ++;
+								weeklyPromosDisc = weeklyPromosDisc + parseFloat(order.discount);
+								if(weeklyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
+									weeklyPromosArr.push(order.promo.toLowerCase());
+								}
+							} else {
+								weekNetRevenue += parseFloat(order.deliveryFee);
 							}
-						} else {
-							weekNetRevenue += parseFloat(order.deliveryFee);
 						}
-					}
-				});
-			}
-			$scope.weekGrossRevenue = weekGrossRevenue.toFixed(2);
-			$scope.weekNetRevenue = weekNetRevenue.toFixed(2);
-			$scope.weekOrders = weeklyOrders;
-			$scope.weekPromos = weeklyPromos;
-			$scope.weekPromosDisc = weeklyPromosDisc.toFixed(2);
-			$scope.weekPromosArr = weeklyPromosArr;
-		});
-
-		var om = $http.get('/orders/monthly/' +areaId);
-
-		om.error(function(err) {
-			console.log('HomeController: orders-monthly ajax failed');
-			console.log(err);
-			$scope.weeksOrders = 'err';
-		});
-
-		om.then(function(res) {
-			var weeksOrders = res.data;
-			var weeksGrossRevenue = 0;
-			var weeksNetRevenue = 0;
-			var monthlyOrders = 0;
-			var monthlyPromos = 0;
-			var monthlyPromosDisc = 0;
-			var monthlyPromosArr = [];
-			if(weeksOrders && weeksOrders.length > 0) {
-				weeksOrders.forEach(function(order) {
-					if(order.orderStatus > 4) {
-						monthlyOrders ++;
-						weeksGrossRevenue += parseFloat(order.total);
-						if(order.discount) {
-							weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
-							monthlyPromos ++;
-							monthlyPromosDisc = monthlyPromosDisc + parseFloat(order.discount);
-							if(monthlyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-								monthlyPromosArr.push(order.promo.toLowerCase());
+					});
+				}
+				$scope.weekGrossRevenue = weekGrossRevenue.toFixed(2);
+				$scope.weekNetRevenue = weekNetRevenue.toFixed(2);
+				$scope.weekOrders = weeklyOrders;
+				$scope.weekPromos = weeklyPromos;
+				$scope.weekPromosDisc = weeklyPromosDisc.toFixed(2);
+				$scope.weekPromosArr = weeklyPromosArr;
+			});
+	
+			var om = $http.get('/orders/monthly/' +areaId);
+	
+			om.error(function(err) {
+				console.log('HomeController: orders-monthly ajax failed');
+				console.log(err);
+				$scope.weeksOrders = 'err';
+			});
+	
+			om.then(function(res) {
+				var weeksOrders = res.data;
+				var weeksGrossRevenue = 0;
+				var weeksNetRevenue = 0;
+				var monthlyOrders = 0;
+				var monthlyPromos = 0;
+				var monthlyPromosDisc = 0;
+				var monthlyPromosArr = [];
+				if(weeksOrders && weeksOrders.length > 0) {
+					weeksOrders.forEach(function(order) {
+						if(order.orderStatus > 4) {
+							monthlyOrders ++;
+							weeksGrossRevenue += parseFloat(order.total);
+							if(order.discount) {
+								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								monthlyPromos ++;
+								monthlyPromosDisc = monthlyPromosDisc + parseFloat(order.discount);
+								if(monthlyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
+									monthlyPromosArr.push(order.promo.toLowerCase());
+								}
+							} else {
+								weeksNetRevenue += parseFloat(order.deliveryFee);
 							}
-						} else {
-							weeksNetRevenue += parseFloat(order.deliveryFee);
 						}
-					}
-				});
-			}
-			$scope.weeksGrossRevenue = weeksGrossRevenue.toFixed(2);
-			$scope.weeksNetRevenue = weeksNetRevenue.toFixed(2);
-			$scope.weeksOrders = monthlyOrders;
-			$scope.weeksPromos = monthlyPromos;
-			$scope.weeksPromosDisc = monthlyPromosDisc.toFixed(2);
-			$scope.weeksPromosArr = monthlyPromosArr;
+					});
+				}
+				$scope.weeksGrossRevenue = weeksGrossRevenue.toFixed(2);
+				$scope.weeksNetRevenue = weeksNetRevenue.toFixed(2);
+				$scope.weeksOrders = monthlyOrders;
+				$scope.weeksPromos = monthlyPromos;
+				$scope.weeksPromosDisc = monthlyPromosDisc.toFixed(2);
+				$scope.weeksPromosArr = monthlyPromosArr;
+			});
+	
+			var cd = $http.get('/customers/daily/' +areaId);
+	
+			cd.error(function(err) {
+				console.log('HomeController: customers-daily ajax failed');
+				console.log(err);
+				$scope.daySignups = 'err';
+			});
+	
+			cd.then(function(res) {
+				$scope.daySignUps = res.data;
+				$scope.daySignups = res.data.length;
+			});
+	
+			var cw = $http.get('/customers/weekly/' +areaId);
+	
+			cw.error(function(err) {
+				console.log('HomeController: customers-weekly ajax failed');
+				console.log(err);
+				$scope.weekSignups = 'err';
+			});
+	
+			cw.then(function(res) {
+				$scope.weekSignUps = res.data;
+				$scope.weekSignups = res.data.length;
+			});
+	
+			var cm = $http.get('/customers/monthly/' +areaId);
+	
+			cm.error(function(err) {
+				console.log('HomeController: customers-monthly ajax failed');
+				console.log(err);
+				$scope.weeksSignups = 'err';
+			});
+	
+			cm.then(function(res) {
+				$scope.weeksSignUps = res.data;
+				$scope.weeksSignups = res.data.length;
+			});
+	
+			var ad = $http.get('/applicants/daily/' +areaId);
+	
+			ad.error(function(err) {
+				console.log('HomeController: applicants-daily ajax failed');
+				console.log(err);
+				$scope.dayApplicants = 'err';
+			});
+	
+			ad.then(function(res) {
+				$scope.dayApplicants = res.data.length;
+			});
+	
+			var aw = $http.get('/applicants/weekly/' +areaId);
+	
+			aw.error(function(err) {
+				console.log('HomeController: applicants-weekly ajax failed');
+				console.log(err);
+				$scope.weekApplicants = 'err';
+			});
+	
+			aw.then(function(res) {
+				$scope.weekApplicants = res.data.length;
+			});
+	
+			var am = $http.get('/applicants/monthly/' +areaId);
+	
+			am.error(function(err) {
+				console.log('HomeController: applicants-monthly ajax failed');
+				console.log(err);
+				$scope.weeksApplicants = 'err';
+			});
+	
+			am.then(function(res) {
+				$scope.weeksApplicants = res.data.length;
+			});
+
 		});
-
-		var cd = $http.get('/customers/daily/' +areaId);
-
-		cd.error(function(err) {
-			console.log('HomeController: customers-daily ajax failed');
-			console.log(err);
-			$scope.daySignups = 'err';
-		});
-
-		cd.then(function(res) {
-			$scope.daySignUps = res.data;
-			$scope.daySignups = res.data.length;
-		});
-
-		var cw = $http.get('/customers/weekly/' +areaId);
-
-		cw.error(function(err) {
-			console.log('HomeController: customers-weekly ajax failed');
-			console.log(err);
-			$scope.weekSignups = 'err';
-		});
-
-		cw.then(function(res) {
-			$scope.weekSignUps = res.data;
-			$scope.weekSignups = res.data.length;
-		});
-
-		var cm = $http.get('/customers/monthly/' +areaId);
-
-		cm.error(function(err) {
-			console.log('HomeController: customers-monthly ajax failed');
-			console.log(err);
-			$scope.weeksSignups = 'err';
-		});
-
-		cm.then(function(res) {
-			$scope.weeksSignUps = res.data;
-			$scope.weeksSignups = res.data.length;
-		});
-
-		var ad = $http.get('/applicants/daily/' +areaId);
-
-		ad.error(function(err) {
-			console.log('HomeController: applicants-daily ajax failed');
-			console.log(err);
-			$scope.dayApplicants = 'err';
-		});
-
-		ad.then(function(res) {
-			$scope.dayApplicants = res.data.length;
-		});
-
-		var aw = $http.get('/applicants/weekly/' +areaId);
-
-		aw.error(function(err) {
-			console.log('HomeController: applicants-weekly ajax failed');
-			console.log(err);
-			$scope.weekApplicants = 'err';
-		});
-
-		aw.then(function(res) {
-			$scope.weekApplicants = res.data.length;
-		});
-
-		var am = $http.get('/applicants/monthly/' +areaId);
-
-		am.error(function(err) {
-			console.log('HomeController: applicants-monthly ajax failed');
-			console.log(err);
-			$scope.weeksApplicants = 'err';
-		});
-
-		am.then(function(res) {
-			$scope.weeksApplicants = res.data.length;
-		});
-
 
 	});
 
@@ -1644,7 +1672,7 @@
 
 	app.controller('DispatchController', function(
 		$scope, $http, $routeParams, $rootScope, 
-		$window, deviceMgr
+		$window, deviceMgr, authMgr, $timeout
 	) {
 		var areaId = $rootScope.areaId;
 
@@ -1654,187 +1682,191 @@
 			$scope.showBig = false;
 		}
 
-		$scope.authLevel = $rootScope.authLevel;
+		function refreshData() {
 
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
-
-		setTimeout(function() {
-			$window.location.reload();
-		}, 30000);
-
-		var p = $http.get('/orders/daily/' + areaId);
+			var authPromise = authMgr.getAuthLevel();
 	
-		p.error(function(err) {
-			console.log('DispatchController: orders-daily ajax failed');
-			console.log(err);
-		});
+			authPromise.then(function(authData) {
 	
-		p.then(function(res) {
-			res.data.map(function(order) {
-				var orderDate = new Date(order.updatedAt);
-				var orderDateSecsPre = orderDate.getTime();
-				var orderDateSecsPost = orderDateSecsPre - 21600;
-				var ampm = 'am';
-				order.updatedYear = new Date(orderDateSecsPost).getFullYear();
-				order.updatedMonth = new Date(orderDateSecsPost).getMonth() + 1;
-				order.updatedDate = new Date(orderDateSecsPost).getDate();
-				if(order.updatedMonth.toString().length < 2) {
-					order.updatedMonth = '0'+order.updatedMonth.toString();
-				}
-				if(order.updatedDate.toString().length < 2) {
-					order.updatedDate = '0'+order.updatedDate.toString();
-				}
-				order.updatedAtDate = order.updatedYear+'-'+order.updatedMonth+'-'+order.updatedDate;
-				order.updatedHours = new Date(orderDateSecsPost).getHours();
-				order.updatedMinutes = new Date(orderDateSecsPost).getMinutes();
-				if(order.updatedHours > 12) {
-					ampm = 'pm';
-					order.updatedHours = order.updatedHours - 12;
-				}
-				if(order.updatedHours.toString().length < 2) {
-					order.updatedHours = '0'+order.updatedHours.toString();
-				}
-				if(order.updatedMinutes.toString().length < 2) {
-					order.updatedMinutes = '0'+order.updatedMinutes.toString();
-				}
-				order.updatedAtTime = order.updatedHours+':'+order.updatedMinutes;
-				order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
-				order.total = parseFloat(order.total).toFixed(2);
-
-				var now = new Date().getTime();
-
-				if(order.paymentAcceptedAt) {
-					var old = (now - order.paymentAcceptedAt).toString();
+				var areaId = $rootScope.areaId;
+				$scope.areaId = $rootScope.areaId;
+				$scope.authUserId = authData.userId;
+				$scope.authLevel = authData.authLevel;
 	
-					var formattedNow = old.substr(0, (old.length - 3)); 
-	
-					var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
-					var formattedAgeSec = parseInt(formattedNow) % 60;
-	
-					if(formattedAgeSec < 10) {
-						formattedAgeSec = '0' + formattedAgeSec;
-					}
-	
-					if(formattedAgeHour > 0) {
-						var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
-						if(formattedAgeMin < 10) {
-							formattedAgeMin = '0' + formattedAgeMin;
+				var p = $http.get('/orders/daily/' + areaId);
+			
+				p.error(function(err) {
+					console.log('DispatchController: orders-daily ajax failed');
+					console.log(err);
+				});
+			
+				p.then(function(res) {
+					res.data.map(function(order) {
+						var orderDate = new Date(order.updatedAt);
+						var orderDateSecsPre = orderDate.getTime();
+						var orderDateSecsPost = orderDateSecsPre - 21600;
+						var ampm = 'am';
+						order.updatedYear = new Date(orderDateSecsPost).getFullYear();
+						order.updatedMonth = new Date(orderDateSecsPost).getMonth() + 1;
+						order.updatedDate = new Date(orderDateSecsPost).getDate();
+						if(order.updatedMonth.toString().length < 2) {
+							order.updatedMonth = '0'+order.updatedMonth.toString();
 						}
-						order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
-					} else {
-						var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
-						order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
-					}
-
-					if(order.orderStatus > 8 && order.orderDeliveredAt && order.paymentAcceptedAt) {
-						var timeToDelivery = parseInt(order.orderDeliveredAt) - parseInt(order.paymentAcceptedAt);
-
-						var formattedNow = timeToDelivery.toString().substr(0, (timeToDelivery.toString().length - 3)); 
-		
-						var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
-						var formattedAgeSec = parseInt(formattedNow) % 60;
-		
-						if(formattedAgeSec < 10) {
-							formattedAgeSec = '0' + formattedAgeSec;
+						if(order.updatedDate.toString().length < 2) {
+							order.updatedDate = '0'+order.updatedDate.toString();
 						}
+						order.updatedAtDate = order.updatedYear+'-'+order.updatedMonth+'-'+order.updatedDate;
+						order.updatedHours = new Date(orderDateSecsPost).getHours();
+						order.updatedMinutes = new Date(orderDateSecsPost).getMinutes();
+						if(order.updatedHours > 12) {
+							ampm = 'pm';
+							order.updatedHours = order.updatedHours - 12;
+						}
+						if(order.updatedHours.toString().length < 2) {
+							order.updatedHours = '0'+order.updatedHours.toString();
+						}
+						if(order.updatedMinutes.toString().length < 2) {
+							order.updatedMinutes = '0'+order.updatedMinutes.toString();
+						}
+						order.updatedAtTime = order.updatedHours+':'+order.updatedMinutes;
+						order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
+						order.total = parseFloat(order.total).toFixed(2);
 		
-						if(formattedAgeHour > 0) {
-							var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
-							if(formattedAgeMin < 10) {
-								formattedAgeMin = '0' + formattedAgeMin;
+						var now = new Date().getTime();
+		
+						if(order.paymentAcceptedAt) {
+							var old = (now - order.paymentAcceptedAt).toString();
+			
+							var formattedNow = old.substr(0, (old.length - 3)); 
+			
+							var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
+							var formattedAgeSec = parseInt(formattedNow) % 60;
+			
+							if(formattedAgeSec < 10) {
+								formattedAgeSec = '0' + formattedAgeSec;
 							}
-							order.timeToDelivery = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
-						} else {
-							var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
-							order.timeToDelivery = formattedAgeMin + ':' + formattedAgeSec;
-						}
-					}
-
-				} else {
-					order.finalAge = 'Pending';
-				}
-
-				// TODO
-				// put this in a config? or what?
-				// orderStatus map
-				// < 1 = not started
-				// 1   = started (ordering)
-				// 2   = payment initiated
-				// 3   = payment accepted
-				// 4   = payment declined
-				// 5   = order completed
-				// 6   = order ordered (at restaurant)
-				// 7   = order collected (from restaurant)
-				// 8   = order en route
-				// 9   = order delivered
-				
-				var orderStatusMap = [
-					'No status',
-					'Ordering',
-					'Payment Initiated',
-					'Payment Not Processed',
-					'Payment Declined',
-					'Payment Accepted',
-					'Order Placed',
-					'Order Picked up',
-					'Order In Route',
-					'Order Delivered'
-				];
-
-				order.currStatus = orderStatusMap[order.orderStatus];
-	
-				if(order.things.length > 0) {
-					order.restaurants = '';
-					var firstRest = true;
-					order.things.forEach(function(thing) {
-						if(!order.restaurants.match(thing.restaurantName)) {
-							if(firstRest) {
-								order.restaurants = thing.restaurantName;
-								firstRest = false;
+			
+							if(formattedAgeHour > 0) {
+								var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+								if(formattedAgeMin < 10) {
+									formattedAgeMin = '0' + formattedAgeMin;
+								}
+								order.finalAge = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
 							} else {
-								order.restaurants = order.restaurants + ', ' + thing.restaurantName;
+								var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
+								order.finalAge = formattedAgeMin + ':' + formattedAgeSec;
 							}
+		
+							if(order.orderStatus > 8 && order.orderDeliveredAt && order.paymentAcceptedAt) {
+								var timeToDelivery = parseInt(order.orderDeliveredAt) - parseInt(order.paymentAcceptedAt);
+		
+								var formattedNow = timeToDelivery.toString().substr(0, (timeToDelivery.toString().length - 3)); 
+				
+								var formattedAgeHour = Math.floor(parseInt(formattedNow) / 3600);
+								var formattedAgeSec = parseInt(formattedNow) % 60;
+				
+								if(formattedAgeSec < 10) {
+									formattedAgeSec = '0' + formattedAgeSec;
+								}
+				
+								if(formattedAgeHour > 0) {
+									var formattedAgeMin = Math.floor(parseInt(formattedNow - (formattedAgeHour * 3600)) / 60);
+									if(formattedAgeMin < 10) {
+										formattedAgeMin = '0' + formattedAgeMin;
+									}
+									order.timeToDelivery = formattedAgeHour + ':' + formattedAgeMin + ':' + formattedAgeSec;
+								} else {
+									var formattedAgeMin = Math.floor(parseInt(formattedNow) / 60);
+									order.timeToDelivery = formattedAgeMin + ':' + formattedAgeSec;
+								}
+							}
+		
+						} else {
+							order.finalAge = 'Pending';
+						}
+		
+						// TODO
+						// put this in a config? or what?
+						// orderStatus map
+						// < 1 = not started
+						// 1   = started (ordering)
+						// 2   = payment initiated
+						// 3   = payment accepted
+						// 4   = payment declined
+						// 5   = order completed
+						// 6   = order ordered (at restaurant)
+						// 7   = order collected (from restaurant)
+						// 8   = order en route
+						// 9   = order delivered
+						
+						var orderStatusMap = [
+							'No status',
+							'Ordering',
+							'Payment Initiated',
+							'Payment Not Processed',
+							'Payment Declined',
+							'Payment Accepted',
+							'Order Placed',
+							'Order Picked up',
+							'Order In Route',
+							'Order Delivered'
+						];
+		
+						order.currStatus = orderStatusMap[order.orderStatus];
+			
+						if(order.things.length > 0) {
+							order.restaurants = '';
+							var firstRest = true;
+							order.things.forEach(function(thing) {
+								if(!order.restaurants.match(thing.restaurantName)) {
+									if(firstRest) {
+										order.restaurants = thing.restaurantName;
+										firstRest = false;
+									} else {
+										order.restaurants = order.restaurants + ', ' + thing.restaurantName;
+									}
+								}
+							});
+						}
+		
+						if(order.driverId) {
+							var r = $http.get('/users/' + order.driverId);
+						
+							r.error(function(err) {
+								console.log('DispatchController: users ajax failed');
+								console.log(err);
+							});
+						
+							r.then(function(res) {
+								order.driver = res.data.fName;
+							});
+						}
+		
+						if(order.customerId) {
+							var r = $http.get('/customers/' + order.customerId);
+						
+							r.error(function(err) {
+								console.log('DispatchController: customers ajax failed');
+								console.log(err);
+							});
+						
+							r.then(function(res) {
+								order.destination = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName;
+							});
+						} else {
+							order.destination = 'not entered yet';
 						}
 					});
-				}
-
-				if(order.driverId) {
-					var r = $http.get('/users/' + order.driverId);
-				
-					r.error(function(err) {
-						console.log('DispatchController: users ajax failed');
-						console.log(err);
-					});
-				
-					r.then(function(res) {
-						order.driver = res.data.fName;
-					});
-				}
-
-				if(order.customerId) {
-					var r = $http.get('/customers/' + order.customerId);
-				
-					r.error(function(err) {
-						console.log('DispatchController: customers ajax failed');
-						console.log(err);
-					});
-				
-					r.then(function(res) {
-						order.destination = res.data.addresses.primary.streetNumber+' '+res.data.addresses.primary.streetName;
-					});
-				} else {
-					order.destination = 'not entered yet';
-				}
+			
+					$scope.orders = res.data;
+				});
 			});
-	
-			$scope.orders = res.data;
-		});
+
+			$timeout(function() {
+				refreshData();
+			}, 30000);
+		}
+		refreshData();
 	});
 
 
@@ -1844,42 +1876,47 @@
 
 	app.controller('DispatchOrderController', function(
 		$scope, $http, $routeParams, $rootScope,
-		$window, messenger, dispatchOrderMgmt
+		$window, messenger, dispatchOrderMgmt, authMgr
 	) {
 		var areaId = $rootScope.areaId;
-		$scope.authLevel = $rootScope.authLevel;
 
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
+		var authPromise = authMgr.getAuthLevel();
 
-		var p = $http.get('/orders/' + $routeParams.id);
-	
-		p.error(function(err) {
-			console.log('DispatchOrderController: orders ajax failed');
-			console.log(err);
-		});
-	
-		p.then(function(res) {
-			$scope.order = res.data;
+		authPromise.then(function(authData) {
 
-			var r = $http.get('/users/drivers/');
-			
-			r.error(function(err) {
-				console.log('DispatchOrderController: users ajax failed');
+			var areaId = $rootScope.areaId;
+			$scope.areaId = $rootScope.areaId;
+			$scope.authLevel = authData.authLevel;
+
+			if(authData.authLevel < 3) {
+				$window.location.href = '#/';
+			}
+
+			var p = $http.get('/orders/' + $routeParams.id);
+		
+			p.error(function(err) {
+				console.log('DispatchOrderController: orders ajax failed');
 				console.log(err);
 			});
-			
-			r.then(function(res) {
-				$scope.drivers = res.data;
+		
+			p.then(function(res) {
+				$scope.order = res.data;
+	
+				var r = $http.get('/users/drivers/');
+				
+				r.error(function(err) {
+					console.log('DispatchOrderController: users ajax failed');
+					console.log(err);
+				});
+				
+				r.then(function(res) {
+					$scope.drivers = res.data;
+				});
 			});
+	
+			$scope.dispatchOrderToDriver = dispatchOrderMgmt.dispatchOrder;
+	
 		});
-
-		$scope.dispatchOrderToDriver = dispatchOrderMgmt.dispatchOrder;
 
 	});
 
@@ -1890,18 +1927,9 @@
 
 	app.controller('DispatchOrderToDriverController', function(
 		$scope, $http, $routeParams, $rootScope,
-		$window, messenger, args, $modalInstance
+		$location, messenger, args, $modalInstance
 	) {
 		var areaId = $rootScope.areaId;
-		$scope.authLevel = $rootScope.authLevel;
-
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
 
 		var p = $http.get('/orders/' + args.orderId);
 	
@@ -1973,8 +2001,10 @@
 				messenger.show('The order has been dispatched.', 'Success!');
 				$http.post('/mail/sendOrderToDriver/'+$scope.order.id);
 
+				var redirectTo = '/dispatch';
+				$location.path(redirectTo);
+
 				return $modalInstance.dismiss('done');
-				$window.location.href = '#/dispatch/';
 			});
 		};
 	});
@@ -2377,94 +2407,95 @@
 	app.controller('OrderDetailsController', function(
 		$scope, $http, $routeParams, $rootScope, 
 		$q, $sce, configMgr, querystring, messenger,
-		$window
+		$window, $timeout
 	) {
 		var areaId = $rootScope.areaId;
-		$scope.authLevel = $rootScope.authLevel;
 
-		// $scope.orderRestaurants = [
-		//   {
-		//     name: ...
-		//     items: [
-		//       name: ...
-		//       quantity: ...
-		//       option: ...
-		//     ]
-		//   }
-		// ];
-		$scope.orderRestaurants = [];
+		function refreshData() {
 
-		// Auth Level Map
-		// Should Exist in a Config
-		// 1 - basic auth level; access to minimal functionality
-		// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-		// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-		// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-		// 5 - unrestricted auth level
-
-		var p = $http.get('/orders/' + $routeParams.id);
+			$scope.authLevel = $rootScope.authLevel;
 	
-		p.error(function(err) {
-			console.log('OrderDetailsController: order ajax failed');
-			console.log(err);
-		});
+			// $scope.orderRestaurants = [
+			//   {
+			//     name: ...
+			//     items: [
+			//       name: ...
+			//       quantity: ...
+			//       option: ...
+			//     ]
+			//   }
+			// ];
+			$scope.orderRestaurants = [];
 	
-		p.then(function(res) {
-			$scope.order = res.data;
-			$scope.orderStatus = $scope.order.orderStatus;
-			$scope.paymentMethod = $scope.order.paymentMethods;
-			$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
-			$scope.discount = '$'+parseFloat($scope.order.discount).toFixed(2);
-			if($scope.order.gratuity) {
-				$scope.gratuity = '$'+parseFloat($scope.order.gratuity).toFixed(2);
-			} else {
-				$scope.gratuity = '$0.00';
-			}
-			$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
-			$scope.order.things.forEach(function(thing) {
-				$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
-					var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
-					if(! restaurant) {
-						restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
-						$scope.orderRestaurants.push(restaurant);
+			var p = $http.get('/orders/' + $routeParams.id);
+		
+			p.error(function(err) {
+				console.log('OrderDetailsController: order ajax failed');
+				console.log(err);
+			});
+		
+			p.then(function(res) {
+				$scope.order = res.data;
+				$scope.orderStatus = $scope.order.orderStatus;
+				$scope.paymentMethod = $scope.order.paymentMethods;
+				$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
+				$scope.discount = '$'+parseFloat($scope.order.discount).toFixed(2);
+				if($scope.order.gratuity) {
+					$scope.gratuity = '$'+parseFloat($scope.order.gratuity).toFixed(2);
+				} else {
+					$scope.gratuity = '$0.00';
+				}
+				$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
+				$scope.order.things.forEach(function(thing) {
+					$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
+						var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
+						if(! restaurant) {
+							restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
+							$scope.orderRestaurants.push(restaurant);
+						}
+						restaurant.items.push(
+							_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
+						);
+					});
+				});
+	
+				var r = $http.get('/customers/' + $scope.order.customerId);
+				
+				r.error(function(err) {
+					console.log('OrderDetailsController: customer ajax failed');
+					console.log(err);
+				});
+				
+				r.then(function(res) {
+					$scope.customer = res.data;
+					if($scope.customer.addresses.primary.apt) {
+						$scope.apt = $scope.customer.addresses.primary.apt;
 					}
-					restaurant.items.push(
-						_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
+					$scope.fName = $scope.customer.fName;
+					$scope.lName = $scope.customer.lName;
+					$scope.phone = $scope.customer.phone;
+					$scope.address = $scope.customer.addresses.primary.streetNumber+' '+$scope.customer.addresses.primary.streetName+' '+$scope.customer.addresses.primary.city;
+	
+					$scope.src = $sce.trustAsResourceUrl(
+						'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
+							key: configMgr.config.vendors.googleMaps.key,
+							q: ([
+								$scope.customer.addresses.primary.streetNumber,
+								$scope.customer.addresses.primary.streetName,
+								$scope.customer.addresses.primary.city,
+								$scope.customer.addresses.primary.state,
+								$scope.customer.addresses.primary.zip
+							].join('+'))
+						})
 					);
 				});
 			});
 
-			var r = $http.get('/customers/' + $scope.order.customerId);
-			
-			r.error(function(err) {
-				console.log('OrderDetailsController: customer ajax failed');
-				console.log(err);
-			});
-			
-			r.then(function(res) {
-				$scope.customer = res.data;
-				if($scope.customer.addresses.primary.apt) {
-					$scope.apt = $scope.customer.addresses.primary.apt;
-				}
-				$scope.fName = $scope.customer.fName;
-				$scope.lName = $scope.customer.lName;
-				$scope.phone = $scope.customer.phone;
-				$scope.address = $scope.customer.addresses.primary.streetNumber+' '+$scope.customer.addresses.primary.streetName+' '+$scope.customer.addresses.primary.city;
-
-				$scope.src = $sce.trustAsResourceUrl(
-					'https://www.google.com/maps/embed/v1/place?' + querystring.stringify({
-						key: configMgr.config.vendors.googleMaps.key,
-						q: ([
-							$scope.customer.addresses.primary.streetNumber,
-							$scope.customer.addresses.primary.streetName,
-							$scope.customer.addresses.primary.city,
-							$scope.customer.addresses.primary.state,
-							$scope.customer.addresses.primary.zip
-						].join('+'))
-					})
-				);
-			});
-		});
+			$timeout(function() {
+				refreshData();
+			}, 30000);
+		}
+		refreshData();
 
 		$scope.setOrderPlaced = function(order) {
 			order.orderStatus = parseInt(6);
@@ -2474,7 +2505,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order has been placed.', 'Success!');
+				messenger.show('Order placed', '');
 
 				$window.location.href = '#/dispatch/';
 			});
@@ -2488,9 +2519,9 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order has been collected.', 'Success!');
+				messenger.show('Order collected', '');
 
-				$window.location.href = '#/orderDetails/' + order.id;
+				refreshData();
 			});
 		}
 
@@ -2502,9 +2533,9 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order is en route.', 'Success!');
+				messenger.show('Order en route', '');
 
-				$window.location.href = '#/orderDetails/' + order.id;
+				refreshData();
 			});
 		}
 
@@ -2516,7 +2547,7 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
-				messenger.show('The order has been delivered.', 'Success!');
+				messenger.show('Order delivered', '');
 
 				$window.location.href = '#/dispatch/';
 			});
@@ -3690,14 +3721,6 @@
 		return service;
 	});
 
-	// Auth Level Map
-	// Should Exist in a Config
-	// 1 - basic auth level; access to minimal functionality
-	// 2 - slightly expanded auth level; access to user-assigned orders (driver)
-	// 3 - expanded auth level; access to all orders; access to all customer info; dispatch (operator)
-	// 4 - enhanced auth level; access to all orders, scheduling/payroll verification, basic reports (manager)
-	// 5 - unrestricted auth level
-	
 	app.controller('UsersAddController', function(
 		navMgr, messenger, pod, userSchema,
 		$scope, $http, $window, $rootScope
