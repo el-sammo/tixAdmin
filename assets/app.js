@@ -198,6 +198,21 @@
 
 
 		///
+		// Shifts
+		///
+
+		$routeProvider.when('/shifts/:id', {
+			controller: 'ShiftViewController',
+			templateUrl: '/templates/shiftView.html'
+		});
+
+		$routeProvider.when('/shifts', {
+			controller: 'ShiftsListController',
+			templateUrl: '/templates/shiftsList.html'
+		});
+
+
+		///
 		// Stories
 		///
 
@@ -957,11 +972,11 @@
 		homeMgmt, messageMgmt, authMgr
 	) {
 		var authPromise = authMgr.getAuthLevel();
+		var areaId = $rootScope.areaId;
+		$scope.areaId = $rootScope.areaId;
 
 		authPromise.then(function(authData) {
 
-			var areaId = $rootScope.areaId;
-			$scope.areaId = $rootScope.areaId;
 			$scope.authLevel = authData.authLevel;
 
 			$scope.sendMessage = messageMgmt.send;
@@ -3019,6 +3034,125 @@
 
 
 	///
+	// Controllers: Shifts
+	///
+
+	app.controller('ShiftsListController', function(
+		$scope, $http, $routeParams, $rootScope, authMgr
+	) {
+		$scope.areaName = $rootScope.areaName;
+		$scope.areaId = $rootScope.areaId;
+
+		var authPromise = authMgr.getAuthLevel();
+
+		authPromise.then(function(authData) {
+
+			$scope.authUserId = authData.userId;
+			$scope.authLevel = authData.authLevel;
+
+			var shiftsHistory = [];
+
+			// first get historic shifts
+			$http.get('/shifts/byDriverId/'+$scope.authUserId).then(function(shifts) {
+				if(shifts && shifts.data && shifts.data.length > 0) {
+					shifts.data.forEach(function(shift) {
+						var thisShift = {};
+						thisShift.id = shift.id;
+						thisShift.date = shift.date;
+						thisShift.net = shift.net;
+						thisShift.reconciledBy = shift.reconciledBy;
+	
+						shiftsHistory.push(thisShift);
+					});
+				}
+
+				// next get current shift
+				$http.get('/orders/byDriverIdToday/' +$scope.authUserId).then(function(orders) {
+					if(orders && orders.data && orders.data.length > 0) {
+						var currentShift = {};
+						var currentTotalTips = 0;
+						var currentCashCollected = 0;
+						var first = true;
+						var currentDate;
+						orders.data.forEach(function(order) {
+							if(order.paymentMethods === 'cash') {
+								currentCashCollected += parseFloat(order.total);
+								console.log('order.total: '+order.total);
+							}
+							if(order.gratuity && parseFloat(order.gratuity) > 0) {
+								currentTotalTips += parseFloat(order.gratuity);
+							}
+							if(first) {
+								var currentDateYear = new Date(order.paymentAcceptedAt).getFullYear();
+								var currentDateMonth = new Date(order.paymentAcceptedAt).getMonth() + 1;
+								var currentDateDate = new Date(order.paymentAcceptedAt).getDate();
+
+								if(currentDateMonth < 10) {
+									currentDateMonth = '0'+currentDateMonth;
+								}
+		
+								if(currentDateDate < 10) {
+									currentDateDate = '0'+currentDateDate;
+								}
+		
+								currentDate = currentDateYear+''+currentDateMonth+''+currentDateDate;
+							}
+
+							first = false;
+						});
+
+						console.log('currentTotalTips: '+currentTotalTips);
+						console.log('currentCashCollected: '+currentCashCollected);
+
+						currentShift.date = currentDate;
+						currentShift.net = parseFloat(currentTotalTips) - parseFloat(currentCashCollected);
+						currentShift.reconciledBy = 'PENDING';
+	
+						shiftsHistory.push(currentShift);
+					}
+				}).catch(function(err) {
+					console.log('ShiftsList: orders-err:');
+					console.log(err);
+				});
+			}).catch(function(err) {
+				console.log('ShiftsList: shifts-err:');
+				console.log(err);
+			});
+
+			$scope.shifts = shiftsHistory;
+	
+		});
+	});
+
+	app.controller('ShiftViewController', function(navMgr, messenger, pod, $scope, $http, $routeParams, $window, $rootScope) {
+		$scope.areaId = $rootScope.areaId;
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.save = function save(story) {
+
+			story.areaId = $scope.areaId;
+
+			$http.post(
+				'/stories/create', story
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+		
+				messenger.show('Story created', '');
+		
+				navMgr.protect(false);
+				$window.location.href = '#/stories/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/stories');
+		};
+	});
+
+
+	///
 	// Controllers: Stories
 	///
 
@@ -3064,7 +3198,6 @@
 			navMgr.cancel('#/stories');
 		};
 	});
-
 
 
 	///
