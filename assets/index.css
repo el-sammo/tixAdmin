@@ -242,7 +242,7 @@ td {
 
 #fms-messenger .alert {
 	/* width: calc(100% - 70em); */
-	width: 40em;
+	width: 14em;
 	height: 40px;
 	position: fixed;
 	text-align: center;

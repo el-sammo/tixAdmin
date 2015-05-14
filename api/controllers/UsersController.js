@@ -54,6 +54,14 @@ module.exports = {
       throw err;
 		});
 	},
+
+	authLevel: function(req, res) {
+		var authLevelData = {};
+		authLevelData.isAuthenticated = req.session.isAuthenticated;
+		authLevelData.userId = req.session.user;
+		authLevelData.authLevel = req.session.authLevel;
+		res.json(authLevelData);
+	},
 	
   login: function(req, res) {
     var isAjax = req.headers.accept.match(/application\/json/);
@@ -100,6 +108,7 @@ function processLogin(req, res, self) {
 
       req.session.isAuthenticated = true;
       req.session.user = user.id;
+      req.session.authLevel = parseInt(user.authLevel);
 
       respond();
 
