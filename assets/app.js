@@ -992,16 +992,38 @@
 			$scope.dailySignUps = homeMgmt.dailySignUps;
 			$scope.weeklySignUps = homeMgmt.weeklySignUps;
 			$scope.monthlySignUps = homeMgmt.monthlySignUps;
-	
-			var od = $http.get('/orders/daily/' +areaId);
-	
-			od.error(function(err) {
-				console.log('HomeController: orders-daily ajax failed');
+
+			var allOrders = $http.get('/orders/allTime/' +areaId).then(function(res) {
+				var allTimeOrderData = res.data;
+				var allTimeGrossRevenue = 0;
+				var allTimeNetRevenue = 0;
+				var allTimeOrders = 0;
+				var allTimePromos = 0;
+				var allTimePromosDisc = 0;
+				allTimeOrderData.forEach(function(order) {
+					if(order.orderStatus > 4) {
+						allTimeOrders ++;
+						allTimeGrossRevenue += parseFloat(order.total);
+						if(order.discount) {
+							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+							allTimePromos ++;
+							allTimePromosDisc += parseFloat(order.discount);
+						} else {
+							allTimeNetRevenue += parseFloat(order.deliveryFee);
+						}
+					}
+				});
+				$scope.allTimeGrossRevenue = allTimeGrossRevenue.toFixed(2);
+				$scope.allTimeNetRevenue = allTimeNetRevenue.toFixed(2);
+				$scope.allTimeOrders = allTimeOrders;
+				$scope.allTimePromos = allTimePromos;
+				$scope.allTimePromosDisc = allTimePromosDisc;
+			}).catch(function(err) {
+				console.log('orders-allTime err:');
 				console.log(err);
-				$scope.dayOrders = 'err';
 			});
 	
-			od.then(function(res) {
+			$http.get('/orders/daily/' +areaId).then(function(res) {
 				var dailyOrders = res.data;
 				var dayGrossRevenue = 0;
 				var dayNetRevenue = 0;
@@ -1033,17 +1055,12 @@
 				$scope.dayPromos = dayPromos;
 				$scope.dayPromosDisc = dayPromosDisc.toFixed(2);
 				$scope.dayPromosArr = dayPromosArr;
-			});
-	
-			var ow = $http.get('/orders/weekly/' +areaId);
-	
-			ow.error(function(err) {
-				console.log('HomeController: orders-weekly ajax failed');
+			}).catch(function(err) {
+				console.log('orders-daily err:');
 				console.log(err);
-				$scope.weekOrders = 'err';
 			});
 	
-			ow.then(function(res) {
+			$http.get('/orders/weekly/' +areaId).then(function(res) {
 				var weekOrders = res.data;
 				var weekGrossRevenue = 0;
 				var weekNetRevenue = 0;
@@ -1075,17 +1092,12 @@
 				$scope.weekPromos = weeklyPromos;
 				$scope.weekPromosDisc = weeklyPromosDisc.toFixed(2);
 				$scope.weekPromosArr = weeklyPromosArr;
-			});
-	
-			var om = $http.get('/orders/monthly/' +areaId);
-	
-			om.error(function(err) {
-				console.log('HomeController: orders-monthly ajax failed');
+			}).catch(function(err) {
+				console.log('orders-weekly err:');
 				console.log(err);
-				$scope.weeksOrders = 'err';
 			});
 	
-			om.then(function(res) {
+			$http.get('/orders/monthly/' +areaId).then(function(res) {
 				var weeksOrders = res.data;
 				var weeksGrossRevenue = 0;
 				var weeksNetRevenue = 0;
@@ -1117,81 +1129,68 @@
 				$scope.weeksPromos = monthlyPromos;
 				$scope.weeksPromosDisc = monthlyPromosDisc.toFixed(2);
 				$scope.weeksPromosArr = monthlyPromosArr;
-			});
-	
-			var cd = $http.get('/customers/daily/' +areaId);
-	
-			cd.error(function(err) {
-				console.log('HomeController: customers-daily ajax failed');
+			}).catch(function(err) {
+				console.log('orders-monthly err:');
 				console.log(err);
-				$scope.daySignups = 'err';
 			});
 	
-			cd.then(function(res) {
+			$http.get('/customers/allTime/' +areaId).then(function(res) {
+				$scope.allTimeSignUps = res.data.length;
+			}).catch(function(err) {
+				console.log('customers-allTime err:');
+				console.log(err);
+			});
+	
+			$http.get('/customers/daily/' +areaId).then(function(res) {
 				$scope.daySignUps = res.data;
 				$scope.daySignups = res.data.length;
-			});
-	
-			var cw = $http.get('/customers/weekly/' +areaId);
-	
-			cw.error(function(err) {
-				console.log('HomeController: customers-weekly ajax failed');
+			}).catch(function(err) {
+				console.log('customers-daily err:');
 				console.log(err);
-				$scope.weekSignups = 'err';
 			});
 	
-			cw.then(function(res) {
+			$http.get('/customers/weekly/' +areaId).then(function(res) {
 				$scope.weekSignUps = res.data;
 				$scope.weekSignups = res.data.length;
-			});
-	
-			var cm = $http.get('/customers/monthly/' +areaId);
-	
-			cm.error(function(err) {
-				console.log('HomeController: customers-monthly ajax failed');
+			}).catch(function(err) {
+				console.log('customers-weekly err:');
 				console.log(err);
-				$scope.weeksSignups = 'err';
 			});
 	
-			cm.then(function(res) {
+			$http.get('/customers/monthly/' +areaId).then(function(res) {
 				$scope.weeksSignUps = res.data;
 				$scope.weeksSignups = res.data.length;
-			});
-	
-			var ad = $http.get('/applicants/daily/' +areaId);
-	
-			ad.error(function(err) {
-				console.log('HomeController: applicants-daily ajax failed');
+			}).catch(function(err) {
+				console.log('customers-monthly err:');
 				console.log(err);
-				$scope.dayApplicants = 'err';
 			});
 	
-			ad.then(function(res) {
+			$http.get('/applicants/allTime/' +areaId).then(function(res) {
+				$scope.allTimeApplicants = res.data.length;
+			}).catch(function(err) {
+				console.log('applicants-allTime err:');
+				console.log(err);
+			});
+	
+			$http.get('/applicants/daily/' +areaId).then(function(res) {
 				$scope.dayApplicants = res.data.length;
-			});
-	
-			var aw = $http.get('/applicants/weekly/' +areaId);
-	
-			aw.error(function(err) {
-				console.log('HomeController: applicants-weekly ajax failed');
+			}).catch(function(err) {
+				console.log('applicants-daily err:');
 				console.log(err);
-				$scope.weekApplicants = 'err';
 			});
 	
-			aw.then(function(res) {
+			$http.get('/applicants/weekly/' +areaId).then(function(res) {
 				$scope.weekApplicants = res.data.length;
-			});
-	
-			var am = $http.get('/applicants/monthly/' +areaId);
-	
-			am.error(function(err) {
-				console.log('HomeController: applicants-monthly ajax failed');
+			}).catch(function(err) {
+				console.log('applicants-weekly err:');
 				console.log(err);
-				$scope.weeksApplicants = 'err';
 			});
 	
-			am.then(function(res) {
+			$http.get('/applicants/monthly/' +areaId).then(function(res) {
 				$scope.weeksApplicants = res.data.length;
+			}).catch(function(err) {
+				console.log('applicants-monthly err:');
+				console.log(err);
 			});
 
 		});
@@ -1661,7 +1660,6 @@
 	) {
 		var p = $http.get('/customers/' + args.customerId).then(function(res) {
 			$scope.customer = res.data;
-			console.log($scope.customer);
 		}).catch(function(err) {
 			console.log('ChargeController: customers ajax failed');
 			console.log(err);
@@ -3077,7 +3075,6 @@
 						orders.data.forEach(function(order) {
 							if(order.paymentMethods === 'cash') {
 								currentCashCollected += parseFloat(order.total);
-								console.log('order.total: '+order.total);
 							}
 							if(order.gratuity && parseFloat(order.gratuity) > 0) {
 								currentTotalTips += parseFloat(order.gratuity);
@@ -3100,9 +3097,6 @@
 
 							first = false;
 						});
-
-						console.log('currentTotalTips: '+currentTotalTips);
-						console.log('currentCashCollected: '+currentCashCollected);
 
 						currentShift.date = currentDate;
 						currentShift.net = parseFloat(currentTotalTips) - parseFloat(currentCashCollected);
