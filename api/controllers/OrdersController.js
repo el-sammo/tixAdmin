@@ -74,6 +74,16 @@ module.exports = {
 		});
 	},
 	
+	allTime: function(req, res) {
+		Orders.find({areaId: req.params.id, orderStatus: { '>': 1}}).sort({updatedAt: 'desc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
 	daily: function(req, res) {
 		var today = new Date();
 	

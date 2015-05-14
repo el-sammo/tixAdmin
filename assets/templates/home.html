@@ -30,107 +30,128 @@
 		</div>
 		<div class="col-md-9">
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					&nbsp;
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<h4>Daily Trends</h4>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<h4>Weekly Trends</h4>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<h4>4-Week Trends</h4>
 				</div>
+				<div class="col-md-2">
+					<h4>All-Time Trends</h4>
+				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Completed Orders
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailyOrders()">{{dayOrders}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklyOrders()">{{weekOrders}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlyOrders">{{weeksOrders}}</span>
 				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimeOrders">{{allTimeOrders}}</span>
+				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Gross Revenue
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailyGrossRevenue()">{{dayGrossRevenue}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklyGrossRevenue()">{{weekGrossRevenue}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlyGrossRevenue()">{{weeksGrossRevenue}}</span>
 				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimeGrossRevenue">{{allTimeGrossRevenue}}</span>
+				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Net Revenue
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailyNetRevenue()">{{dayNetRevenue}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklyNetRevenue()">{{weekNetRevenue}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlyNetRevenue()">{{weeksNetRevenue}}</span>
 				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimeNetRevenue">{{allTimeNetRevenue}}</span>
+				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Promo Redemptions
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailyPromos()" alt="{{dayPromosArr}}">{{dayPromos}} for {{dayPromosDisc}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklyPromos()" alt="{{weekPromosArr}}">{{weekPromos}} for {{weekPromosDisc}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlyPromos()" alt="{{weeksPromosArr}}">{{weeksPromos}} for {{weeksPromosDisc}}</span>
 				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimePromos()" alt="{{allTimePromos}}">{{weeksPromos}} for {{allTimePromosDisc}}</span>
+				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Signups
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailySignUps()">{{daySignups}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklySignUps()">{{weekSignups}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlySignUps()">{{weeksSignups}}</span>
+				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimeSignUps()">{{allTimeSignUps}}</span>
 				</div>
 			</div>
 			<br/>
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-2">
 					Applicants
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="dailyApplicants()">{{dayApplicants}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="weeklyApplicants()">{{weekApplicants}}</span>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<span class="modalLink" ng-click="monthlyApplicants()">{{weeksApplicants}}</span>
+				</div>
+				<div class="col-md-2">
+					<span class="modalLink" ng-click="allTimeApplicants()">{{allTimeApplicants}}</span>
 				</div>
 			</div>
 		</div>
