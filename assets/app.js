@@ -1688,23 +1688,6 @@
 		$window, deviceMgr, authMgr, $timeout
 	) {
 
-		var currentHours = new Date().getHours();
-		var currentMinutes = new Date().getMinutes();
-		var ampm = 'am';
-
-		if(currentHours > 11) {
-			ampm = 'pm';
-			if(currentHours > 12) {
-				currentHours -= 12;;
-			}
-		}
-
-		if(currentMinutes < 10) {
-			currentMinutes = '0'+currentMinutes;
-		}
-
-		$scope.currentDisplayTime = currentHours+':'+currentMinutes+' '+ampm;
-
 		var areaId = $rootScope.areaId;
 
 		if(deviceMgr.isBigScreen()) {
@@ -1714,6 +1697,23 @@
 		}
 
 		function refreshData() {
+			var currentHours = new Date().getHours();
+			var currentMinutes = new Date().getMinutes();
+			var ampm = 'am';
+	
+			if(currentHours > 11) {
+				ampm = 'pm';
+				if(currentHours > 12) {
+					currentHours -= 12;;
+				}
+			}
+	
+			if(currentMinutes < 10) {
+				currentMinutes = '0'+currentMinutes;
+			}
+	
+			$scope.currentDisplayTime = currentHours+':'+currentMinutes+' '+ampm;
+
 
 			var authPromise = authMgr.getAuthLevel();
 	
