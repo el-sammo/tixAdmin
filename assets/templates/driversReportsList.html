@@ -1,0 +1,24 @@
+
+<div class="col-md-6 page-header">
+	<h3>Shift History</h3>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Name</h3>
+			</td>
+			<td>
+				<h3>Shift History</h3>
+			</td>
+		</tr>
+		<tr ng-repeat="driver in drivers">
+			<td>
+				<span>{{driver.fName}} {{driver.lName}}</span>
+			</td>
+			<td>
+				<a href="#/driverShifts/{{driver.id}}">Shift History</a>
+			</td>
+		</tr>
+	</table>
+</div>

@@ -93,6 +93,16 @@
 
 
 		///
+		// Drivers
+		///
+
+		$routeProvider.when('/driversReports', {
+			controller: 'DriversReportsController',
+			templateUrl: '/templates/driversReportsList.html'
+		});
+
+
+		///
 		// Email List Mgmt
 		///
 
@@ -209,6 +219,11 @@
 		$routeProvider.when('/shifts', {
 			controller: 'ShiftsListController',
 			templateUrl: '/templates/shiftsList.html'
+		});
+
+		$routeProvider.when('/driverShifts/:id', {
+			controller: 'DriverShiftsListController',
+			templateUrl: '/templates/driverShiftsList.html'
 		});
 
 
@@ -978,6 +993,7 @@
 		authPromise.then(function(authData) {
 
 			$scope.authLevel = authData.authLevel;
+			$scope.authUserId = authData.userId;
 
 			$scope.sendMessage = messageMgmt.send;
 		
@@ -2041,6 +2057,38 @@
 	});
 
 
+	///
+	// Controllers: Drivers
+	///
+
+	app.controller('DriversReportsController', function(
+		$scope, $http, $rootScope, authMgr
+	) {
+		var authPromise = authMgr.getAuthLevel();
+
+		authPromise.then(function(authData) {
+
+			var areaId = $rootScope.areaId;
+			$scope.areaId = $rootScope.areaId;
+			$scope.authLevel = authData.authLevel;
+
+			if(authData.authLevel < 3) {
+				$window.location.href = '#/';
+			}
+
+			$http.get('/users/activeByAreaId/' + areaId).then(function(res) {
+				$scope.drivers = res.data;
+			}).catch(function(err) {
+				console.log('DriversReportsController users-activeByAreaId ajax failed');
+				console.log(err);
+			});
+	
+		});
+
+	});
+
+
+
 	app.factory('emailListSchema', function() {
 		var service = {
 			defaults: {
@@ -3053,23 +3101,24 @@
 	// Controllers: Shifts
 	///
 
-	app.controller('ShiftsListController', function(
+	app.controller('DriverShiftsListController', function(
 		$scope, $http, $routeParams, $rootScope, authMgr
 	) {
 		$scope.areaName = $rootScope.areaName;
 		$scope.areaId = $rootScope.areaId;
 
+		var driverId = $routeParams.id;
+
 		var authPromise = authMgr.getAuthLevel();
 
 		authPromise.then(function(authData) {
 
-			$scope.authUserId = authData.userId;
 			$scope.authLevel = authData.authLevel;
 
 			var shiftsHistory = [];
 
 			// first get historic shifts
-			$http.get('/shifts/byDriverId/'+$scope.authUserId).then(function(shifts) {
+			$http.get('/shifts/byDriverId/'+driverId).then(function(shifts) {
 				if(shifts && shifts.data && shifts.data.length > 0) {
 					shifts.data.forEach(function(shift) {
 						var thisShift = {};
@@ -3083,7 +3132,7 @@
 				}
 
 				// next get current shift
-				$http.get('/orders/byDriverIdToday/' +$scope.authUserId).then(function(orders) {
+				$http.get('/orders/byDriverIdToday/' +driverId).then(function(orders) {
 					if(orders && orders.data && orders.data.length > 0) {
 						var currentShift = {};
 						var currentTotalTips = 0;

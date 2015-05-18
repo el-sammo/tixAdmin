@@ -24,7 +24,8 @@
 			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/schedules/view">Schedule View</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/stories/add">Story Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/stories/view">Stories View</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 1"><a href="#/shifts">Shift History</a><br/></span>
+			<span class="leftNavLink" ng-show="authLevel > 1 && authLevel < 3"><a href="#/driverShifts/{{authUserId}}">Shift History</a><br/></span>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/driversReports">Driver Shift Reports</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/add">User Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/search">User Search</a><br/></span>
 		</div>

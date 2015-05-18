@@ -55,6 +55,16 @@ module.exports = {
 		});
 	},
 
+	activeByAreaId: function(req, res) {
+		Users.find({areaId: req.params.id, active: true}).sort({fName: 'asc', lName: 'asc'}).limit(50).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+
 	authLevel: function(req, res) {
 		var authLevelData = {};
 		authLevelData.isAuthenticated = req.session.isAuthenticated;

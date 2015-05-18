@@ -1,0 +1,30 @@
+
+<div class="col-md-12 page-header">
+	<h3>Shift History</h3>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Date</h3>
+			</td>
+			<td>
+				<h3>Result</h3>
+			</td>
+			<td>
+				<h3>Reconciled By</h3>
+			</td>
+		</tr>
+		<tr ng-repeat="shift in shifts">
+			<td>
+				<span>{{shift.date}}</span>
+			</td>
+			<td>
+				<span>{{shift.net}}</span>
+			</td>
+			<td>
+				<span>{{shift.reconciledBy}}</span>
+			</td>
+		</tr>
+	</table>
+</div>
