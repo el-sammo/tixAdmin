@@ -18,13 +18,23 @@ module.exports = {
 		promise.then(function(order) {
 			var order = order[0];
 			var userId = order.driverId;
+			var customerId = order.customerId;
+
+			promise = Customers.find(customerId);
 	
-			promise = Users.find(userId);
+			promise.then(function(customer) {
+				var customer = customer[0];
 	
-			promise.then(function(user) {
-				var user = user[0];
-				var email = user.phone + '@vtext.com';
-				sendMail(email, 'Dispatch!', 'dispatch', order);
+				promise = Users.find(userId);
+		
+				promise.then(function(user) {
+					var user = user[0];
+					var email = user.phone + '@vtext.com';
+					var dataObj = {};
+					dataObj.order = order;
+					dataObj.customer = customer;
+					sendMail(email, 'Dispatch!', 'dispatch', dataObj);
+				});
 			});
 		});
 	},
@@ -130,7 +140,7 @@ function sendMail(email, subject, template, data) {
 	if(template == 'dispatch') {
 
 		var rests = [];
-		data.things.forEach(function(thing) {
+		data.order.things.forEach(function(thing) {
 			if(rests.indexOf(thing.restaurantName) < 0) {
 				rests.push(thing.restaurantName);
 			}
@@ -156,16 +166,21 @@ function sendMail(email, subject, template, data) {
 			}
 		})
 
-		var readyMins = 'now at ' + restNames + ':';
+		var readyMins = 'now at ' + restNames;
 		if(parseInt(data.readyMins) > 1) {
-			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes at ' + restNames + ':';
+			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes at ' + restNames;
 		}
+
+		var streetNum = data.customer.addresses.primary.streetNumber;
+		var streetName = data.customer.addresses.primary.streetName;
+
+		var address = streetNum+' '+streetName;
 
 		mailOptions = {
 			from: 'Grub2You Dispatch <dispatch@grub2you.com>',
 			to: email,
 			subject: subject,
-			text: 'The following order is ready for pickup ' + readyMins + ' http://grub2you.com:3001/#/orderDetails/' + data.id
+			text: 'Order ready for pickup ' + readyMins + ' for delivery to '+address+' - grub2you.com:3001/#/dispatch'
 		};
 	}
 
