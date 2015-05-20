@@ -167,8 +167,8 @@ function sendMail(email, subject, template, data) {
 		})
 
 		var readyMins = 'now at ' + restNames;
-		if(parseInt(data.readyMins) > 1) {
-			readyMins = 'in ' + parseInt(data.readyMins) + ' minutes at ' + restNames;
+		if(parseInt(data.order.readyMins) > 1) {
+			readyMins = 'in ' + parseInt(data.order.readyMins) + ' minutes at ' + restNames;
 		}
 
 		var streetNum = data.customer.addresses.primary.streetNumber;
