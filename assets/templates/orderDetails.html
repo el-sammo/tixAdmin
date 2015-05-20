@@ -7,11 +7,11 @@
 			<span class="orderDetailsDestinationInfo">{{phone}}</span>
 		</div>
 		<div class="col-md-2">
-			<span class="orderDetailsDestinationInfo">{{address}}</span>
-			<span class="orderDetailsDestinationInfo" ng-show="apt"><br/>Apt/Unit: {{apt}}</span>
+			<span class="orderDetailsDestinationInfo">{{address}}<br/></span>
+			<span class="orderDetailsDestinationInfo" ng-show="apt">Apt/Unit: {{apt}}<br/></span>
 		</div>
 		<div class="col-md-2">
-			<span class="orderDetailsDestinationInfo" ng-show="paymentMethod != 'cash'">CC - {{total}}</span>
+			<span class="orderDetailsDestinationInfoBold" ng-show="paymentMethod != 'cash'">CC - {{total}}</span>
 			<span class="orderDetailsDestinationInfoRed" ng-show="paymentMethod == 'cash'">Cash - {{total}}</span>
 			<br/>
 			<span class="orderDetailsDestinationInfo">Delivery Fee - {{deliveryFee}}</span>
@@ -19,13 +19,16 @@
 			<span class="orderDetailsDestinationInfo">Discount - {{discount}}</span>
 			<br/>
 			<span class="orderDetailsDestinationInfo">Gratuity - {{gratuity}}</span>
+			<br/>
+			<span class="orderDetailsDestinationInfoGreen">Restauarant - {{subplustax}}</span>
 		</div>
 		<div class="col-md-2">
 			<br/>
 			<span class="orderActionLink" ng-show="orderStatus < 6" ng-click="setOrderPlaced(order)">Set Order Placed</span>
-			<span class="orderActionLink" ng-show="orderStatus > 5 && orderStatus < 7" ng-click="setOrderCollected(order)">Set Order Collected</span>
-			<span class="orderActionLink" ng-show="orderStatus > 6 && orderStatus < 8" ng-click="setOrderEnRoute(order)">Set Order En Route</span>
-			<span class="orderActionLink" ng-show="orderStatus > 7 && orderStatus < 9" ng-click="setOrderDelivered(order)">Set Order Delivered</span>
+			<span class="orderActionLink" ng-show="dispatchReceived < 1 && orderStatus > 5 && orderStatus < 7" ng-click="setDispatchReceived(order)">Confirm Dispatch</span>
+			<span class="orderActionLink" ng-show="orderStatus > 5 && orderStatus < 7 && dispatchReceived > 1" ng-click="setOrderCollected(order)">Set Order Collected</span>
+			<span class="orderActionLink" ng-show="orderStatus > 6 && orderStatus < 8 && dispatchReceived > 1" ng-click="setOrderEnRoute(order)">Set Order En Route</span>
+			<span class="orderActionLink" ng-show="orderStatus > 7 && orderStatus < 9 && dispatchReceived > 1" ng-click="setOrderDelivered(order)">Set Order Delivered</span>
 		</div>
 		<div class="col-md-2">
 			&nbsp;

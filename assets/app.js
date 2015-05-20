@@ -2516,6 +2516,10 @@
 			p.then(function(res) {
 				$scope.order = res.data;
 				$scope.orderStatus = $scope.order.orderStatus;
+				$scope.dispatchReceived = parseInt('0');
+				if($scope.order.dispatchReceived) {
+					$scope.dispatchReceived = $scope.order.dispatchReceived;
+				}
 				$scope.paymentMethod = $scope.order.paymentMethods;
 				$scope.deliveryFee = '$'+parseFloat($scope.order.deliveryFee).toFixed(2);
 				$scope.discount = '$'+parseFloat($scope.order.discount).toFixed(2);
@@ -2525,6 +2529,8 @@
 					$scope.gratuity = '$0.00';
 				}
 				$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
+				var subplustax = parseFloat($scope.order.subtotal) + parseFloat($scope.order.tax);
+				$scope.subplustax = '$'+parseFloat(subplustax).toFixed(2);
 				$scope.order.things.forEach(function(thing) {
 					$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 						var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
@@ -2587,6 +2593,19 @@
 				messenger.show('Order placed', '');
 
 				$window.location.href = '#/dispatch/';
+			});
+		}
+
+		$scope.setDispatchReceived = function(order) {
+			order.dispatchReceived = new Date().getTime();
+			$http.put(
+				'/orders/' + order.id, order
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Dispatch confirmed', '');
+
+				refreshData();
 			});
 		}
 

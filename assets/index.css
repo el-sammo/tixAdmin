@@ -69,6 +69,15 @@ td {
 .orderDetailsDestinationInfo {
 }
 
+.orderDetailsDestinationInfoBold {
+	font-weight: 900;
+}
+
+.orderDetailsDestinationInfoGreen {
+	font-weight: 700;
+	color: green;
+}
+
 .orderDetailsDestinationInfoRed {
 	font-weight: 700;
 	color: red;
