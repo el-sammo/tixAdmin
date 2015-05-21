@@ -3202,9 +3202,10 @@
 						orders.data.forEach(function(order) {
 							if(order.paymentMethods === 'cash') {
 								currentCashCollected += parseFloat(order.total);
-							}
-							if(order.gratuity && parseFloat(order.gratuity) > 0) {
-								currentTotalTips += parseFloat(order.gratuity);
+							} else {
+								if(order.gratuity && parseFloat(order.gratuity) > 0) {
+									currentTotalTips += parseFloat(order.gratuity);
+								}
 							}
 							if(first) {
 								var currentDateYear = new Date(order.paymentAcceptedAt).getFullYear();
