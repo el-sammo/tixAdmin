@@ -703,6 +703,53 @@
 	});
 
 
+	app.factory('orderMgmt', function($modal, $rootScope, $http) {
+		var service = {
+			assumeOrder: function(customerId) {
+				$modal.open({
+					templateUrl: '/templates/assumeOrder.html',
+					backdrop: true,
+					controller: 'OrderMgmtController',
+					resolve: {
+						args: function() {
+							return {
+								customerId: customerId
+							}
+						}
+					}
+				});
+			},
+			startOrder: function(customerId) {
+				$modal.open({
+					templateUrl: '/templates/startOrder.html',
+					backdrop: true,
+					controller: 'OrderMgmtController',
+					resolve: {
+						args: function() {
+							return {
+								customerId: customerId
+							}
+						}
+					}
+				});
+			}
+		};
+		return service;
+	});
+
+
+	app.controller('OrderMgmtController', function(
+		args, $scope, $modalInstance, $http, $rootScope
+	) {
+		$scope.secret = '8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7';
+		$scope.customerId = args.customerId;
+		$http.get('/customers/' +$scope.customerId).then(function(res) {
+			$scope.fName = res.data.fName;
+			$scope.lName = res.data.lName;
+		});
+	});
+
+
 	///
 	// HTTP interception
 	///
@@ -1516,7 +1563,7 @@
 	app.controller('CustomersEditController', function(
 		navMgr, messenger, pod, customerSchema, 
 		$scope, $http, $routeParams, customerMgmt,
-		$window
+		$window, orderMgmt
 	) {
 
 		$scope.customerId = $routeParams.id;
@@ -1591,15 +1638,9 @@
 			navMgr.cancel('#/customers/orders/' +$routeParams.id);
 		};
 
-		$scope.assumeOrder = function(customerId) {
-			console.log('one-time-use username: '+customerId);
-			console.log('one-time use password: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
-		};
+		$scope.assumeOrder = orderMgmt.assumeOrder;
 
-		$scope.startOrder = function(customerId) {
-			console.log('one-time-use username: '+customerId);
-			console.log('one-time use password: 8847fhhfw485fwkebfwerfv7w458gvwervbkwer8fw5fberubckfckcaer4cbwvb72arkbfrcb1n4hg7');
-		};
+		$scope.startOrder = orderMgmt.startOrder;
 
 		$scope.specialCharge = customerMgmt.specialCharge;
 
@@ -3185,7 +3226,7 @@
 						});
 
 						currentShift.date = currentDate;
-						currentShift.net = parseFloat(currentTotalTips) - parseFloat(currentCashCollected);
+						currentShift.net = '$'+(parseFloat(currentTotalTips) - parseFloat(currentCashCollected)).toFixed(2);
 						currentShift.reconciledBy = 'PENDING';
 	
 						shiftsHistory.push(currentShift);
