@@ -180,9 +180,15 @@ function sendMail(email, subject, template, data) {
 			from: 'Grub2You Dispatch <dispatch@grub2you.com>',
 			to: email,
 			subject: subject,
-			text: 'Order ready for pickup ' + readyMins + ' for delivery to '+address+' - grub2you.com:3001/#/dispatch'
+			text: 'Order ready ' + readyMins + ' for delivery to '+address
 		};
 	}
+
+	console.log('   ')
+	console.log('mailOptions:');
+	console.log('   ')
+	console.log(mailOptions);
+	console.log('   ')
 
 	transporter.sendMail(mailOptions, function(err, info) {
 		if(err) {
