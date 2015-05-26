@@ -7,13 +7,34 @@
 	<form name="sendMassMessageForm">
 		<div class="row">
 			<div class="col-md-4">
-				<h4>Message Type</h4>
+				<h4>Message Type:</h4>
 			</div>
 			<div class="col-md-8 select">
 				<select name="mType" ng-model="mType">
 					<option value="email">Email</option>
 					<option value="text">Text</option>
 				</select>
+			</div>
+		</div>
+		<div class="row" ng-show="mType === 'email'">
+			<div class="col-md-4">
+				<h4>Email Recipients:</h4>
+			</div>
+			<div class="col-md-8 select">
+				<select name="rType" ng-model="rType">
+					<option value="all">All Email Addresses</option>
+					<option value="never">Never Ordered</option>
+					<option value="lastWeek">Not Ordered in the Last Week</option>
+					<option value="lastMonth">Not Ordered in the Last Month</option>
+				</select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Subject:</h4>
+			</div>
+			<div class="col-md-8">
+				<input type="text" ng-model="subject">
 			</div>
 		</div>
 		<br/>

@@ -2497,7 +2497,12 @@
 
 			message.areaId = areaId;
 			message.mType = $scope.mType;
+			if($scope.rType) {
+				message.rType = $scope.rType;
+			}
+
 			message.content = $scope.content;
+			message.subject = $scope.subject;
 
 			$http.post('/messages/create', message).success(
 			function(data, status, headers, config) {
@@ -2532,6 +2537,10 @@
 		var areaId = $rootScope.areaId;
 
 		function refreshData() {
+			// assure that the page is still the same
+			if(!location.pathname.includes('orderDetails')) {
+				return;
+			}
 
 			$scope.authLevel = $rootScope.authLevel;
 	

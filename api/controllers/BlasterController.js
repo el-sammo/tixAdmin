@@ -13,21 +13,43 @@ var env = sails.config.environment;
 
 module.exports = {
 	sendEmail: function(req, res) {
-		if(env && env == 'production') {
+		if(env && env === 'production') {
 			var messageId = req.params.id;
+
+			var today = new Date();
+
+			var thisYear = today.getFullYear();
+			var thisMonth = today.getMonth();
+			var thisDate = today.getDate();
+
+			var lastWeek = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime() - 604800000;
+			var lastMonth = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime() - (4 * 604800000);
 
 			messagePromise = Messages.find(messageId);
 	
 			messagePromise.then(function(message) {
+				var thisMessage = message[0];
 
-				// TODO: cheating here - want to call Emails.areaIdActive(message.areaId)
-				emailsPromise = Emails.find();
+				if(thisMessage.rType === 'all') {
+					emailsPromise = Emails.find({active: true, areaId: thisMessage.areaId});
+				}
+
+				if(thisMessage.rType === 'never') {
+					emailsPromise = Emails.find({hasOrdered: {$exists: false}, active: true, areaId: thisMessage.areaId});
+				}
+
+				if(thisMessage.rType === 'lastWeek') {
+					emailsPromise = Emails.find({hasOrdered: true, mostRecentOrder: {$lte: lastWeek}, active: true, areaId: thisMessage.areaId});
+				}
+
+				if(thisMessage.rType === 'lastMonth') {
+					emailsPromise = Emails.find({hasOrdered: true, mostRecentOrder: {$lte: lastMonth}, active: true, areaId: thisMessage.areaId});
+				}
 
 				emailsPromise.then(function(emails) {
-					// TODO: cheating here, too - see above
 					emails.forEach(function(email) {
 						if(email.active) {
-							sendMail(email.email, 'Howdy!', 'cta', message[0]);
+							sendMail(email.email, thisMessage.subject, 'generic', thisMessage);
 						}
 					});
 					console.log('there are '+emails.length+' email addresses in this list');
@@ -37,7 +59,7 @@ module.exports = {
 	},
 
 	sendText: function(req, res) {
-		if(env && env == 'production') {
+		if(env && env === 'production') {
 			var messageId = req.params.id;
 
 			messagePromise = Messages.find(messageId);
@@ -75,9 +97,19 @@ function sendMail(email, subject, template, data) {
 			html: ''
 		};
 
-	if(template == 'cta') {
+	if(template === 'cta') {
 		mailOptions = {
-			from: 'Grub2You <orders@grub2you.com>',
+			from: 'Grub2You <info@grub2you.com>',
+			to: email,
+			subject: subject,
+			text: data.content,
+			html: data.content
+		};
+	}
+
+	if(template === 'generic') {
+		mailOptions = {
+			from: 'Grub2You <info@grub2you.com>',
 			to: email,
 			subject: subject,
 			text: data.content,
