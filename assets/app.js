@@ -2538,7 +2538,8 @@
 
 		function refreshData() {
 			// assure that the page is still the same
-			if(!location.pathname.includes('orderDetails')) {
+			// using hash instead of pathname
+			if(!location.hash.includes('orderDetails')) {
 				return;
 			}
 
