@@ -1754,6 +1754,12 @@
 		}
 
 		function refreshData() {
+			// assure that the page is still the same
+			// using hash instead of pathname
+			if(!location.hash.match('dispatch')) {
+				return;
+			}
+
 			var currentHours = new Date().getHours();
 			var currentMinutes = new Date().getMinutes();
 			var ampm = 'am';
@@ -2539,7 +2545,7 @@
 		function refreshData() {
 			// assure that the page is still the same
 			// using hash instead of pathname
-			if(!location.hash.includes('orderDetails')) {
+			if(!location.hash.match('orderDetails')) {
 				return;
 			}
 
