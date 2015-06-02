@@ -4018,6 +4018,8 @@
 		$scope.save = function save(user, options) {
 			options || (options = {});
 
+			user.active = true;
+
 			$http.post(
 				'/users/create', user
 			).success(function(data, status, headers, config) {
