@@ -226,6 +226,11 @@
 			templateUrl: '/templates/driverShiftsList.html'
 		});
 
+		$routeProvider.when('/driverShifts/reconcile/:id', {
+			controller: 'DriverShiftReconcileController',
+			templateUrl: '/templates/driverShiftReconcile.html'
+		});
+
 
 		///
 		// Stories
@@ -1986,26 +1991,18 @@
 				$window.location.href = '#/';
 			}
 
-			var p = $http.get('/orders/' + $routeParams.id);
-		
-			p.error(function(err) {
-				console.log('DispatchOrderController: orders ajax failed');
-				console.log(err);
-			});
-		
-			p.then(function(res) {
+			$http.get('/orders/' + $routeParams.id).then(function(res) {
 				$scope.order = res.data;
 	
-				var r = $http.get('/users/drivers/');
-				
-				r.error(function(err) {
-					console.log('DispatchOrderController: users ajax failed');
+				$http.get('/users/drivers/').then(function(res) {
+					$scope.drivers = res.data;
+				}).catch(function(err) {
+					console.log('DispatchOrderController drivers ajax error:');
 					console.log(err);
 				});
-				
-				r.then(function(res) {
-					$scope.drivers = res.data;
-				});
+			}).catch(function(err) {
+				console.log('DispatchOrderController orders ajax error:');
+				console.log(err);
 			});
 	
 			$scope.dispatchOrderToDriver = dispatchOrderMgmt.dispatchOrder;
@@ -2025,14 +2022,7 @@
 	) {
 		var areaId = $rootScope.areaId;
 
-		var p = $http.get('/orders/' + args.orderId);
-	
-		p.error(function(err) {
-			console.log('DispatchOrderToDriverController: orders ajax failed');
-			console.log(err);
-		});
-	
-		p.then(function(res) {
+		$http.get('/orders/' + args.orderId).then(function(res) {
 			$scope.order = res.data;
 
 			var rests = [];
@@ -2062,16 +2052,15 @@
 				}
 			})
 
-			var r = $http.get('/users/' + args.driverId);
-			
-			r.error(function(err) {
-				console.log('DispatchOrderToDriverController: users ajax failed');
+			$http.get('/users/' + args.driverId).then(function(res) {
+				$scope.driver = res.data;
+			}).catch(function(err) {
+				console.log('DispatchOrderToDriverController users ajax failed');
 				console.log(err);
 			});
-			
-			r.then(function(res) {
-				$scope.driver = res.data;
-			});
+		}).catch(function(err) {
+			console.log('DispatchOrderToDriverController orders ajax failed');
+			console.log(err);
 		});
 
 		$scope.dispatchOrder = function() {
@@ -2092,8 +2081,15 @@
 			).success(function(data, status, headers, config) {
 				if(status >= 400) return;
 
+				$http.get(
+					'/mail/sendOrderToDriver/'+$scope.order.id
+				).then(function(res) {
+//					console.log('res:');
+//					console.log(res);
+//					if(res.statusText === 'OK') {
+//					} 
+				});
 				messenger.show('Order dispatched', '');
-				$http.post('/mail/sendOrderToDriver/'+$scope.order.id);
 
 				var redirectTo = '/dispatch';
 				$location.path(redirectTo);
@@ -3184,6 +3180,8 @@
 		$scope.areaId = $rootScope.areaId;
 
 		var driverId = $routeParams.id;
+
+		$scope.driverId = driverId;
 
 		var authPromise = authMgr.getAuthLevel();
 

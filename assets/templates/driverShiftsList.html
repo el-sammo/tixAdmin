@@ -17,13 +17,13 @@
 		</tr>
 		<tr ng-repeat="shift in shifts">
 			<td>
-				<span>{{shift.date}}</span>
+				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.date}}</a>
 			</td>
 			<td>
-				<span>{{shift.net}}</span>
+				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.net}}</a>
 			</td>
 			<td>
-				<span>{{shift.reconciledBy}}</span>
+				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.reconciledBy}}</a>
 			</td>
 		</tr>
 	</table>
