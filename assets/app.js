@@ -2568,6 +2568,8 @@
 		
 			p.then(function(res) {
 				$scope.order = res.data;
+				console.log('$scope.order:');
+				console.log($scope.order);
 				$scope.orderStatus = $scope.order.orderStatus;
 				$scope.dispatchReceived = parseInt('0');
 				if($scope.order.dispatchReceived) {
@@ -2584,6 +2586,7 @@
 				$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
 				var subplustax = parseFloat($scope.order.subtotal) + parseFloat($scope.order.tax);
 				$scope.subplustax = '$'+parseFloat(subplustax).toFixed(2);
+				$scope.discountPercent = 0;
 				$scope.order.things.forEach(function(thing) {
 					$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 						var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
@@ -2591,6 +2594,13 @@
 							restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
 							$scope.orderRestaurants.push(restaurant);
 						}
+						// TODO: build an array (if more than one rest w/discount
+						// and ng-repeat loop through on the template
+						if(restaurantData.discountPercent) {
+							$scope.discountPercent = restaurantData.discountPercent;
+							$scope.discountPercentRestName = restaurantData.name;
+						}
+						console.log('$scope.discountPercent: '+$scope.discountPercent);
 						restaurant.items.push(
 							_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
 						);
