@@ -2583,12 +2583,19 @@
 				$scope.total = '$'+parseFloat($scope.order.total).toFixed(2);
 				var subplustax = parseFloat($scope.order.subtotal) + parseFloat($scope.order.tax);
 				$scope.subplustax = '$'+parseFloat(subplustax).toFixed(2);
+				$scope.discountPercent = 0;
 				$scope.order.things.forEach(function(thing) {
 					$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 						var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
 						if(! restaurant) {
 							restaurant = {name: restaurantData.name, phone: restaurantData.phone, items: []};
 							$scope.orderRestaurants.push(restaurant);
+						}
+						// TODO: build an array (if more than one rest w/discount
+						// and ng-repeat loop through on the template
+						if(restaurantData.discountPercent) {
+							$scope.discountPercent = restaurantData.discountPercent;
+							$scope.discountPercentRestName = restaurantData.name;
 						}
 						restaurant.items.push(
 							_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
