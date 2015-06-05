@@ -1,0 +1,87 @@
+<div class="col-md-12 page-header" ng-cloak>
+	<h4>Driver's Orders as of {{currentDisplayTime}}</h4>
+</div>
+<div class="col-md-12">
+	<div class="row">
+		<div class="col-md-2">
+			<h4>Destination</h4>
+		</div>
+		<div class="col-md-2">
+			<h4>Payment Type</h4>
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<h4>Gratuity</h4>
+		</div>
+		<div class="col-md-1">
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<h4>Cash Collected</h4>
+		</div>
+		<div class="col-md-1">
+		</div>
+	</div>
+	<div class="row" ng-show="showBig" ng-repeat="order in orders">
+		<div class="col-md-2">
+			<span>{{order.destination}}</span>
+		</div>
+		<div class="col-md-2">
+			<span ng-show="order.paymentMethods === 'cash'">Cash</span>
+			<span ng-show="order.paymentMethods != 'cash'">CC</span>
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<span ng-show="order.paymentMethods === 'cash'">{{order.gratuity}}</span>
+			<span class="shiftReviewInfoGreen" ng-show="order.paymentMethods != 'cash'">{{order.gratuity}}</span>
+		</div>
+		<div class="col-md-1">
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<span class="shiftReviewInfoRed" ng-show="order.paymentMethods === 'cash'">{{order.total}}</span>
+			<span ng-show="order.paymentMethods != 'cash'">0.00</span>
+		</div>
+		<div class="col-md-1">
+		</div>
+	</div>
+	<br/>
+	<div class="row" ng-show="showBig">
+		<div class="col-md-2">
+			Amount Owed
+		</div>
+		<div class="col-md-2">
+			{{numberOrders}} Orders
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<span class="shiftReviewInfoGreen">{{currentTotalTips}}</span>
+		</div>
+		<div class="col-md-1" style="text-align: center;">
+			minus
+		</div>
+		<div class="col-md-1" style="text-align: right;">
+			<span class="shiftReviewInfoRed">{{currentCashCollected}}</span>
+		</div>
+		<div class="col-md-1" style="text-align: center;">
+			equals
+		</div>
+		<div class="col-md-2">
+			<span class="shiftReviewInfoGreen" ng-show="!currentNetValue < 0">{{currentNet}}</span>
+			<span class="shiftReviewInfoRed" ng-show="currentNetValue < 0">{{currentNet}}</span>
+		</div>
+		<div class="col-md-2">
+		</div>
+	</div>
+	<div class="row" ng-show="!showBig" ng-repeat="order in orders" style="border-bottom: 1px solid grey; margin-bottom: 8px">
+		<div class="col-md-3">
+			<span>{{order.destination}}</span>
+		</div>
+		<div class="col-md-3">
+			<span ng-show="order.paymentMethods === 'cash'">CASH</span>
+			<span ng-show="order.paymentMethods != 'cash'">CC</span>
+		</div>
+		<div class="col-md-3">
+			<span>{{order.gratuity}}</span>
+		</div>
+		<div class="col-md-3">
+			<span ng-show="order.paymentMethods === 'cash'">{{order.total}}</span>
+			<span ng-show="order.paymentMethods != 'cash'">CC</span>
+		</div>
+	</div>
+</div>
