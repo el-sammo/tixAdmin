@@ -2568,8 +2568,6 @@
 		
 			p.then(function(res) {
 				$scope.order = res.data;
-				console.log('$scope.order:');
-				console.log($scope.order);
 				$scope.orderStatus = $scope.order.orderStatus;
 				$scope.dispatchReceived = parseInt('0');
 				if($scope.order.dispatchReceived) {
@@ -2600,7 +2598,6 @@
 							$scope.discountPercent = restaurantData.discountPercent;
 							$scope.discountPercentRestName = restaurantData.name;
 						}
-						console.log('$scope.discountPercent: '+$scope.discountPercent);
 						restaurant.items.push(
 							_.pick(thing, ['quantity', 'name', 'option', 'specInst', 'price'])
 						);
