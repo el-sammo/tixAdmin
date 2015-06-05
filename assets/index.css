@@ -49,6 +49,18 @@ td {
 	color: red;
 }
 
+.shiftReviewInfoGreen {
+	font-size: 14px;
+	font-weight: 500;
+	color: green;
+}
+
+.shiftReviewInfoRed {
+	font-size: 14px;
+	font-weight: 500;
+	color: red;
+}
+
 .leftNavLink {
 	color: #428ECB;
 	cursor: pointer;

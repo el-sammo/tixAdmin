@@ -56,6 +56,26 @@ module.exports = {
 		});
 	},
 
+	byDriverIdDate: function(req, res) {
+		var rtParamPcs = req.params.id.split('-date-');
+		var driverId = rtParamPcs[0];
+		var shiftDate = rtParamPcs[1];
+
+		var thisYear = parseInt(shiftDate.substr(0,4));
+		var thisMonth = parseInt(shiftDate.substr(4,2)) - 1;
+		var thisDate = parseInt(shiftDate.substr(6,2));
+
+		var thisDayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+
+		Orders.find({driverId: driverId, paymentAcceptedAt: { '>=': thisDayMilliseconds}}).sort({updatedAt: 'asc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+
 	last24Hours: function(req, res) {
 		var today = new Date();
 	

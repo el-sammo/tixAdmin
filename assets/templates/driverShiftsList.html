@@ -17,13 +17,28 @@
 		</tr>
 		<tr ng-repeat="shift in shifts">
 			<td>
-				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.date}}</a>
+				<span ng-show="!shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/view/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.date}}</a>
+				</span>
+				<span ng-show="shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/reconcile/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.date}}</a>
+				</span>
 			</td>
 			<td>
-				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.net}}</a>
+				<span ng-show="!shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/review/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.net}}</a>
+				</span>
+				<span ng-show="shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/reconcile/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.net}}</a>
+				</span>
 			</td>
 			<td>
-				<a href="#/driverShifts/reconcile/{{driverId}}-{{shift.date}}" style="text-decoration: none;">{{shift.reconciledBy}}</a>
+				<span ng-show="!shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/review/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.reconciledBy}}</a>
+				</span>
+				<span ng-show="shift.reconciledBy === 'PENDING'">
+					<a href="#/driverShifts/reconcile/{{driverId}}-date-{{shift.date}}" style="text-decoration: none;">{{shift.reconciledBy}}</a>
+				</span>
 			</td>
 		</tr>
 	</table>

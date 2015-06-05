@@ -1782,7 +1782,6 @@
 	
 			$scope.currentDisplayTime = currentHours+':'+currentMinutes+' '+ampm;
 
-
 			var authPromise = authMgr.getAuthLevel();
 	
 			authPromise.then(function(authData) {
@@ -3258,6 +3257,118 @@
 			$scope.shifts = shiftsHistory;
 	
 		});
+	});
+
+	app.controller('DriverShiftReconcileController', function(
+		$scope, $http, $routeParams, $rootScope, authMgr, deviceMgr
+	) {
+		$scope.areaName = $rootScope.areaName;
+		$scope.areaId = $rootScope.areaId;
+
+		if(deviceMgr.isBigScreen()) {
+			$scope.showBig = true;
+		} else {
+			$scope.showBig = false;
+		}
+
+		var currentHours = new Date().getHours();
+		var currentMinutes = new Date().getMinutes();
+		var ampm = 'am';
+	
+		if(currentHours > 11) {
+			ampm = 'pm';
+			if(currentHours > 12) {
+				currentHours -= 12;;
+			}
+		}
+	
+		if(currentMinutes < 10) {
+			currentMinutes = '0'+currentMinutes;
+		}
+	
+		$scope.currentDisplayTime = currentHours+':'+currentMinutes+' '+ampm;
+
+		var rtParamPcs = $routeParams.id.split('-date-');
+
+		var driverId = rtParamPcs[0];
+		var shiftDate = rtParamPcs[1];
+
+		$scope.driverId = driverId;
+
+		var authPromise = authMgr.getAuthLevel();
+
+		authPromise.then(function(authData) {
+
+			$scope.authLevel = authData.authLevel;
+
+			// get orders for specified driver and date
+			$http.get('/orders/byDriverIdDate/' +$routeParams.id).then(function(orders) {
+				if(orders && orders.data && orders.data.length > 0) {
+					var driverOrders = orders.data;
+
+					var completeOrders = [];
+					var currentCashCollected = 0;
+					var currentTotalTips = 0;
+					var numberOrders = 0;
+
+					driverOrders.forEach(function(order) {
+						var getCompleteOrderPromise = getCompleteOrder(order);
+
+						getCompleteOrderPromise.then(function(completeOrder) {
+							numberOrders ++;
+							completeOrders.push(completeOrder);
+
+							if(completeOrder.paymentMethods === 'cash') {
+								currentCashCollected += parseFloat(completeOrder.total);
+							} else {
+								if(completeOrder.gratuity && parseFloat(completeOrder.gratuity) > 0) {
+									currentTotalTips += parseFloat(completeOrder.gratuity);
+								}
+							}
+
+							$scope.numberOrders = numberOrders;
+							$scope.currentCashCollected = '$' + parseFloat(currentCashCollected).toFixed(2);
+							$scope.currentTotalTips = '$' + parseFloat(currentTotalTips).toFixed(2);
+							$scope.currentNet = '$' + (parseFloat(currentTotalTips) - parseFloat(currentCashCollected)).toFixed(2);
+							$scope.currentNetValue = (parseFloat(currentTotalTips) - parseFloat(currentCashCollected));
+
+						});
+
+					});
+
+					$scope.orders = completeOrders;
+
+				}
+			}).catch(function(err) {
+				console.log('DriverShiftReconcileController: driver-date-orders err:');
+				console.log(err);
+			});
+		});
+
+		function getCompleteOrder(order) {
+			var thisDriverOrder = {};
+			var customerId = order.customerId;
+
+			thisDriverOrder.paymentMethods = order.paymentMethods;
+			thisDriverOrder.gratuity = parseFloat(order.gratuity).toFixed(2);
+			thisDriverOrder.total = parseFloat(order.total).toFixed(2);
+
+			// get destination address info for each order
+			return $http.get('/customers/'+customerId).then(function(customers) {
+				if(customers && customers.data) {
+					var customer = customers.data;
+					var destinationAddress = customer.addresses.primary.streetNumber+' '+customer.addresses.primary.streetName;
+					thisDriverOrder.destination = destinationAddress;
+				} else {
+					console.log('DriverShiftReconcileController: order-customers empty');
+					thisDriverOrder.destination = '';
+				}
+				return thisDriverOrder;
+			}).catch(function(err) {
+				console.log('DriverShiftReconcileController: order-customers err:');
+				console.log(err);
+			});
+		};
 	});
 
 	app.controller('ShiftViewController', function(navMgr, messenger, pod, $scope, $http, $routeParams, $window, $rootScope) {
