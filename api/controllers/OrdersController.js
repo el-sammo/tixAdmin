@@ -66,8 +66,9 @@ module.exports = {
 		var thisDate = parseInt(shiftDate.substr(6,2));
 
 		var thisDayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+		var nextDayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime() + 86400000;
 
-		Orders.find({driverId: driverId, paymentAcceptedAt: { '>=': thisDayMilliseconds}}).sort({updatedAt: 'asc'}).then(function(results) {
+		Orders.find({driverId: driverId, $and: [ {paymentAcceptedAt: { '>=': thisDayMilliseconds}}, {paymentAcceptedAt: { '<': nextDayMilliseconds}} ] }).sort({updatedAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));
 		}).catch(function(err) {
       res.json({error: 'Server error'}, 500);
