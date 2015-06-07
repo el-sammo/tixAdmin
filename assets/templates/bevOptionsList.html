@@ -1,0 +1,32 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{bev.name}} <small>OPTIONS</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add/{{bev.id}}" class="pull-right">
+    <button id="optionAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="optionAdd" class="fa-btn-text divspan">Add Option to {{bev.name}}</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Option</h3>
+			</td>
+			<td>
+				<h3>Edit</h3>
+			</td>
+		</tr>
+		<tr ng-init="bevOptionId = bevOption.id" ng-repeat="bevOption in bevOptions">
+			<td>
+				<span>{{bevOption.name}}</span>
+			</td>
+			<td>
+				<span><a href="#/bevOptions/edit/{{bevOptionId}}">Edit {{bevOption.name}}</a></span>
+			</td>
+		</tr>
+	</table>
+</div>

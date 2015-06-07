@@ -308,6 +308,46 @@
 
 
 		///
+		// Bevs
+		///
+
+		$routeProvider.when('/bevs/:id', {
+			controller: 'BevsListController',
+			templateUrl: '/templates/bevsList.html'
+		});
+
+		$routeProvider.when('/bevs/add/:id', {
+			controller: 'BevsAddController',
+			templateUrl: '/templates/bevsForm.html'
+		});
+
+		$routeProvider.when('/bevs/edit/:id', {
+			controller: 'BevsEditController',
+			templateUrl: '/templates/bevsForm.html'
+		});
+
+
+		///
+		// BevOptions
+		///
+
+		$routeProvider.when('/bevOptions/:id', {
+			controller: 'BevOptionsListController',
+			templateUrl: '/templates/bevOptionsList.html'
+		});
+
+		$routeProvider.when('/bevOptions/add/:id', {
+			controller: 'BevOptionsAddController',
+			templateUrl: '/templates/bevOptionsForm.html'
+		});
+
+		$routeProvider.when('/bevOptions/edit/:id', {
+			controller: 'BevOptionsEditController',
+			templateUrl: '/templates/bevOptionsForm.html'
+		});
+
+
+		///
 		// Users
 		///
 
@@ -4032,6 +4072,335 @@
 
 		$scope.cancel = function cancel() {
 			navMgr.cancel('#/options');
+		};
+	});
+
+
+	///
+	// Controllers: Bevs
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/bevs/);
+	});
+
+	app.factory('bevSchema', function() {
+		function nameTransform(bev) {
+			if(! bev || ! bev.name || bev.name.length < 1) {
+				return 'bev-name';
+			}
+			return (bev.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				bev: {
+					menuId: '',
+					name: '',
+					desc: '',
+					image: '',
+					active: ''
+				}
+			},
+
+			links: {
+				website: {
+					placeholder: function(bev) {
+						return 'www.' + nameTransform(bev) + '.com';
+					},
+					addon: 'http://'
+				},
+				facebook: {
+					placeholder: nameTransform,
+					addon: 'facebook.com/'
+				},
+				twitter: {
+					placeholder: nameTransform,
+					addon: '@'
+				},
+				instagram: {
+					placeholder: nameTransform,
+					addon: 'instagram.com/'
+				},
+				pinterest: {
+					placeholder: nameTransform,
+					addon: 'pinterest.com/'
+				},
+			},
+
+			populateDefaults: function(bev) {
+				$.map(service.defaults.bev, function(value, key) {
+					if(bev[key]) return;
+					if(typeof value === 'object') {
+						bev[key] = angular.copy(value);
+						return;
+					}
+					bev[key] = value;
+				});
+				return bev;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('BevsListController', function(
+		datatables, $http, $routeParams, $scope, $rootScope
+	) {
+		var areaId = $rootScope.areaId;
+		$scope.path = 'bevs';
+
+		$http.get('/areas/' + areaId).then(function(res) {
+			$scope.area = res.data;
+		}).catch(function(err) {
+			console.log('BevsListController areas ajax failed');
+			console.log(err);
+		});
+
+		$http.get('/bevs/byAreaId/' + areaId).then(function(res) {
+			$scope.bevs = res.data;
+		}).catch(function(err) {
+			console.log('BevsListController bevs ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('BevsAddController', function(
+		navMgr, messenger, pod, bevSchema, $scope, $http, $routeParams, $window
+	) {
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.bevSchema = bevSchema;
+		$scope.bev = bevSchema.populateDefaults({});
+
+		$scope.bev.areaId = $routeParams.id;
+		$scope.bev.active = true;
+
+		$scope.save = function save(bev, options) {
+			options || (options = {});
+
+			$http.post(
+				'/bevs/create', bev
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Bev created', '');
+
+				if(options.addMore) {
+					$scope.bev = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/bevs/' + $routeParams.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/bevs/'+$routeParams.id);
+		};
+	});
+
+	app.controller('BevsEditController', function(
+		navMgr, messenger, pod, bevSchema, $scope, $http, $routeParams
+	) {
+		
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.bevSchema = bevSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/bevs/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.bev = bevSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(bev, options) {
+			options || (options = {});
+
+			$http.put(
+				'/bevs/' + bev.id, bev
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Bev updated', '');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/bevs');
+		};
+	});
+
+
+	///
+	// Controllers: BevOptions
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/bevOptions/);
+	});
+
+	app.factory('bevOptionSchema', function() {
+		function nameTransform(bevOption) {
+			if(! bevOption || ! bevOption.name || bevOption.name.length < 1) {
+				return 'bevOption-name';
+			}
+			return (bevOption.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				bevOption: {
+					bevId: '',
+					name: '',
+					price: ''
+				}
+			},
+
+			links: {
+				website: {
+					placeholder: function(bevOption) {
+						return 'www.' + nameTransform(bevOption) + '.com';
+					},
+					addon: 'http://'
+				},
+				facebook: {
+					placeholder: nameTransform,
+					addon: 'facebook.com/'
+				},
+				twitter: {
+					placeholder: nameTransform,
+					addon: '@'
+				},
+				instagram: {
+					placeholder: nameTransform,
+					addon: 'instagram.com/'
+				},
+				pinterest: {
+					placeholder: nameTransform,
+					addon: 'pinterest.com/'
+				},
+			},
+
+			populateDefaults: function(bevOption) {
+				$.map(service.defaults.bevOption, function(value, key) {
+					if(bevOption[key]) return;
+					if(typeof value === 'object') {
+						bevOption[key] = angular.copy(value);
+						return;
+					}
+					bevOption[key] = value;
+				});
+				return bevOption;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('BevOptionsListController', function(datatables, $http, $routeParams, $scope) {
+		$scope.path = 'bevOptions';
+
+		$http.get('/bevs/' + $routeParams.id).then(function(res) {
+			$scope.bev = res.data;
+		}).catch(function(err) {
+			console.log('BevOptionsListController bev ajax failed');
+			console.log(err);
+		});
+
+		$http.get('/bevOptions/byBevId/' + $routeParams.id).then(function(res) {
+			$scope.bevOptions = res.data;
+		}).catch(function(err) {
+			console.log('BevOptionsListController bevOptions ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('BevOptionsAddController', function(
+		navMgr, messenger, pod, bevOptionSchema, $scope, $http, $routeParams, $window
+	) {
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.bevOptionSchema = bevOptionSchema;
+		$scope.bevOption = bevOptionSchema.populateDefaults({});
+
+		$scope.bevOption.bevId = $routeParams.id;
+
+		$scope.save = function save(bevOption, bevOptions) {
+			bevOptions || (bevOptions = {});
+
+			$http.post(
+				'/bevOptions/create', bevOption
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('BevOption created', '');
+
+				if(bevOptions.addMore) {
+					$scope.bevOption = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/bevOptions/' + $routeParams.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/bevOptions/'+$routeParams.id);
+		};
+	});
+
+	app.controller('BevOptionsEditController', function(
+		navMgr, messenger, pod, bevOptionSchema, $scope, $http, $routeParams
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.bevOptionSchema = bevOptionSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/bevOptions/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.bevOption = bevOptionSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(bevOption, bevOptions) {
+			bevOptions || (bevOptions = {});
+
+			$http.put(
+				'/bevOptions/' + bevOption.id, bevOption
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('BevOption updated', '');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/bevOptions');
 		};
 	});
 

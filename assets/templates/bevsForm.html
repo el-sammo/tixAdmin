@@ -1,0 +1,71 @@
+<div id="fms-bevs-form" class="col-md-12" ng-cloak>
+	<div class="page-header" ng-show="!bev.name && !editMode">
+		<h3>Add Beverage</h3>
+	</div>
+	<div class="page-header" ng-show="!bev.name && editMode">
+		<h3>Update Beverage</h3>
+	</div>
+	<div class="page-header" ng-show="bev.name">
+		<h3>
+			<small>BEVERAGE: </small>
+			{{bev.name}} 
+		</h3>
+	</div>
+	<form name="form" class="form-horizontal">
+		<div class="form-group">
+			<label for="name" class="col-md-1 control-label">Beverage Name</label>
+			<div class="col-md-11">
+				<input 
+					type="text" class="form-control" placeholder="Name"
+					ng-model="bev.name" id="name"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="desc" class="col-md-1 control-label">Description</label>
+			<div class="col-md-11">
+				<input 
+					type="text" class="form-control" placeholder="Refreshing citrus flavor"
+					ng-model="bev.desc" id="desc"
+				>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="active" class="col-md-1 control-label">Active</label>
+			<div class="col-md-9">
+				<input type="radio" ng-model="bev.active" id="active" name="active" value="true">Yes<br>
+				<input type="radio" ng-model="bev.active" id="active" name="active" value="false">No<br>
+			</div>
+		</div>
+
+		<br/>
+		<br/>
+
+		<div class="navbar navbar-default navbar-fixed-bottom">
+			<div class="container-fluid">
+				<button
+					type="button" class="btn btn-danger col-md-1" 
+					ng-click="cancel()"
+				>
+					Cancel
+				</button>
+				<button 
+					type="button" class="btn btn-primary col-md-1 pull-right" 
+					ng-click="save(bev)"
+				>
+					<i class="fa fa-save"></i> &nbsp;
+					Save
+				</button>
+				<button
+					type="button" class="btn btn-default col-md-1 pull-right" 
+					ng-click="save(bev, {addMore: true})"
+					ng-show="!editMode"
+				>
+					More
+				</button>
+			</div>
+		</div>
+	</form>
+</div>
