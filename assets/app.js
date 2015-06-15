@@ -3697,6 +3697,7 @@
 		});
 
 		$scope.save = function save(menu, options) {
+
 			options || (options = {});
 
 			$http.put(
