@@ -3397,7 +3397,11 @@
 			var customerId = order.customerId;
 
 			thisDriverOrder.paymentMethods = order.paymentMethods;
-			thisDriverOrder.gratuity = parseFloat(order.gratuity).toFixed(2);
+			if(order.gratuity) {
+				thisDriverOrder.gratuity = parseFloat(order.gratuity).toFixed(2);
+			} else {
+				thisDriverOrder.gratuity = '0.00';
+			}
 			thisDriverOrder.total = parseFloat(order.total).toFixed(2);
 
 			// get destination address info for each order
