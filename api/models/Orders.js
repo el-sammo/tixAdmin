@@ -22,6 +22,10 @@ module.exports = {
 		customerId: {
       type: 'string',
       required: true
+    },
+		discount: {
+      type: 'float',
+      required: false
 		}
   },
 
