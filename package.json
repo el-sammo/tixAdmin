@@ -27,7 +27,8 @@
     "sails-disk": "~0.10.0",
     "sails-mongo": "*",
 		"auth-net-types": "*",
-		"auth-net-cim": "*"
+		"auth-net-cim": "*",
+		"node-geocoder": "*"
   },
   "scripts": {
     "start": "node app.js",

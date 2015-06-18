@@ -1080,6 +1080,8 @@
 	) {
 		var authPromise = authMgr.getAuthLevel();
 		var areaId = $rootScope.areaId;
+		var ccPercent = .029;
+		var extraCCCharge = .3;
 		$scope.areaId = $rootScope.areaId;
 
 		authPromise.then(function(authData) {
@@ -1109,15 +1111,26 @@
 				var allTimePromos = 0;
 				var allTimePromosDisc = 0;
 				allTimeOrderData.forEach(function(order) {
+					var ccTotal = 0;
 					if(order.orderStatus > 4) {
 						allTimeOrders ++;
 						allTimeGrossRevenue += parseFloat(order.total);
 						if(order.discount) {
-							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+							if(order.paymentMethods != 'cash') {
+								var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+								var ccCharge = extraCCCharge;
+								ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+							}
+							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal));
 							allTimePromos ++;
 							allTimePromosDisc += parseFloat(order.discount);
 						} else {
-							allTimeNetRevenue += parseFloat(order.deliveryFee);
+							if(order.paymentMethods != 'cash') {
+								var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+								var ccCharge = extraCCCharge;
+								ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+							}
+							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal));
 						}
 					}
 				});
@@ -1130,7 +1143,7 @@
 				console.log('orders-allTime err:');
 				console.log(err);
 			});
-	
+
 			$http.get('/orders/daily/' +areaId).then(function(res) {
 				var dailyOrders = res.data;
 				var dayGrossRevenue = 0;
@@ -1141,18 +1154,29 @@
 				var dayPromosArr = [];
 				if(dailyOrders && dailyOrders.length > 0) {
 					dailyOrders.forEach(function(order) {
+						var ccTotal = 0;
 						if(order.orderStatus > 4) {
 							dayOrders ++;
 							dayGrossRevenue += parseFloat(order.total);
 							if(order.discount) {
-								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal));
 								dayPromos ++;
 								dayPromosDisc = dayPromosDisc + parseFloat(order.discount);
 								if(dayPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
 									dayPromosArr.push(order.promo.toLowerCase());
 								}
 							} else {
-								dayNetRevenue += parseFloat(order.deliveryFee);
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal));
 							}
 						}
 					});
@@ -1178,18 +1202,29 @@
 				var weeklyPromosArr = [];
 				if(weekOrders && weekOrders.length > 0) {
 					weekOrders.forEach(function(order) {
+						var ccTotal = 0;
 						if(order.orderStatus > 4) {
 							weeklyOrders ++;
 							weekGrossRevenue += parseFloat(order.total);
 							if(order.discount) {
-								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal));
 								weeklyPromos ++;
 								weeklyPromosDisc = weeklyPromosDisc + parseFloat(order.discount);
 								if(weeklyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
 									weeklyPromosArr.push(order.promo.toLowerCase());
 								}
 							} else {
-								weekNetRevenue += parseFloat(order.deliveryFee);
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal));
 							}
 						}
 					});
@@ -1215,18 +1250,29 @@
 				var monthlyPromosArr = [];
 				if(weeksOrders && weeksOrders.length > 0) {
 					weeksOrders.forEach(function(order) {
+						var ccTotal = 0;
 						if(order.orderStatus > 4) {
 							monthlyOrders ++;
 							weeksGrossRevenue += parseFloat(order.total);
 							if(order.discount) {
-								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount));
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal));
 								monthlyPromos ++;
 								monthlyPromosDisc = monthlyPromosDisc + parseFloat(order.discount);
 								if(monthlyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
 									monthlyPromosArr.push(order.promo.toLowerCase());
 								}
 							} else {
-								weeksNetRevenue += parseFloat(order.deliveryFee);
+								if(order.paymentMethods != 'cash') {
+									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
+									var ccCharge = extraCCCharge;
+									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+								}
+								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal));
 							}
 						}
 					});
