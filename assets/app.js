@@ -2723,7 +2723,7 @@
 
 			$timeout(function() {
 				refreshData();
-			}, 30000);
+			}, 120000);
 		}
 		refreshData();
 
