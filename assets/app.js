@@ -1741,18 +1741,34 @@
 	});
 
 	app.controller('CustomersOrdersController', function(
-		customerSchema,	$scope, $http, $window, $rootScope
+		customerSchema,	$scope, $http, $window, $rootScope, $routeParams
 	) {
 
-		var p = $http.get('/orders/byCustomerId/' + $routeParams.id);
-	
-		p.error(function(err) {
-			console.log('CustomersOrdersController: customers-orders ajax failed');
+		$http.get('/orders/byCustomerIdCompleted/' + $routeParams.id).then(function(res) {
+			var allOrders = res.data;
+
+			allOrders.map(function(order) {
+				var d = new Date(order.paymentAcceptedAt);
+
+				var orderYear = d.getFullYear();
+				var orderMonth = d.getMonth() + 1;
+				var orderDay = d.getDate();
+
+				if(orderMonth < 10) {
+					orderMonth = '0'+orderMonth;
+				}
+
+				if(orderDay < 10) {
+					orderDay = '0'+orderDay;
+				}
+
+				order.orderDate = orderYear+'-'+orderMonth+'-'+orderDay;
+			});
+
+			$scope.orders = allOrders;
+		}).catch(function(err) {
+			console.log('CustomersOrdersController orders-byCustomerIdCompleted ajax fail');
 			console.log(err);
-		});
-	
-		p.then(function(res) {
-			$scope.orders = res.data;
 		});
 
 	});

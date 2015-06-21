@@ -28,6 +28,16 @@ module.exports = {
 		});
 	},
 	
+	byCustomerIdCompleted: function(req, res) {
+		Orders.find({customerId: req.params.id, orderStatus: 9}).sort({updatedAt: 'desc'}).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
 	byAreaId: function(req, res) {
 		Orders.findByAreaId(req.params.id).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));

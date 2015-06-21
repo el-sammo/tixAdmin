@@ -9,10 +9,10 @@
 	</div>
 	<div class="row" ng-repeat="order in orders">
 		<div class="col-md-3">
-			<a href="/orders/{{order.id}}" style="text-decoration: none;">{{order.createdAt}}</a>
+			<a href="#/orderDetails/{{order.id}}" style="text-decoration: none;">{{order.orderDate}}</a>
 		</div>
 		<div class="col-md-3">
-			<a href="/orders/{{order.id}}" style="text-decoration: none;">{{order.total}}</a>
+			<a href="#/orderDetails/{{order.id}}" style="text-decoration: none;">{{order.total}}</a>
 		</div>
 	</div>
 </div>
