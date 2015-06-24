@@ -2686,6 +2686,7 @@
 				var subplustax = parseFloat($scope.order.subtotal) + parseFloat($scope.order.tax);
 				$scope.subplustax = '$'+parseFloat(subplustax).toFixed(2);
 				$scope.discountPercent = 0;
+				$scope.bevThings = $scope.order.bevThings;
 				$scope.order.things.forEach(function(thing) {
 					$scope.getRestaurantName(thing.optionId).then(function(restaurantData) {
 						var restaurant = _.find($scope.orderRestaurants, {name: restaurantData.name});
