@@ -1892,6 +1892,9 @@
 				$scope.areaId = $rootScope.areaId;
 				$scope.authUserId = authData.userId;
 				$scope.authLevel = authData.authLevel;
+
+				var allOrdersTime = 0;
+				var allOrdersCount = 0;
 	
 				var p = $http.get('/orders/daily/' + areaId);
 			
@@ -1901,6 +1904,48 @@
 				});
 			
 				p.then(function(res) {
+					res.data.forEach(function(order) {
+						if(order.orderStatus > 8) {
+							var thisOrderTime = (order.orderDeliveredAt - order.paymentAcceptedAt);
+							allOrdersTime += thisOrderTime;
+							allOrdersCount ++;
+						}
+					});
+
+					if(allOrdersTime > 0 && allOrdersCount > 0) {
+						var formattedAvg = ((allOrdersTime / 1000) / allOrdersCount).toString();
+	
+						console.log('formattedAvg: '+formattedAvg);
+	
+						$scope.avgColor = 'green';
+						if(parseInt(formattedAvg) > 2700 && parseInt(formattedAvg) <= 3600) {
+							$scope.avgColor = 'orange';
+						} else if(parseInt(formattedAvg) > 3600) {
+							$scope.avgColor = 'red';
+						}
+	
+						var formattedAvgAgeHour = Math.floor(parseInt(formattedAvg) / 3600);
+						var formattedAvgAgeSec = parseInt(formattedAvg) % 60;
+				
+						if(formattedAvgAgeSec < 10) {
+							formattedAvgAgeSec = '0' + formattedAvgAgeSec;
+						}
+				
+						if(formattedAvgAgeHour > 0) {
+							var formattedAvgAgeMin = Math.floor(parseInt(formattedAvg - (formattedAvgAgeHour * 3600)) / 60);
+							if(formattedAvgAgeMin < 10) {
+								formattedAvgAgeMin = '0' + formattedAvgAgeMin;
+							}
+							$scope.averageOrderTime = formattedAvgAgeHour + ':' + formattedAvgAgeMin + ':' + formattedAvgAgeSec;
+						} else {
+							var formattedAvgAgeMin = Math.floor(parseInt(formattedAvg) / 60);
+							$scope.averageOrderTime = formattedAvgAgeMin + ':' + formattedAvgAgeSec;
+						}
+					} else {
+						$scope.avgColor = 'black';
+						$scope.averageOrderTime = 'NA';
+					}
+
 					res.data.map(function(order) {
 						var orderDate = new Date(order.updatedAt);
 						var orderDateSecsPre = orderDate.getTime();
@@ -1931,6 +1976,12 @@
 						order.updatedAtTime = order.updatedHours+':'+order.updatedMinutes;
 						order.updatedAt = order.updatedAtDate+' '+order.updatedAtTime+' '+ampm;
 						order.total = parseFloat(order.total).toFixed(2);
+
+						if(order.paymentMethods === 'cash') {
+							order.payType = 'cash';
+						} else {
+							order.payType = 'cc';
+						}
 		
 						var now = new Date().getTime();
 		

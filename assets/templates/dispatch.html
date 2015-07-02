@@ -1,5 +1,6 @@
 <div class="col-md-12 page-header" ng-cloak>
 	<h4>Current Orders as of {{currentDisplayTime}}</h4>
+ 	<h4><font color="{{avgColor}}">Average Order Time: {{averageOrderTime}}</font></h4>
 </div>
 <div class="col-md-12">
 	<div class="row">
@@ -34,9 +35,9 @@
 			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.currStatus}} ({{order.orderStatus}})</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.total}}</a><br/></span>
-			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.total}}</a><br/></span>
-			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.total}}</a><br/></span>
+			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.total}} ({{order.payType}})</a><br/></span>
+			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.total}} ({{order.payType}})</a><br/></span>
+			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.total}} ({{order.payType}})</a><br/></span>
 		</div>
 		<div class="col-md-2">
 			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.restaurants}}</a> </span>
@@ -68,9 +69,9 @@
 			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.currStatus}} ({{order.orderStatus}})</a><br/></span>
 		</div>
 		<div class="col-md-2">
-			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.total}}</a><br/></span>
-			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.total}}</a><br/></span>
-			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.total}}</a><br/></span>
+			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.total}} ({{order.payType}})</a><br/></span>
+			<span ng-show="order.orderStatus > 8"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkGreen">{{order.total}} ({{order.payType}})</a><br/></span>
+			<span ng-show="order.orderStatus < 5"><a href="#/orderDetails/{{order.id}}" class="leftNavLinkRed">{{order.total}} ({{order.payType}})</a><br/></span>
 		</div>
 		<div class="col-md-2">
 			<span ng-show="order.orderStatus > 4 && order.orderStatus < 9"><a href="#/orderDetails/{{order.id}}" class="leftNavLink">{{order.restaurants}}</a> </span>
