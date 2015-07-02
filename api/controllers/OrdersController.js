@@ -117,12 +117,19 @@ module.exports = {
 	
 	daily: function(req, res) {
 		var today = new Date();
-	
 		var thisYear = today.getFullYear();
 		var thisMonth = today.getMonth();
 		var thisDate = today.getDate();
-	
-		var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+
+		var thisHour = new Date().getHours();
+
+		if(thisHour < 2) {
+			var yesterday = new Date();
+			yesterday.setDate(thisDate - 1);
+			var todayMilliseconds = new Date(yesterday).getTime();
+		} else {
+			var todayMilliseconds = new Date(thisYear, thisMonth, thisDate, 0, 0, 0, 0).getTime();
+		}
 
 		Orders.find({areaId: req.params.id, paymentInitiatedAt: { '>=': todayMilliseconds}, orderStatus: { '>': 1}}).sort({updatedAt: 'desc'}).then(function(results) {
 			res.send(JSON.stringify(results));

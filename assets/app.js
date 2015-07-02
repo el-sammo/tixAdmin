@@ -1915,8 +1915,6 @@
 					if(allOrdersTime > 0 && allOrdersCount > 0) {
 						var formattedAvg = ((allOrdersTime / 1000) / allOrdersCount).toString();
 	
-						console.log('formattedAvg: '+formattedAvg);
-	
 						$scope.avgColor = 'green';
 						if(parseInt(formattedAvg) > 2700 && parseInt(formattedAvg) <= 3600) {
 							$scope.avgColor = 'orange';
