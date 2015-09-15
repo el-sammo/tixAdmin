@@ -1,32 +1,18 @@
 <div class="col-md-12 page-header" ng-cloak>
-	<h3>G2U Management System</h3>
+	<h3>Championship Tickets Management System</h3>
 </div>
 <div class="col-md-12">
 	<div class="row">
 		<div class="col-md-3">
-			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/applicants">Applicants	View</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/bevs/{{areaId}}">Beverage Management</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/customers/add">Customer Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/customers/search">Customer Search</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 1"><a href="#/dispatch">Dispatch Center</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/emailList/add">Email List Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/emailList/search">Email List Search</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/hotels/add/{{areaId}}">Hotel Add</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/hotels/">Hotels List</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/messages">Messaging History</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2" ng-click="sendMessage()">Message Send<br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/payroll/process">Process Payroll</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/promos/add/{{areaId}}">Promo Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/promos/">Promos List</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 3 && authLevel < 5"><a href="#/reports/basic">Reports</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 4"><a href="#/reports/advanced">Reports</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/areas">Restaurant Management</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/schedules/add">Schedule Add</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/schedules/view">Schedule View</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/stories/add">Story Add</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 3"><a href="#/stories/view">Stories View</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 1 && authLevel < 3"><a href="#/driverShifts/{{authUserId}}">Shift History</a><br/></span>
-			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/driversReports">Driver Shift Reports</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/add">User Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/search">User Search</a><br/></span>
 		</div>
