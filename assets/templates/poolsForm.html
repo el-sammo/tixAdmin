@@ -1,0 +1,51 @@
+<div id="fms-pools-form" class="col-md-12" ng-cloak>
+	<div class="page-header" ng-show="!pool.name && !editMode">
+		<h3>Add Pool</h3>
+	</div>
+	<div class="page-header" ng-show="!pool.name && editMode">
+		<h3>Update Pool</h3>
+	</div>
+	<div class="page-header" ng-show="pool.name">
+		<h3>
+			<small>POOL: </small>
+			{{pool.name}} 
+		</h3>
+	</div>
+	<form name="form" class="form-horizontal">
+		<div class="form-group">
+			<label for="name" class="col-md-3 control-label">Pool Name*</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control"
+					ng-model="pool.name" id="name"
+				>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="max_entities" class="col-md-3 control-label">Max Entities*</label>
+			<div class="col-md-9">
+				<input 
+					type="text" class="form-control"
+					ng-model="pool.max_entities" id="max_entities"
+				>
+			</div>
+		</div>
+		<div class="navbar navbar-default navbar-fixed-bottom">
+			<div class="container-fluid">
+				<button
+					type="button" class="btn btn-danger col-md-1" 
+					ng-click="cancel()"
+				>
+					Cancel
+				</button>
+				<button 
+					type="button" class="btn btn-primary col-md-1 pull-right" 
+					ng-click="save(pool)"
+				>
+					<i class="fa fa-save"></i> &nbsp;
+					Save
+				</button>
+			</div>
+		</div>
+	</form>
+</div>

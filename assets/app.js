@@ -23,6 +23,31 @@
 
 
 		///
+		// Championships
+		///
+
+		$routeProvider.when('/championships/list', {
+			controller: 'ChampionshipsListController',
+			templateUrl: '/templates/championshipsList.html'
+		});
+
+		$routeProvider.when('/championships/add', {
+			controller: 'ChampionshipsAddController',
+			templateUrl: '/templates/championshipsForm.html'
+		});
+
+		$routeProvider.when('/championships/edit/:id', {
+			controller: 'ChampionshipsEditController',
+			templateUrl: '/templates/championshipsForm.html'
+		});
+
+		$routeProvider.when('/championships/search', {
+			controller: 'ChampionshipsSearchController',
+			templateUrl: '/templates/championshipsSearch.html'
+		});
+
+
+		///
 		// Customers
 		///
 
@@ -68,6 +93,31 @@
 
 
 		///
+		// Entities
+		///
+
+		$routeProvider.when('/entities/list', {
+			controller: 'EntitiesListController',
+			templateUrl: '/templates/entitiesList.html'
+		});
+
+		$routeProvider.when('/entities/list/:id', {
+			controller: 'EntitiesPoolListController',
+			templateUrl: '/templates/entitiesPoolList.html'
+		});
+
+		$routeProvider.when('/entities/add', {
+			controller: 'EntitiesAddController',
+			templateUrl: '/templates/entitiesForm.html'
+		});
+
+		$routeProvider.when('/entities/edit/:id', {
+			controller: 'EntitiesEditController',
+			templateUrl: '/templates/entitiesForm.html'
+		});
+
+
+		///
 		// Messaging
 		///
 
@@ -89,6 +139,26 @@
 		$routeProvider.when('/orderDetails/:id', {
 			controller: 'OrderDetailsController',
 			templateUrl: '/templates/orderDetails.html'
+		});
+
+
+		///
+		// Pools
+		///
+
+		$routeProvider.when('/pools/list/:id', {
+			controller: 'PoolsListController',
+			templateUrl: '/templates/poolsList.html'
+		});
+
+		$routeProvider.when('/pools/add/:id', {
+			controller: 'PoolsAddController',
+			templateUrl: '/templates/poolsForm.html'
+		});
+
+		$routeProvider.when('/pools/edit/:id', {
+			controller: 'PoolsEditController',
+			templateUrl: '/templates/poolsForm.html'
 		});
 
 
@@ -811,11 +881,9 @@
 		homeMgmt, messageMgmt, authMgr
 	) {
 		var authPromise = authMgr.getAuthLevel();
-		var areaId = $rootScope.areaId;
 		var ccPercent = .029;
 		var extraCCCharge = .3;
 		var bevCost = .32;
-		$scope.areaId = $rootScope.areaId;
 
 		authPromise.then(function(authData) {
 
@@ -837,7 +905,7 @@
 			$scope.weeklySignUps = homeMgmt.weeklySignUps;
 			$scope.monthlySignUps = homeMgmt.monthlySignUps;
 
-			var allOrders = $http.get('/orders/allTime/' +areaId).then(function(res) {
+			var allOrders = $http.get('/orders/allTime/').then(function(res) {
 				var allTimeOrderData = res.data;
 
 				var allTimeBevs = 0;
@@ -901,7 +969,7 @@
 				console.log(err);
 			});
 
-			$http.get('/orders/daily/' +areaId).then(function(res) {
+			$http.get('/orders/daily/').then(function(res) {
 				var dailyOrders = res.data;
 
 				var dayBevs = 0;
@@ -972,7 +1040,7 @@
 				console.log(err);
 			});
 	
-			$http.get('/orders/weekly/' +areaId).then(function(res) {
+			$http.get('/orders/weekly/').then(function(res) {
 				var weekOrders = res.data;
 
 				var weekGrossRevenue = 0;
@@ -1043,7 +1111,7 @@
 				console.log(err);
 			});
 	
-			$http.get('/orders/monthly/' +areaId).then(function(res) {
+			$http.get('/orders/monthly/').then(function(res) {
 				var weeksOrders = res.data;
 
 				var weeksBevs = 0;
@@ -1114,14 +1182,14 @@
 				console.log(err);
 			});
 	
-			$http.get('/customers/allTime/' +areaId).then(function(res) {
+			$http.get('/customers/allTime/').then(function(res) {
 				$scope.allTimeSignUps = res.data.length;
 			}).catch(function(err) {
 				console.log('customers-allTime err:');
 				console.log(err);
 			});
 	
-			$http.get('/customers/daily/' +areaId).then(function(res) {
+			$http.get('/customers/daily/').then(function(res) {
 				$scope.daySignUps = res.data;
 				$scope.daySignups = res.data.length;
 			}).catch(function(err) {
@@ -1129,7 +1197,7 @@
 				console.log(err);
 			});
 	
-			$http.get('/customers/weekly/' +areaId).then(function(res) {
+			$http.get('/customers/weekly/').then(function(res) {
 				$scope.weekSignUps = res.data;
 				$scope.weekSignups = res.data.length;
 			}).catch(function(err) {
@@ -1137,7 +1205,7 @@
 				console.log(err);
 			});
 	
-			$http.get('/customers/monthly/' +areaId).then(function(res) {
+			$http.get('/customers/monthly/').then(function(res) {
 				$scope.weeksSignUps = res.data;
 				$scope.weeksSignups = res.data.length;
 			}).catch(function(err) {
@@ -1145,28 +1213,28 @@
 				console.log(err);
 			});
 	
-			$http.get('/applicants/allTime/' +areaId).then(function(res) {
+			$http.get('/applicants/allTime/').then(function(res) {
 				$scope.allTimeApplicants = res.data.length;
 			}).catch(function(err) {
 				console.log('applicants-allTime err:');
 				console.log(err);
 			});
 	
-			$http.get('/applicants/daily/' +areaId).then(function(res) {
+			$http.get('/applicants/daily/').then(function(res) {
 				$scope.dayApplicants = res.data.length;
 			}).catch(function(err) {
 				console.log('applicants-daily err:');
 				console.log(err);
 			});
 	
-			$http.get('/applicants/weekly/' +areaId).then(function(res) {
+			$http.get('/applicants/weekly/').then(function(res) {
 				$scope.weekApplicants = res.data.length;
 			}).catch(function(err) {
 				console.log('applicants-weekly err:');
 				console.log(err);
 			});
 	
-			$http.get('/applicants/monthly/' +areaId).then(function(res) {
+			$http.get('/applicants/monthly/').then(function(res) {
 				$scope.weeksApplicants = res.data.length;
 			}).catch(function(err) {
 				console.log('applicants-monthly err:');
@@ -1174,6 +1242,158 @@
 			});
 
 		});
+
+	});
+
+
+	///
+	// Controllers: Championships
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/championships/);
+	});
+
+	app.factory('championshipSchema', function() {
+		function nameTransform(championship) {
+			if(! championship || ! championship.name || championship.name.length < 1) {
+				return 'championship-name';
+			}
+			return (championship.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				championship: {
+					name: '',
+					tagline: '',
+					location: '',
+					date: ''
+				}
+			},
+	
+			populateDefaults: function(championship) {
+				$.map(service.defaults.championship, function(value, key) {
+					if(championship[key]) return;
+					if(typeof value === 'object') {
+						championship[key] = angular.copy(value);
+						return;
+					}
+					championship[key] = value;
+				});
+				return championship;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('ChampionshipsListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.path = 'championships';
+
+		$http.get('/championships/').then(function(res) {
+			$scope.championships = res.data;
+		}).catch(function(err) {
+			console.log('ChampionshipsListController: championships ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('ChampionshipsAddController', function(
+		navMgr, messenger, pod, championshipSchema,
+		$scope, $http, $window, $rootScope
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.championshipSchema = championshipSchema;
+		$scope.championship = championshipSchema.populateDefaults({});
+
+		$scope.save = function save(championship, options) {
+			options || (options = {});
+
+			$http.post(
+				'/championships/create', championship
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Championship created', '');
+
+				if(options.addMore) {
+					$scope.championship = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/championships/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/championships');
+		};
+	});
+
+
+	app.controller('ChampionshipsEditController', function(
+		navMgr, messenger, pod, championshipSchema, 
+		$scope, $http, $routeParams, $window, orderMgmt
+	) {
+
+		$scope.championshipId = $routeParams.id;
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.championshipSchema = championshipSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/championships/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.championship = championshipSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(championship, options) {
+			options || (options = {});
+
+			$http.put(
+				'/championships/' + championship.id, championship
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Championship updated', '');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/championships');
+		};
+	});
+
+	app.controller('ChampionshipsSearchController', function(
+		championshipSchema,	$scope, $http, $window, $rootScope
+	) {
+
+		$scope.nameSearch = function() {
+			var p = $http.get('/championships/byName/' + $scope.name);
+	
+			p.error(function(err) {
+				console.log('ChampionshipsSearchController: championships-fName ajax failed');
+				console.log(err);
+			});
+	
+			p.then(function(res) {
+				$scope.championships = res.data;
+			});
+		}
 
 	});
 
@@ -1604,6 +1824,159 @@
 
 
 	///
+	// Controllers: Entities
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/entities/);
+	});
+
+	app.factory('entitySchema', function() {
+		function nameTransform(entity) {
+			if(! entity || ! entity.name || entity.name.length < 1) {
+				return 'entity-name';
+			}
+			return (entity.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				entity: {
+					name: '',
+					tagline: '',
+					location: '',
+					date: ''
+				}
+			},
+	
+			populateDefaults: function(entity) {
+				$.map(service.defaults.entity, function(value, key) {
+					if(entity[key]) return;
+					if(typeof value === 'object') {
+						entity[key] = angular.copy(value);
+						return;
+					}
+					entity[key] = value;
+				});
+				return entity;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('EntitiesListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.path = 'entities';
+
+		$http.get('/entities').then(function(res) {
+			$scope.entities = res.data;
+		}).catch(function(err) {
+			console.log('EntitiesListController: entities ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('EntitiesAddController', function(
+		navMgr, messenger, pod, entitySchema,
+		$scope, $http, $window, $rootScope
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.entitySchema = entitySchema;
+		$scope.entity = entitySchema.populateDefaults({});
+
+		$scope.save = function save(entity, options) {
+			options || (options = {});
+
+			$http.post(
+				'/entities/create', entity
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Entity created', '');
+
+				if(options.addMore) {
+					$scope.entity = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/entities/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/entities');
+		};
+	});
+
+
+	app.controller('EntitiesEditController', function(
+		navMgr, messenger, pod, entitySchema, 
+		$scope, $http, $routeParams, $window, orderMgmt
+	) {
+
+		$scope.entityId = $routeParams.id;
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.entitySchema = entitySchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/entities/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.entity = entitySchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(entity, options) {
+			options || (options = {});
+
+			$http.put(
+				'/entities/' + entity.id, entity
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Entity updated', '');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/entities');
+		};
+	});
+
+	app.controller('EntitiesPoolListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.path = 'pools';
+		var championshipId = $routeParams.id;
+
+		$http.get('/championships/' +championshipId).then(function(res) {
+			$scope.championship = res.data;
+		}).catch(function(err) {
+			console.log('EntitiesPoolListController: pools ajax failed');
+			console.log(err);
+		});
+
+		$http.get('/pools/byChampionshipId/' +championshipId).then(function(res) {
+			$scope.pools = res.data;
+		}).catch(function(err) {
+			console.log('EntitiesPoolListController: pools ajax failed');
+			console.log(err);
+		});
+
+	});
+
+
+	///
 	// Messages
 	///
 	
@@ -1928,6 +2301,146 @@
 	});
 
 
+	///
+	// Controllers: Pools
+	///
+
+	app.config(function(httpInterceptorProvider) {
+		httpInterceptorProvider.register(/^\/pools/);
+	});
+
+	app.factory('poolSchema', function() {
+		function nameTransform(pool) {
+			if(! pool || ! pool.name || pool.name.length < 1) {
+				return 'pool-name';
+			}
+			return (pool.name
+				.replace(/[^a-zA-Z ]/g, '')
+				.replace(/ /g, '-')
+				.toLowerCase()
+			);
+		}
+
+		var service = {
+			defaults: {
+				pool: {
+					name: '',
+					championshipId: '',
+					max_entities: ''
+				}
+			},
+	
+			populateDefaults: function(pool) {
+				$.map(service.defaults.pool, function(value, key) {
+					if(pool[key]) return;
+					if(typeof value === 'object') {
+						pool[key] = angular.copy(value);
+						return;
+					}
+					pool[key] = value;
+				});
+				return pool;
+			}
+		};
+
+		return service;
+	});
+
+	app.controller('PoolsListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.path = 'pools';
+		var championshipId = $routeParams.id;
+
+		$http.get('/championships/' +championshipId).then(function(res) {
+			$scope.championship = res.data;
+		}).catch(function(err) {
+			console.log('PoolsListController: pools ajax failed');
+			console.log(err);
+		});
+
+		$http.get('/pools/byChampionshipId/' +championshipId).then(function(res) {
+			$scope.pools = res.data;
+		}).catch(function(err) {
+			console.log('PoolsListController: pools ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('PoolsAddController', function(
+		navMgr, messenger, pod, poolSchema,
+		$scope, $http, $window, $rootScope, $routeParams
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.poolSchema = poolSchema;
+		$scope.pool = poolSchema.populateDefaults({});
+
+		$scope.pool.championshipId = $routeParams.id;
+
+		$scope.save = function save(pool, options) {
+			options || (options = {});
+
+			$http.post(
+				'/pools/create', pool
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Pool created', '');
+
+				if(options.addMore) {
+					$scope.pool = {};
+					return;
+				}
+
+				navMgr.protect(false);
+				$window.location.href = '#/pools/' + data.id;
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/pools');
+		};
+	});
+
+
+	app.controller('PoolsEditController', function(
+		navMgr, messenger, pod, poolSchema, 
+		$scope, $http, $routeParams, $window, orderMgmt
+	) {
+
+		$scope.poolId = $routeParams.id;
+
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.poolSchema = poolSchema;
+		$scope.editMode = true;
+
+		$http.get(
+			'/pools/' + $routeParams.id
+		).success(function(data, status, headers, config) {
+			$scope.pool = poolSchema.populateDefaults(data);
+		});
+
+		$scope.save = function save(pool, options) {
+			options || (options = {});
+
+			$http.put(
+				'/pools/' + pool.id, pool
+			).success(function(data, status, headers, config) {
+				if(status >= 400) return;
+
+				messenger.show('Pool updated', '');
+
+				$scope.form.$setPristine();
+			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/pools');
+		};
+	});
 	///
 	// Controllers: Promos
 	///

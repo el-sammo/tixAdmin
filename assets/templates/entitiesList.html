@@ -1,0 +1,36 @@
+
+<div class="col-md-6 page-header">
+	<h3><small>ENTITIES</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add" class="pull-right">
+    <button id="entityAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="entityAdd" class="fa-btn-text divspan">Add an Entity</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Entity</h3>
+			</td>
+			<td>
+				<h3>Colors</h3>
+			</td>
+		</tr>
+		<tr ng-init="entityId = entity.id" ng-repeat="entity in entities">
+			<td>
+				<span><a href="#/entities/edit/{{entityId}}">{{entity.name}} ({{entity.mascot}})</a></span>
+			</td>
+			<td>
+				<div style="width: 60px; height: 20px; position: relative;">
+					<div style="width: 15px; height: 15px; background-color: #{{entity.color1}}; border: 1px dotted black; position: relative;"></div>
+					<div style="top: -15px; left: 20px; width: 15px; height: 15px; background-color: #{{entity.color2}}; border: 1px dotted black; position: relative;"></div>
+					<div style="top: -30px; left: 40px; width: 15px; height: 15px; background-color: #{{entity.color3}}; border: 1px dotted black; position: relative;"></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>

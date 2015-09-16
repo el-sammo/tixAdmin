@@ -1,0 +1,32 @@
+
+<div class="col-md-6 page-header">
+	<h3>{{championship.name}} <small>POOLS</small></h3>
+</div>
+<div class="col-md-6 page-header">
+	<a href="#/{{path}}/add/{{championship.id}}" class="pull-right">
+    <button id="poolAdd" class="btn btn-default">
+      <i class="fa fa-2x fa-plus-square"></i>
+			<div id="poolAdd" class="fa-btn-text divspan">Add a Pool to {{championship.name}}</div>
+    </button>
+  </a>
+</div>
+<div class="col-md-12">
+	<table class="table table-responsive table-condensed table-striped">
+		<tr>
+			<td>
+				<h3>Pool</h3>
+			</td>
+			<td>
+				<h3>Entities</h3>
+			</td>
+		</tr>
+		<tr ng-init="poolId = pool.id" ng-repeat="pool in pools">
+			<td>
+				<span><a href="#/pools/edit/{{poolId}}">{{pool.name}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/entities/list/{{poolId}}">View Entities</a></span>
+			</td>
+		</tr>
+	</table>
+</div>

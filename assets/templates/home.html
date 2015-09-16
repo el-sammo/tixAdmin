@@ -4,9 +4,11 @@
 <div class="col-md-12">
 	<div class="row">
 		<div class="col-md-3">
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/championships/list">Championships</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/customers/search">Customer Search</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/emailList/add">Email List Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/emailList/search">Email List Search</a><br/></span>
+			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/entities/list">Entities</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/messages">Messaging History</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2" ng-click="sendMessage()">Message Send<br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/promos/add/{{areaId}}">Promo Add</a><br/></span>
