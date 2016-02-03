@@ -22,12 +22,10 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="max_entities" class="col-md-3 control-label">Max Entities*</label>
+			<label for="leagueCode" class="col-md-3 control-label"> League: </label><br>
 			<div class="col-md-9">
-				<input 
-					type="text" class="form-control"
-					ng-model="pool.max_entities" id="max_entities"
-				>
+				<select name="leagueCode" ng-model="pool.leagueCode" class="form-control" ng-options="leagueCode.code for leagueCode in leagueCodes">
+				</select><br>
 			</div>
 		</div>
 		<div class="navbar navbar-default navbar-fixed-bottom">

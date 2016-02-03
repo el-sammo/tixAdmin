@@ -17,6 +17,10 @@ module.exports = {
 		championshipId: {
       type: 'string',
       required: true
+		},
+		leagueCode: {
+      type: 'string',
+      required: true
 		}
   }
   

@@ -1272,7 +1272,8 @@
 					name: '',
 					tagline: '',
 					location: '',
-					date: ''
+					date: '',
+					expires: ''
 				}
 			},
 	
@@ -1357,6 +1358,11 @@
 			'/championships/' + $routeParams.id
 		).success(function(data, status, headers, config) {
 			$scope.championship = championshipSchema.populateDefaults(data);
+			var expires = $scope.championship.expires;
+			var d = new Date(expires);
+			var dString = d.toString();
+			var formatString = dString.substr(4,12);
+			$scope.championship.expires = formatString;
 		});
 
 		$scope.save = function save(championship, options) {
@@ -2326,7 +2332,7 @@
 				pool: {
 					name: '',
 					championshipId: '',
-					max_entities: ''
+					leagueCode: ''
 				}
 			},
 	
@@ -2373,6 +2379,13 @@
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
 
+		$http.get('/leagues/').then(function(res) {
+			$scope.leagueCodes = res.data;
+		}).catch(function(err) {
+			console.log('PoolsAddController: leagues ajax failed');
+			console.log(err);
+		});
+
 		$scope.poolSchema = poolSchema;
 		$scope.pool = poolSchema.populateDefaults({});
 
@@ -2409,6 +2422,13 @@
 		$scope, $http, $routeParams, $window, orderMgmt
 	) {
 
+		$http.get('/leagues/').then(function(res) {
+			$scope.leagueCodes = res.data;
+		}).catch(function(err) {
+			console.log('PoolsAddController: leagues ajax failed');
+			console.log(err);
+		});
+
 		$scope.poolId = $routeParams.id;
 
 		navMgr.protect(function() { return $scope.form.$dirty; });
@@ -2426,6 +2446,11 @@
 		$scope.save = function save(pool, options) {
 			options || (options = {});
 
+			pool.leagueCode = pool.leagueCode.code;
+
+			console.log('pool:');
+			console.log(pool);
+
 			$http.put(
 				'/pools/' + pool.id, pool
 			).success(function(data, status, headers, config) {
@@ -2441,6 +2466,8 @@
 			navMgr.cancel('#/pools');
 		};
 	});
+
+
 	///
 	// Controllers: Promos
 	///
