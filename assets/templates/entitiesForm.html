@@ -1,4 +1,4 @@
-<div id="fms-entities-form" class="col-md-12" ng-cloak>
+<div id="fms-entities-form" class="col-md-12" style="top: -40px; position: relative;" ng-cloak>
 	<div class="page-header" ng-show="!entity.name && !editMode">
 		<h3>Add Entity</h3>
 	</div>
@@ -58,14 +58,14 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="league_code" class="col-md-3 control-label">League Code*</label>
+			<label for="repeatSelect" class="col-md-3 control-label">League Code*</label>
 			<div class="col-md-9">
-				<input 
-					type="text" class="form-control" 
-					ng-model="entity.league_code" id="league_code"
-				>
+				<select name="repeatSelect" id="repeatSelect" ng-model="data.repeatSelect">
+					<option ng-repeat="option in data.availableOptions" value="{{option.name}}">{{option.name}}</option>
+				</select>
 			</div>
 		</div>
+		<br/>
 		<div class="navbar navbar-default navbar-fixed-bottom">
 			<div class="container-fluid">
 				<button
