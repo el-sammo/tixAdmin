@@ -14,7 +14,15 @@ module.exports = {
       type: 'string',
       required: true
 		},
-    poolId: {
+    mascot: {
+      type: 'string',
+      required: true
+		},
+    color1: {
+      type: 'string',
+      required: true
+		},
+    color2: {
       type: 'string',
       required: true
 		},

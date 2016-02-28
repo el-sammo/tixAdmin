@@ -161,6 +161,16 @@
 			templateUrl: '/templates/poolsForm.html'
 		});
 
+		$routeProvider.when('/pools/entities/:id', {
+			controller: 'PoolsEntitiesListController',
+			templateUrl: '/templates/poolsEntitiesList.html'
+		});
+
+		$routeProvider.when('/pools/entities/add/:id', {
+			controller: 'PoolsEntitiesAddController',
+			templateUrl: '/templates/poolsEntitiesForm.html'
+		});
+
 
 		///
 		// Promos
@@ -1376,6 +1386,8 @@
 				messenger.show('Championship updated', '');
 
 				$scope.form.$setPristine();
+				navMgr.protect(false);
+				$window.location.href = '#/championships/list';
 			});
 		};
 
@@ -1853,9 +1865,10 @@
 			defaults: {
 				entity: {
 					name: '',
-					tagline: '',
-					location: '',
-					date: ''
+					mascot: '',
+					color1: '',
+					color1: '',
+					leagueCode: ''
 				}
 			},
 	
@@ -1878,7 +1891,7 @@
 	app.controller('EntitiesListController', function($scope, $http, $routeParams, $rootScope) {
 		$scope.path = 'entities';
 
-		$http.get('/entities').then(function(res) {
+		$http.get('/entities/allEntities').then(function(res) {
 			$scope.entities = res.data;
 		}).catch(function(err) {
 			console.log('EntitiesListController: entities ajax failed');
@@ -1894,11 +1907,23 @@
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
 
+		$http.get('/leagues').then(function(res) {
+			$scope.data = {
+				repeatSelect: null,
+				availableOptions: res.data,
+			};
+		}).catch(function(err) {
+			console.log('EntitiesListController: entities ajax failed');
+			console.log(err);
+		});
+
 		$scope.entitySchema = entitySchema;
 		$scope.entity = entitySchema.populateDefaults({});
 
 		$scope.save = function save(entity, options) {
 			options || (options = {});
+
+			entity.leagueCode = $scope.data.repeatSelect;
 
 			$http.post(
 				'/entities/create', entity
@@ -1913,7 +1938,7 @@
 				}
 
 				navMgr.protect(false);
-				$window.location.href = '#/entities/' + data.id;
+				$window.location.href = '#/entities/list';
 			});
 		};
 
@@ -1939,11 +1964,26 @@
 		$http.get(
 			'/entities/' + $routeParams.id
 		).success(function(data, status, headers, config) {
+			var oldLeagueCode = data.leagueCode;
 			$scope.entity = entitySchema.populateDefaults(data);
+
+			$http.get('/leagues').then(function(res) {
+				$scope.data = {
+//					repeatSelect: oldLeagueCode,  <-- debug
+					repeatSelect: null,
+					availableOptions: res.data,
+				};
+			}).catch(function(err) {
+				console.log('EntitiesListController: entities ajax failed');
+				console.log(err);
+			});
+
 		});
 
 		$scope.save = function save(entity, options) {
 			options || (options = {});
+
+			entity.leagueCode = $scope.data.repeatSelect;
 
 			$http.put(
 				'/entities/' + entity.id, entity
@@ -1953,6 +1993,9 @@
 				messenger.show('Entity updated', '');
 
 				$scope.form.$setPristine();
+
+				navMgr.protect(false);
+				$window.location.href = '#/entities/list';
 			});
 		};
 
@@ -2416,7 +2459,6 @@
 		};
 	});
 
-
 	app.controller('PoolsEditController', function(
 		navMgr, messenger, pod, poolSchema, 
 		$scope, $http, $routeParams, $window, orderMgmt
@@ -2460,6 +2502,104 @@
 
 				$scope.form.$setPristine();
 			});
+		};
+
+		$scope.cancel = function cancel() {
+			navMgr.cancel('#/pools');
+		};
+	});
+
+	app.controller('PoolsEntitiesListController', function($scope, $http, $routeParams, $rootScope) {
+		$scope.path = 'pools';
+		var poolId = $routeParams.id;
+
+		$http.get('/pools/' +poolId).then(function(res) {
+			$scope.pool = res.data;
+			var eligibleEntities = res.data.eligibleEntities;
+			eligibleEntities.forEach(function(entity) {
+				$http.get('/entities/' +entity.entityId).then(function(res) {
+					entity.entityName = res.data.name;
+				}).catch(function(err) {
+					console.log('PoolsEntitiesListController: entity ajax failed');
+					console.log(err);
+				});
+				entity.expectedOdds = (entity.expectedOdds / 100).toFixed(2) + '%';
+			});
+			$scope.eligibleEntities = eligibleEntities;
+		}).catch(function(err) {
+			console.log('PoolsListController: pools ajax failed');
+			console.log(err);
+		});
+
+	});
+
+	app.controller('PoolsEntitiesAddController', function(
+		$scope, $http, $window, $rootScope, $routeParams,
+		navMgr, messenger, pod 
+	) {
+		navMgr.protect(function() { return $scope.form.$dirty; });
+		pod.podize($scope);
+
+		$scope.poolId = $routeParams.id;
+
+		$http.get('/pools/' +$scope.poolId).then(function(res) {
+			$scope.pool = res.data;
+			var leagueCode = res.data.leagueCode;
+console.log('leagueCode:');			
+console.log(leagueCode);			
+			var eligibleEntities;
+			if(res.data.eligibleEntities) {
+				eligibleEntities = res.data.eligibleEntities;
+			} else {
+				eligibleEntities = [];
+			}
+
+			$http.get('/entities/byLeagueCode/' +leagueCode).then(function(res) {
+				var leagueCodeEntities = res.data;
+
+console.log('eligibleEntities:');		
+console.log(eligibleEntities);		
+console.log('leagueCodeEntities:');		
+console.log(leagueCodeEntities);		
+
+			}).catch(function(err) {
+				console.log('PoolsListController: pools ajax failed');
+				console.log(err);
+			});
+
+		}).catch(function(err) {
+			console.log('PoolsListController: pools ajax failed');
+			console.log(err);
+		});
+
+		$scope.save = function save(pool, options) {
+			options || (options = {});
+
+			var newEntity = {
+				entityId: $scope.entityId,
+				expectedOdds: $scope.odds,
+			}
+
+			$scope.eligibleEntities.push(newEntity);
+
+console.log('$scope.eligibleEntities:');			
+console.log($scope.eligibleEntities);			
+
+//			$http.post(
+//				'/pools/create', pool
+//			).success(function(data, status, headers, config) {
+//				if(status >= 400) return;
+//
+//				messenger.show('Pool created', '');
+//
+//				if(options.addMore) {
+//					$scope.pool = {};
+//					return;
+//				}
+//
+//				navMgr.protect(false);
+//				$window.location.href = '#/pools/' + data.id;
+//			});
 		};
 
 		$scope.cancel = function cancel() {
