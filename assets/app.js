@@ -425,30 +425,30 @@
 		$modal, $rootScope, $http
 	) {
 		var service = {
-			dailyOrders: function() {
+			dailyReservations: function() {
 				$modal.open({
-					templateUrl: '/templates/dailyOrders.html',
+					templateUrl: '/templates/dailyReservations.html',
 					backdrop: true,
 					controller: 'HomeController'
 				});
 			},
-			weeklyOrders: function() {
+			weeklyReservations: function() {
 				$modal.open({
-					templateUrl: '/templates/weeklyOrders.html',
+					templateUrl: '/templates/weeklyReservations.html',
 					backdrop: true,
 					controller: 'HomeController'
 				});
 			},
-			monthlyOrders: function() {
+			monthlyReservations: function() {
 				$modal.open({
-					templateUrl: '/templates/monthlyOrders.html',
+					templateUrl: '/templates/monthlyReservations.html',
 					backdrop: true,
 					controller: 'HomeController'
 				});
 			},
-			allTimeOrders: function() {
+			allTimeReservations: function() {
 				$modal.open({
-					templateUrl: '/templates/allTimeOrders.html',
+					templateUrl: '/templates/allTimeReservations.html',
 					backdrop: true,
 					controller: 'HomeController'
 				});
@@ -888,12 +888,27 @@
 
 	app.controller('HomeController', function(
 		$scope, $http, $routeParams, $rootScope,
-		homeMgmt, messageMgmt, authMgr
+		$window, homeMgmt, messageMgmt, authMgr
 	) {
 		var authPromise = authMgr.getAuthLevel();
 		var ccPercent = .029;
 		var extraCCCharge = .3;
-		var bevCost = .32;
+
+		$scope.logout = function() {
+			var url = '/users/logout';
+			return $http.get(url).success(
+				function(data, status, headers, config) {
+					if(status >= 400) {
+						return $q.reject(data);
+					}
+					$window.location.href = '#/';
+				}
+			).catch(function(err) {
+				console.log('GET ' + url + ': ajax failed');
+				console.error(err);
+				return $q.reject(err);
+			});
+		},
 
 		authPromise.then(function(authData) {
 
@@ -902,10 +917,10 @@
 
 			$scope.sendMessage = messageMgmt.send;
 		
-			$scope.dailyOrders = homeMgmt.dailyOrders;
-			$scope.weeklyOrders = homeMgmt.weeklyOrders;
-			$scope.monthlyOrders = homeMgmt.monthlyOrders;
-			$scope.allTimeOrders = homeMgmt.allTimeOrders;
+			$scope.dailyReservations = homeMgmt.dailyReservations;
+			$scope.weeklyReservations = homeMgmt.weeklyReservations;
+			$scope.monthlyReservations = homeMgmt.monthlyReservations;
+			$scope.allTimeReservations = homeMgmt.allTimeReservations;
 	
 			$scope.dailyPromos = homeMgmt.dailyPromos;
 			$scope.weeklyPromos = homeMgmt.weeklyPromos;
@@ -915,280 +930,174 @@
 			$scope.weeklySignUps = homeMgmt.weeklySignUps;
 			$scope.monthlySignUps = homeMgmt.monthlySignUps;
 
-			var allOrders = $http.get('/orders/allTime/').then(function(res) {
-				var allTimeOrderData = res.data;
+			var allReservations = $http.get('/reservations/allTime/').then(function(res) {
+				var allTimeReservationData = res.data;
 
-				var allTimeBevs = 0;
-				var allTimeBevsNet = 0;
 				var allTimeGrossRevenue = 0;
 				var allTimeNetRevenue = 0;
-				var allTimeOrders = 0;
+				var allTimeReservations = 0;
 				var allTimePromos = 0;
 				var allTimePromosDisc = 0;
 
-				allTimeOrderData.forEach(function(order) {
-					var ccTotal = 0;
-					var bevNet = 0;
-					if(order.orderStatus > 4) {
-						allTimeOrders ++;
-						allTimeGrossRevenue += parseFloat(order.total);
-						if(order.discount) {
-							if(order.paymentMethods != 'cash') {
-								var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-								var ccCharge = extraCCCharge;
-								ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-							}
-							if(order.bevThings && order.bevThings.length > 0) {
-								order.bevThings.forEach(function(bevThing) {
-									allTimeBevs += bevThing.quantity;
-									var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-									allTimeBevsNet += parseFloat(thisBevThingEffect);
-									bevNet += parseFloat(thisBevThingEffect);
-								});
-							}
-							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal) + parseFloat(bevNet));
-							allTimePromos ++;
-							allTimePromosDisc += parseFloat(order.discount);
-						} else {
-							if(order.paymentMethods != 'cash') {
-								var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-								var ccCharge = extraCCCharge;
-								ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-							}
-							if(order.bevThings && order.bevThings.length > 0) {
-								order.bevThings.forEach(function(bevThing) {
-									allTimeBevs += bevThing.quantity;
-									var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-									allTimeBevsNet += parseFloat(thisBevThingEffect);
-									bevNet += parseFloat(thisBevThingEffect);
-								});
-							}
-							allTimeNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal) + parseFloat(bevNet));
-						}
+				allTimeReservationData.forEach(function(reservation) {
+
+					allTimeReservations ++;
+					allTimeGrossRevenue += parseFloat(reservation.total);
+
+					var ccFee = (parseFloat(reservation.total) * ccPercent).toFixed(2);
+					var ccCharge = extraCCCharge;
+					var ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+
+					if(reservation.discount) {
+						allTimeNetRevenue += (parseFloat(reservation.total) - parseFloat(reservation.discount) - parseFloat(ccTotal));
+						allTimePromos ++;
+						allTimePromosDisc += parseFloat(reservation.discount);
+					} else {
+						allTimeNetRevenue += (parseFloat(reservation.total) - parseFloat(ccTotal));
 					}
 				});
-				$scope.allTimeBevs = allTimeBevs;
-				$scope.allTimeBevsNet = allTimeBevsNet.toFixed(2);
+
 				$scope.allTimeGrossRevenue = allTimeGrossRevenue.toFixed(2);
 				$scope.allTimeNetRevenue = allTimeNetRevenue.toFixed(2);
-				$scope.allTimeOrders = allTimeOrders;
+				$scope.allTimeReservations = allTimeReservations;
 				$scope.allTimePromos = allTimePromos;
 				$scope.allTimePromosDisc = allTimePromosDisc;
+
 			}).catch(function(err) {
-				console.log('orders-allTime err:');
+				console.log('reservations-allTime err:');
 				console.log(err);
 			});
 
-			$http.get('/orders/daily/').then(function(res) {
-				var dailyOrders = res.data;
+			$http.get('/reservations/daily/').then(function(res) {
+				var dailyReservations = res.data;
 
-				var dayBevs = 0;
-				var dayBevsNet = 0;
 				var dayGrossRevenue = 0;
 				var dayNetRevenue = 0;
-				var dayOrders = 0;
+				var dayReservations = 0;
 				var dayPromos = 0;
 				var dayPromosArr = [];
 				var dayPromosDisc = 0;
 
-				if(dailyOrders && dailyOrders.length > 0) {
-					dailyOrders.forEach(function(order) {
-						var ccTotal = 0;
-						var bevNet = 0;
-						if(order.orderStatus > 4) {
-							dayOrders ++;
-							dayGrossRevenue += parseFloat(order.total);
-							if(order.discount) {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										dayBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										dayBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal) + parseFloat(bevNet));
-								dayPromos ++;
-								dayPromosDisc = dayPromosDisc + parseFloat(order.discount);
-								if(dayPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-									dayPromosArr.push(order.promo.toLowerCase());
-								}
-							} else {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										dayBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										dayBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								dayNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal) + parseFloat(bevNet));
+				if(dailyReservations && dailyReservations.length > 0) {
+					dailyReservations.forEach(function(reservation) {
+
+						dayReservations ++;
+						dayGrossRevenue += parseFloat(reservation.total);
+
+						var ccFee = (parseFloat(reservation.total) * ccPercent).toFixed(2);
+						var ccCharge = extraCCCharge;
+						var ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+
+						if(reservation.discount) {
+							dayNetRevenue += (parseFloat(reservation.total) - parseFloat(reservation.discount) - parseFloat(ccTotal));
+							dayPromos ++;
+							dayPromosDisc = dayPromosDisc + parseFloat(reservation.discount);
+							if(dayPromosArr.indexOf(reservation.promo.toLowerCase()) < 0) {
+								dayPromosArr.push(reservation.promo.toLowerCase());
 							}
+						} else {
+							dayNetRevenue += (parseFloat(reservation.total) - parseFloat(ccTotal));
 						}
 					});
 				}
-				$scope.dayBevs = dayBevs;
-				$scope.dayBevsNet = dayBevsNet.toFixed(2);
+
 				$scope.dayGrossRevenue = dayGrossRevenue.toFixed(2);
 				$scope.dayNetRevenue = dayNetRevenue.toFixed(2);
-				$scope.dayOrders = dayOrders;
+				$scope.dayReservations = dayReservations;
 				$scope.dayPromos = dayPromos;
 				$scope.dayPromosArr = dayPromosArr;
 				$scope.dayPromosDisc = dayPromosDisc.toFixed(2);
+
 			}).catch(function(err) {
-				console.log('orders-daily err:');
+				console.log('reservations-daily err:');
 				console.log(err);
 			});
 	
-			$http.get('/orders/weekly/').then(function(res) {
-				var weekOrders = res.data;
+			$http.get('/reservations/weekly/').then(function(res) {
+				var weekReservations = res.data;
 
 				var weekGrossRevenue = 0;
 				var weekNetRevenue = 0;
-				var weeklyBevs = 0;
-				var weeklyBevsNet = 0;
-				var weeklyOrders = 0;
+				var weeklyReservations = 0;
 				var weeklyPromos = 0;
 				var weeklyPromosArr = [];
 				var weeklyPromosDisc = 0;
 
-				if(weekOrders && weekOrders.length > 0) {
-					weekOrders.forEach(function(order) {
-						var ccTotal = 0;
-						var bevNet = 0;
-						if(order.orderStatus > 4) {
-							weeklyOrders ++;
-							weekGrossRevenue += parseFloat(order.total);
-							if(order.discount) {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										weeklyBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										weeklyBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal) + parseFloat(bevNet));
-								weeklyPromos ++;
-								weeklyPromosDisc = weeklyPromosDisc + parseFloat(order.discount);
-								if(weeklyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-									weeklyPromosArr.push(order.promo.toLowerCase());
-								}
-							} else {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										weeklyBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										weeklyBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								weekNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal) + parseFloat(bevNet));
+				if(weekReservations && weekReservations.length > 0) {
+					weekReservations.forEach(function(reservation) {
+
+						weeklyReservations ++;
+						weekGrossRevenue += parseFloat(reservation.total);
+
+						var ccFee = (parseFloat(reservation.total) * ccPercent).toFixed(2);
+						var ccCharge = extraCCCharge;
+						var ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+
+						if(reservation.discount) {
+							weekNetRevenue += (parseFloat(reservation.total) - parseFloat(reservation.discount) - parseFloat(ccTotal));
+							weeklyPromos ++;
+							weeklyPromosDisc = weeklyPromosDisc + parseFloat(reservation.discount);
+							if(weeklyPromosArr.indexOf(reservation.promo.toLowerCase()) < 0) {
+								weeklyPromosArr.push(reservation.promo.toLowerCase());
 							}
+						} else {
+							weekNetRevenue += (parseFloat(reservation.total) - parseFloat(ccTotal));
 						}
 					});
 				}
-				$scope.weekBevs = weeklyBevs;
-				$scope.weekBevsNet = weeklyBevsNet.toFixed(2);
+
 				$scope.weekGrossRevenue = weekGrossRevenue.toFixed(2);
 				$scope.weekNetRevenue = weekNetRevenue.toFixed(2);
-				$scope.weekOrders = weeklyOrders;
+				$scope.weekReservations = weeklyReservations;
 				$scope.weekPromos = weeklyPromos;
 				$scope.weekPromosArr = weeklyPromosArr;
 				$scope.weekPromosDisc = weeklyPromosDisc.toFixed(2);
+
 			}).catch(function(err) {
-				console.log('orders-weekly err:');
+				console.log('reservations-weekly err:');
 				console.log(err);
 			});
 	
-			$http.get('/orders/monthly/').then(function(res) {
-				var weeksOrders = res.data;
+			$http.get('/reservations/monthly/').then(function(res) {
+				var weeksReservations = res.data;
 
-				var weeksBevs = 0;
-				var weeksBevsNet = 0;
 				var weeksGrossRevenue = 0;
 				var weeksNetRevenue = 0;
-				var monthlyOrders = 0;
+				var monthlyReservations = 0;
 				var monthlyPromos = 0;
 				var monthlyPromosArr = [];
 				var monthlyPromosDisc = 0;
 
-				if(weeksOrders && weeksOrders.length > 0) {
-					weeksOrders.forEach(function(order) {
-						var ccTotal = 0;
-						var bevNet = 0;
-						if(order.orderStatus > 4) {
-							monthlyOrders ++;
-							weeksGrossRevenue += parseFloat(order.total);
-							if(order.discount) {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										weeksBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										weeksBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(order.discount) - parseFloat(ccTotal) + parseFloat(bevNet));
-								monthlyPromos ++;
-								monthlyPromosDisc = monthlyPromosDisc + parseFloat(order.discount);
-								if(monthlyPromosArr.indexOf(order.promo.toLowerCase()) < 0) {
-									monthlyPromosArr.push(order.promo.toLowerCase());
-								}
-							} else {
-								if(order.paymentMethods != 'cash') {
-									var ccFee = (parseFloat(order.total) * ccPercent).toFixed(2);
-									var ccCharge = extraCCCharge;
-									ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
-								}
-								if(order.bevThings && order.bevThings.length > 0) {
-									order.bevThings.forEach(function(bevThing) {
-										weeksBevs += bevThing.quantity;
-										var thisBevThingEffect = ((bevThing.price * bevThing.quantity) - (bevCost * bevThing.quantity)).toFixed(2);
-										weeksBevsNet += parseFloat(thisBevThingEffect);
-										bevNet += parseFloat(thisBevThingEffect);
-									});
-								}
-								weeksNetRevenue += (parseFloat(order.deliveryFee) - parseFloat(ccTotal) + parseFloat(bevNet));
-							}
+				weeksReservations.forEach(function(reservation) {
+							
+					monthlyReservations ++;
+					weeksGrossRevenue += parseFloat(reservation.total);
+
+					var ccFee = (parseFloat(reservation.total) * ccPercent).toFixed(2);
+					var ccCharge = extraCCCharge;
+					var ccTotal = parseFloat(ccFee) + parseFloat(ccCharge);
+
+					if(reservation.discount) {
+						weeksNetRevenue += (parseFloat(reservation.total) - parseFloat(reservation.discount) - parseFloat(ccTotal));
+						monthlyPromos ++;
+						monthlyPromosDisc = monthlyPromosDisc + parseFloat(reservation.discount);
+						if(monthlyPromosArr.indexOf(reservation.promo.toLowerCase()) < 0) {
+							monthlyPromosArr.push(reservation.promo.toLowerCase());
 						}
-					});
-				}
-				$scope.weeksBevs = weeksBevs;
-				$scope.weeksBevsNet = weeksBevsNet.toFixed(2);
+					} else {
+						weeksNetRevenue += (parseFloat(reservation.total) - parseFloat(ccTotal));
+					}
+				});
+
 				$scope.weeksGrossRevenue = weeksGrossRevenue.toFixed(2);
 				$scope.weeksNetRevenue = weeksNetRevenue.toFixed(2);
-				$scope.weeksOrders = monthlyOrders;
+				$scope.weeksReservations = monthlyReservations;
 				$scope.weeksPromos = monthlyPromos;
 				$scope.weeksPromosArr = monthlyPromosArr;
 				$scope.weeksPromosDisc = monthlyPromosDisc.toFixed(2);
+
 			}).catch(function(err) {
-				console.log('orders-monthly err:');
+				console.log('reservations-monthly err:');
 				console.log(err);
 			});
 	
@@ -1668,8 +1577,8 @@
 			});
 		}
 
-		$scope.phoneSearch = function() {
-			var p = $http.get('/customers/byPhone/' + $scope.phone);
+		$scope.emailSearch = function() {
+			var p = $http.get('/customers/byEmail/' + $scope.email);
 	
 			p.error(function(err) {
 				console.log('CustomersSearchController: customers-phone ajax failed');
@@ -1913,7 +1822,7 @@
 				availableOptions: res.data,
 			};
 		}).catch(function(err) {
-			console.log('EntitiesListController: entities ajax failed');
+			console.log('EntitiesAddController: leagues ajax failed');
 			console.log(err);
 		});
 
@@ -2422,8 +2331,11 @@
 		navMgr.protect(function() { return $scope.form.$dirty; });
 		pod.podize($scope);
 
-		$http.get('/leagues/').then(function(res) {
-			$scope.leagueCodes = res.data;
+		$http.get('/leagues').then(function(res) {
+			$scope.data = {
+				repeatSelect: null,
+				availableOptions: res.data,
+			};
 		}).catch(function(err) {
 			console.log('PoolsAddController: leagues ajax failed');
 			console.log(err);
@@ -2436,6 +2348,8 @@
 
 		$scope.save = function save(pool, options) {
 			options || (options = {});
+
+			pool.leagueCode = $scope.data.repeatSelect;
 
 			$http.post(
 				'/pools/create', pool
@@ -2464,13 +2378,6 @@
 		$scope, $http, $routeParams, $window, orderMgmt
 	) {
 
-		$http.get('/leagues/').then(function(res) {
-			$scope.leagueCodes = res.data;
-		}).catch(function(err) {
-			console.log('PoolsAddController: leagues ajax failed');
-			console.log(err);
-		});
-
 		$scope.poolId = $routeParams.id;
 
 		navMgr.protect(function() { return $scope.form.$dirty; });
@@ -2482,16 +2389,26 @@
 		$http.get(
 			'/pools/' + $routeParams.id
 		).success(function(data, status, headers, config) {
+			var oldLeagueCode = data.leagueCode;
 			$scope.pool = poolSchema.populateDefaults(data);
+
+			$http.get('/leagues').then(function(res) {
+				$scope.data = {
+//					repeatSelect: oldLeagueCode,  <-- debug
+					repeatSelect: null,
+					availableOptions: res.data,
+				};
+			}).catch(function(err) {
+				console.log('EntitiesListController: entities ajax failed');
+				console.log(err);
+			});
+
 		});
 
 		$scope.save = function save(pool, options) {
 			options || (options = {});
 
-			pool.leagueCode = pool.leagueCode.code;
-
-			console.log('pool:');
-			console.log(pool);
+			pool.leagueCode = $scope.data.repeatSelect;
 
 			$http.put(
 				'/pools/' + pool.id, pool
@@ -2515,17 +2432,19 @@
 
 		$http.get('/pools/' +poolId).then(function(res) {
 			$scope.pool = res.data;
-			var eligibleEntities = res.data.eligibleEntities;
-			eligibleEntities.forEach(function(entity) {
-				$http.get('/entities/' +entity.entityId).then(function(res) {
-					entity.entityName = res.data.name;
-				}).catch(function(err) {
-					console.log('PoolsEntitiesListController: entity ajax failed');
-					console.log(err);
+			if(res.data.eligibleEntities) {
+				var eligibleEntities = res.data.eligibleEntities;
+				eligibleEntities.forEach(function(entity) {
+					$http.get('/entities/' +entity.entityId).then(function(res) {
+						entity.entityName = res.data.name;
+					}).catch(function(err) {
+						console.log('PoolsEntitiesListController: entity ajax failed');
+						console.log(err);
+					});
+					entity.expectedOdds = (entity.expectedOdds / 100).toFixed(2) + '%';
 				});
-				entity.expectedOdds = (entity.expectedOdds / 100).toFixed(2) + '%';
-			});
-			$scope.eligibleEntities = eligibleEntities;
+				$scope.eligibleEntities = eligibleEntities;
+			}
 		}).catch(function(err) {
 			console.log('PoolsListController: pools ajax failed');
 			console.log(err);

@@ -22,12 +22,14 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="leagueCode" class="col-md-3 control-label"> League: </label><br>
+			<label for="repeatSelect" class="col-md-3 control-label">League Code*</label>
 			<div class="col-md-9">
-				<select name="leagueCode" ng-model="pool.leagueCode" class="form-control" ng-options="leagueCode.code for leagueCode in leagueCodes">
-				</select><br>
+				<select name="repeatSelect" id="repeatSelect" ng-model="data.repeatSelect">
+					<option ng-repeat="option in data.availableOptions" value="{{option.name}}">{{option.name}}</option>
+				</select>
 			</div>
 		</div>
+		<br/>
 		<div class="navbar navbar-default navbar-fixed-bottom">
 			<div class="container-fluid">
 				<button

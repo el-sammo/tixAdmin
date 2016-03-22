@@ -17,12 +17,18 @@
 				<h3>Pool</h3>
 			</td>
 			<td>
+				<h3>League</h3>
+			</td>
+			<td>
 				<h3>Entities</h3>
 			</td>
 		</tr>
 		<tr ng-init="poolId = pool.id" ng-repeat="pool in pools">
 			<td>
 				<span><a href="#/pools/edit/{{poolId}}">{{pool.name}}</a></span>
+			</td>
+			<td>
+				<span><a href="#/pools/edit/{{poolId}}">{{pool.leagueCode}}</a></span>
 			</td>
 			<td>
 				<span><a href="#/pools/entities/{{poolId}}">View Entities</a></span>

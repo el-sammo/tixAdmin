@@ -17,6 +17,9 @@
 			<span class="leftNavLink" ng-show="authLevel > 4"><a href="#/reports/advanced">Reports</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/add">User Add</a><br/></span>
 			<span class="leftNavLink" ng-show="authLevel > 2"><a href="#/users/search">User Search</a><br/></span>
+			<br/>
+			<br/>
+			<span class="leftNavLink" ng-show="authLevel > 2" ng-click="logout()">Log Out<br/></span>
 		</div>
 		<div class="col-md-9">
 			<div class="row">
@@ -39,19 +42,19 @@
 			<br/>
 			<div class="row">
 				<div class="col-md-2">
-					Completed Orders
+					Reservations
 				</div>
 				<div class="col-md-2">
-					<span class="modalLink" ng-click="dailyOrders()">{{dayOrders}}</span>
+					<span class="modalLink" ng-click="dailyReservations()">{{dayReservations}}</span>
 				</div>
 				<div class="col-md-2">
-					<span class="modalLink" ng-click="weeklyOrders()">{{weekOrders}}</span>
+					<span class="modalLink" ng-click="weeklyReservations()">{{weekReservations}}</span>
 				</div>
 				<div class="col-md-2">
-					<span class="modalLink" ng-click="monthlyOrders()">{{weeksOrders}}</span>
+					<span class="modalLink" ng-click="monthlyReservations()">{{weeksReservations}}</span>
 				</div>
 				<div class="col-md-2">
-					<span class="modalLink" ng-click="allTimeOrders()">{{allTimeOrders}}</span>
+					<span class="modalLink" ng-click="allTimeReservations()">{{allTimeReservations}}</span>
 				</div>
 			</div>
 			<br/>

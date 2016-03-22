@@ -1,0 +1,32 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="nav-away-modal-title">
+		This Week's Reservations
+  </h3>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-6">
+					Reservations
+				</div>
+				<div class="col-md-6">
+					{{weekReservations}}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					Reservations Net
+				</div>
+				<div class="col-md-6">
+					{{weekNetRevenue}}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary pull-left" ng-click="$close('discard')">
+    <i class="fa fa-reply"></i> &nbsp; OK
+  </button>
+</div>

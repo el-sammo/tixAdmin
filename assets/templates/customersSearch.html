@@ -1,22 +1,22 @@
 <div class="col-md-12" ng-controller="CustomersSearchController">
 	<div class="row" id="searchHead">
 		<div class="col-md-2">
-			Search by Phone:
+			Search by Email:
 		</div>
 		<div class="col-md-2">
-			<input type="text" placeholder="1234567890" id="phone" ng-change="phoneSearch()" ng-model="phone">
+			<input type="text" placeholder="" id="email" ng-change="emailSearch()" ng-model="email">
 		</div>
 		<div class="col-md-2">
 			Search by First Name:
 		</div>
 		<div class="col-md-2">
-			<input type="text" placeholder="John" id="fName" ng-change="fNameSearch()" ng-model="fName">
+			<input type="text" placeholder="" id="fName" ng-change="fNameSearch()" ng-model="fName">
 		</div>
 		<div class="col-md-2">
 			Search by Last Name:
 		</div>
 		<div class="col-md-2">
-			<input type="text" placeholder="Smith" id="lName" ng-change="lNameSearch()" ng-model="lName">
+			<input type="text" placeholder="" id="lName" ng-change="lNameSearch()" ng-model="lName">
 		</div>
 	</div>
 	<div class="row" id="searchResultsHead">
@@ -27,7 +27,7 @@
 			<h5>Last Name</h5>
 		</div>
 		<div class="col-md-3">
-			<h5>Address</h5>
+			<h5>Email</h5>
 		</div>
 		<div class="col-md-3">
 			<h5>Phone</h5>
@@ -41,7 +41,7 @@
 			<a href="#/customers/edit/{{customer.id}}" style="text-decoration: none;">{{customer.lName}}</a>
 		</div>
 		<div class="col-md-3">
-			<a href="#/customers/edit/{{customer.id}}" style="text-decoration: none;">{{customer.addresses.primary.streetNumber}} {{customer.addresses.primary.streetName}}</a>
+			<a href="#/customers/edit/{{customer.id}}" style="text-decoration: none;">{{customer.email}}</a>
 		</div>
 		<div class="col-md-3">
 			<a href="#/customers/edit/{{customer.id}}" style="text-decoration: none;">{{customer.phone}}</a>

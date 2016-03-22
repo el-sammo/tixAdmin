@@ -58,6 +58,16 @@ module.exports = {
 		});
 	},
 	
+	byEmail: function(req, res) {
+		Customers.find({email: {contains: req.params.id}}).sort({fName: 'asc', lName: 'asc'}).limit(30).then(function(results) {
+			res.send(JSON.stringify(results));
+		}).catch(function(err) {
+      res.json({error: 'Server error'}, 500);
+      console.error(err);
+      throw err;
+		});
+	},
+	
 	allTime: function(req, res) {
 		Customers.find({areaId: req.params.id}).sort({createdAt: 'asc'}).then(function(results) {
 			res.send(JSON.stringify(results));

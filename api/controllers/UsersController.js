@@ -100,7 +100,14 @@ module.exports = {
     }
 
     res.view({layout: layout}, view);
+  }, 
+
+  logout: function(req, res) {
+    req.session.isAuthenticated = false;
+    req.session.userId = null;
+    return res.send(JSON.stringify({success: true}));
   }
+
 };
 
 function processLogin(req, res, self) {
